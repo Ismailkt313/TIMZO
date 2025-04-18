@@ -1,0 +1,165 @@
+
+    <%- include('../../views/Partials/user/navbar') %>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="container">
+            <h1>NEW YEAR, <br>BIG SALE</h1>
+            <p>DISCOUNT UP TO 50%</p>
+            <button class="shop-btn">SHOP NOW</button>
+        </div>
+    </section>
+
+    <!-- New Arrivals Section -->
+    <section class="container">
+        <h2 class="section-title">New Arrivals</h2>
+        <div class="row">
+            <% newArrivals.forEach(product => { %>
+                <div class="col-6 col-md-3">
+                    <div class="card product-card">
+                        <img src="<%= product.image %>" class="card-img-top" alt="<%= product.title %>">
+                        <div class="card-body">
+                            <h5 class="product-title"><%= product.title %></h5>
+                            <div class="rating">
+                                <% for(let i = 0; i < product.rating; i++) { %>
+                                    <i class="fas fa-star"></i>
+                                <% } %>
+                                <% for(let i = product.rating; i < 5; i++) { %>
+                                    <i class="far fa-star"></i>
+                                <% } %>
+                            </div>
+                            <p class="product-price">$<%= product.price.toFixed(2) %></p>
+                        </div>
+                    </div>
+                </div>
+            <% }); %>
+        </div>
+    </section>
+
+    <!-- Sale Banner -->
+    <section class="sale-banner">
+        <div class="container">
+            <h2>SALE</h2>
+            <p>GRAB IT FAST</p>
+        </div>
+    </section>
+
+    <!-- Trending Section -->
+    <section class="container">
+        <h2 class="section-title">Trending</h2>
+        <div class="row">
+            <% trendingProducts.forEach(product => { %>
+                <div class="col-6 col-md-4">
+                    <div class="card product-card">
+                        <img src="<%= product.image %>" class="card-img-top" alt="<%= product.title %>">
+                        <div class="card-body">
+                            <h5 class="product-title"><%= product.title %></h5>
+                            <div class="rating">
+                                <% for(let i = 0; i < product.rating; i++) { %>
+                                    <i class="fas fa-star"></i>
+                                <% } %>
+                                <% for(let i = product.rating; i < 5; i++) { %>
+                                    <i class="far fa-star"></i>
+                                <% } %>
+                            </div>
+                            <p class="product-price">$<%= product.price.toFixed(2) %></p>
+                        </div>
+                    </div>
+                </div>
+            <% }); %>
+        </div>
+    </section>
+
+    <!-- Explore More Section -->
+    <section class="container mb-5">
+        <h2 class="section-title">Explore More</h2>
+        <div class="row">
+            <% exploreProducts.forEach(product => { %>
+                <div class="col-6 col-md-3">
+                    <div class="card product-card">
+                        <img src="<%= product.image %>" class="card-img-top" alt="<%= product.title %>">
+                        <div class="card-body">
+                            <h5 class="product-title"><%= product.title %></h5>
+                            <div class="rating">
+                                <% for(let i = 0; i < product.rating; i++) { %>
+                                    <i class="fas fa-star"></i>
+                                <% } %>
+                                <% for(let i = product.rating; i < 5; i++) { %>
+                                    <i class="far fa-star"></i>
+                                <% } %>
+                            </div>
+                            <p class="product-price">$<%= product.price.toFixed(2) %></p>
+                        </div>
+                    </div>
+                </div>
+            <% }); %>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="container-fluid bg-light py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="fas fa-truck"></i>
+                        </div>
+                        <h5>FREE SHIPPING</h5>
+                        <p>On all orders over $99</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <h5>HIGH QUALITY</h5>
+                        <p>2-year warranty included</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="fas fa-exchange-alt"></i>
+                        </div>
+                        <h5>EASY RETURNS</h5>
+                        <p>30-day money back guarantee</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="fas fa-headset"></i>
+                        </div>
+                        <h5>24/7 SUPPORT</h5>
+                        <p>Dedicated customer service</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <%- include('../../views/Partials/user/footer') %>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Optional JavaScript for enhancing functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add smooth scrolling for links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+            });
+            
+            // Initialize any Bootstrap tooltips
+            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            const tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+        });
+    </script>
