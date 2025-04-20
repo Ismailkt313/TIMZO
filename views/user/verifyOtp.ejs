@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Verify OTP - Timzo</title>
+  <!-- Add in your HTML head or before </body> -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <style>
+    body {
+      background: linear-gradient(to right, #1c92d2, #f2fcfe);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .otp-container {
+      background: white;
+      padding: 40px;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      text-align: center;
+      animation: slideUp 1s ease;
+    }
+
+    @keyframes slideUp {
+      from {
+        transform: translateY(50px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    h2 {
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    input[type="text"] {
+      padding: 10px;
+      width: 200px;
+      font-size: 18px;
+      border: 2px solid #ccc;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+
+    button {
+      padding: 10px 20px;
+      background-color: #1c92d2;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      margin-top: 10px;
+    }
+
+    .timer {
+      margin: 10px 0;
+      font-weight: bold;
+      color: #ff4500;
+    }
+
+    .error {
+      color: red;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="otp-container">
+    <h2>Verify OTP</h2>
+
+    <% if (error) { %>
+      <p class="error"><%= error %></p>
+    <% } %>
+
+    <form action="/user/verify-otp" method="POST">
+      <input type="text" id="otp" name="otp" placeholder="Enter OTP" required />
+      <br />
+      <button type="submit">Verify OTP</button>
+    </form>
+
+    <div class="timer" id="timer">01:00</div>
+
+      <button type="submit" onclick="resendOTP()">Resend OTP</button>
+    
+  </div>
+
+  <script>
+    let timer = 60;
+    let countdown; // <-- to store the interval globally
+    const timerDisplay = document.getElementById("timer");
+  
+    function startTimer() {
+      clearInterval(countdown); // prevent multiple intervals
+      timer = 60;
+      timerDisplay.textContent = "01:00";
+  
+      countdown = setInterval(() => {
+        if (timer <= 0) {
+          clearInterval(countdown);
+          timerDisplay.textContent = "OTP expired? Try resending.";
+          return;
+        }
+  
+        timer--;
+        let minutes = Math.floor(timer / 60);
+        let seconds = timer % 60;
+        timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+      }, 1000);
+    }
+  
+    startTimer(); // Start when page loads
+  
+    function resendOTP() {
+      fetch("/user/resend-otp", {
+        method: "POST"
+      })
+      .then(res => res.json())
+      .then(response => {
+        if (response.success) {
+          Swal.fire({
+            icon: "success",
+            title: "OTP resent successfully!",
+            timer: 1500,
+            showConfirmButton: false
+          });
+          startTimer(); // Restart the timer properly
+        } else {
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: response.error || "Something went wrong."
+          });
+        }
+      })
+      .catch(error => {
+        Swal.fire({
+          icon: "error",
+          title: "Network Error",
+          text: "Please try again later."
+        });
+      });
+    }
+  </script>
+  
+  
+
+</body>
+</html>

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Home - Timzo</title>
+  <link rel="stylesheet" href="/css/style.css" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background-color: #f8f8f8;
+    }
+
+    header {
+      background-color: #000;
+      padding: 15px 20px;
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    nav a {
+      color: white;
+      margin-left: 20px;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .hero {
+      background: url('https://images.unsplash.com/photo-1519648023493-d82b5f8d7da1') no-repeat center center/cover;
+      height: 80vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      text-align: center;
+    }
+
+    .hero h1 {
+      font-size: 48px;
+      background-color: rgba(0, 0, 0, 0.5);
+      padding: 20px;
+      border-radius: 10px;
+    }
+
+    .features {
+      padding: 40px 20px;
+      text-align: center;
+    }
+
+    .features h2 {
+      margin-bottom: 30px;
+      font-size: 32px;
+    }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 30px;
+    }
+
+    .feature {
+      background-color: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    footer {
+      background-color: #000;
+      color: white;
+      text-align: center;
+      padding: 20px;
+      margin-top: 40px;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo">Timzo</div>
+    <nav>
+      <a href="/">Home</a>
+      <a href="/shop">Shop</a>
+      <a href="/login">Login</a>
+      <a href="/signup">Sign Up</a>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <h1>Discover Stylish Watches at Timzo</h1>
+  </section>
+
+  <section class="features">
+    <h2>Why Choose Timzo?</h2>
+    <div class="feature-grid">
+      <div class="feature">
+        <h3>Elegant Designs</h3>
+        <p>Explore our curated collection of premium and trendy watches.</p>
+      </div>
+      <div class="feature">
+        <h3>Fast Delivery</h3>
+        <p>We make sure your order reaches you as quickly as possible.</p>
+      </div>
+      <div class="feature">
+        <h3>Secure Payments</h3>
+        <p>Enjoy safe and seamless transactions on every order.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    &copy; <%= new Date().getFullYear() %> Timzo. All rights reserved.
+  </footer>
+
+</body>
+</html>

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign Up - Timzo</title>
+  <link rel="stylesheet" href="/css/style.css" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f2f2f2;
+    }
+    .signup-container {
+      max-width: 400px;
+      margin: 50px auto;
+      background: #fff;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    input[type="tel"] {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      background: #000;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    button:hover {
+      background: #333;
+    }
+    .error {
+      color: red;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+    .login-link {
+      text-align: center;
+      margin-top: 15px;
+    }
+    .google-btn {
+      display: inline-block;
+      background: #4285F4;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 5px;
+      font-weight: bold;
+      text-decoration: none;
+    }
+    .google-btn img {
+      vertical-align: middle;
+      margin-right: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="signup-container">
+    <h2>Sign Up</h2>
+
+    <% if (error) { %>
+      <p class="error"><%= error %></p>
+    <% } %>
+
+    <form action="/sign-up" method="POST">
+      <input type="text" id="name" name="fullname" placeholder="Full Name"  /> 
+      <input type="email" id="email" name="email" placeholder="Email"  />
+      <input type="tel" id="mobile" name="mobile" placeholder="Mobile Number"  />
+      <input type="password" id="password" name="password" placeholder="Password"  />
+      <input type="password" id="confirmPassword" name="conformPassword" placeholder="Conform Password"  />
+      <button type="submit">Create Account</button>
+    </form>
+
+    <div style="text-align: center; margin-top: 20px;">
+      <p>or</p>
+      <a href="/auth/google" class="google-btn">
+        <img src="https://img.icons8.com/color/16/000000/google-logo.png" />
+        Sign up with Google
+      </a>
+    </div>
+
+    <div class="login-link">
+      Already have an account? <a href="/login">Login here</a>
+    </div>
+  </div>
+</body>
+</html>
