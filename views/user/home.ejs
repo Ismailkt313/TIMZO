@@ -1,124 +1,165 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Home - Timzo</title>
-  <link rel="stylesheet" href="/css/style.css" />
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      background-color: #f8f8f8;
-    }
 
-    header {
-      background-color: #000;
-      padding: 15px 20px;
-      color: white;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
+<%- include('../../views/Partials/user/navbar') %>
 
-    .logo {
-      font-size: 24px;
-      font-weight: bold;
-    }
-
-    nav a {
-      color: white;
-      margin-left: 20px;
-      text-decoration: none;
-      font-weight: 500;
-    }
-
-    .hero {
-      background: url('https://images.unsplash.com/photo-1519648023493-d82b5f8d7da1') no-repeat center center/cover;
-      height: 80vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      text-align: center;
-    }
-
-    .hero h1 {
-      font-size: 48px;
-      background-color: rgba(0, 0, 0, 0.5);
-      padding: 20px;
-      border-radius: 10px;
-    }
-
-    .features {
-      padding: 40px 20px;
-      text-align: center;
-    }
-
-    .features h2 {
-      margin-bottom: 30px;
-      font-size: 32px;
-    }
-
-    .feature-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 30px;
-    }
-
-    .feature {
-      background-color: white;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    }
-
-    footer {
-      background-color: #000;
-      color: white;
-      text-align: center;
-      padding: 20px;
-      margin-top: 40px;
-    }
-  </style>
-</head>
-<body>
-
-  <header>
-    <div class="logo">Timzo</div>
-    <nav>
-      <a href="/">Home</a>
-      <a href="/shop">Shop</a>
-      <a href="/login">Login</a>
-      <a href="/signup">Sign Up</a>
-    </nav>
-  </header>
-
-  <section class="hero">
-    <h1>Discover Stylish Watches at Timzo</h1>
-  </section>
-
-  <section class="features">
-    <h2>Why Choose Timzo?</h2>
-    <div class="feature-grid">
-      <div class="feature">
-        <h3>Elegant Designs</h3>
-        <p>Explore our curated collection of premium and trendy watches.</p>
-      </div>
-      <div class="feature">
-        <h3>Fast Delivery</h3>
-        <p>We make sure your order reaches you as quickly as possible.</p>
-      </div>
-      <div class="feature">
-        <h3>Secure Payments</h3>
-        <p>Enjoy safe and seamless transactions on every order.</p>
-      </div>
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <h1>NEW YEAR, <br>BIG SALE</h1>
+        <p>DISCOUNT UP TO 50%</p>
+        <button class="shop-btn">SHOP NOW</button>
     </div>
-  </section>
+</section>
 
-  <footer>
-    &copy; <%= new Date().getFullYear() %> Timzo. All rights reserved.
-  </footer>
+<!-- New Arrivals Section -->
+<section class="container">
+    <h2 class="section-title">New Arrivals</h2>
+    <div class="row">
+        <% newArrivals.forEach(product => { %>
+            <div class="col-6 col-md-3">
+                <div class="card product-card">
+                    <img src="<%= product.image %>" class="card-img-top" alt="<%= product.title %>">
+                    <div class="card-body">
+                        <h5 class="product-title"><%= product.title %></h5>
+                        <div class="rating">
+                            <% for(let i = 0; i < product.rating; i++) { %>
+                                <i class="fas fa-star"></i>
+                            <% } %>
+                            <% for(let i = product.rating; i < 5; i++) { %>
+                                <i class="far fa-star"></i>
+                            <% } %>
+                        </div>
+                        <p class="product-price">$<%= product.price.toFixed(2) %></p>
+                    </div>
+                </div>
+            </div>
+        <% }); %>
+    </div>
+</section>
 
-</body>
-</html>
+<!-- Sale Banner -->
+<section class="sale-banner">
+    <div class="container">
+        <h2>SALE</h2>
+        <p>GRAB IT FAST</p>
+    </div>
+</section>
+
+<!-- Trending Section -->
+<section class="container">
+    <h2 class="section-title">Trending</h2>
+    <div class="row">
+        <% trendingProducts.forEach(product => { %>
+            <div class="col-6 col-md-4">
+                <div class="card product-card">
+                    <img src="<%= product.image %>" class="card-img-top" alt="<%= product.title %>">
+                    <div class="card-body">
+                        <h5 class="product-title"><%= product.title %></h5>
+                        <div class="rating">
+                            <% for(let i = 0; i < product.rating; i++) { %>
+                                <i class="fas fa-star"></i>
+                            <% } %>
+                            <% for(let i = product.rating; i < 5; i++) { %>
+                                <i class="far fa-star"></i>
+                            <% } %>
+                        </div>
+                        <p class="product-price">$<%= product.price.toFixed(2) %></p>
+                    </div>
+                </div>
+            </div>
+        <% }); %>
+    </div>
+</section>
+
+<!-- Explore More Section -->
+<section class="container mb-5">
+    <h2 class="section-title">Explore More</h2>
+    <div class="row">
+        <% exploreProducts.forEach(product => { %>
+            <div class="col-6 col-md-3">
+                <div class="card product-card">
+                    <img src="<%= product.image %>" class="card-img-top" alt="<%= product.title %>">
+                    <div class="card-body">
+                        <h5 class="product-title"><%= product.title %></h5>
+                        <div class="rating">
+                            <% for(let i = 0; i < product.rating; i++) { %>
+                                <i class="fas fa-star"></i>
+                            <% } %>
+                            <% for(let i = product.rating; i < 5; i++) { %>
+                                <i class="far fa-star"></i>
+                            <% } %>
+                        </div>
+                        <p class="product-price">$<%= product.price.toFixed(2) %></p>
+                    </div>
+                </div>
+            </div>
+        <% }); %>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="container-fluid bg-light py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-3">
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-truck"></i>
+                    </div>
+                    <h5>FREE SHIPPING</h5>
+                    <p>On all orders over $99</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h5>HIGH QUALITY</h5>
+                    <p>2-year warranty included</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-exchange-alt"></i>
+                    </div>
+                    <h5>EASY RETURNS</h5>
+                    <p>30-day money back guarantee</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-headset"></i>
+                    </div>
+                    <h5>24/7 SUPPORT</h5>
+                    <p>Dedicated customer service</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<%- include('../../views/Partials/user/footer') %>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Optional JavaScript for enhancing functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add smooth scrolling for links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+        
+        // Initialize any Bootstrap tooltips
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        const tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+    });
+</script>

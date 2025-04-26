@@ -9,13 +9,13 @@ const userSchema = new Schema({
   email: {
     type: String,
     required: true,
-    unique: true,
-  },
-  mobile: {
-    type: Number,
-    required: false,
-    unique: true,
-    default: null,
+    unique: true, 
+  }, 
+  mobile: {  
+    type: Number, 
+    required: false, 
+    unique: false,
+    default: null, 
     sparse:true,
   },
   password: {
@@ -35,7 +35,7 @@ const userSchema = new Schema({
   isBlocked: {
     type: Boolean,
     default: false,
-  },
+  },  
   isAdmin: {
     type: Boolean,
     default: false,
@@ -43,3 +43,4 @@ const userSchema = new Schema({
 }, { timestamps: true })
 
 module.exports = mongoose.model('User', userSchema)
+  

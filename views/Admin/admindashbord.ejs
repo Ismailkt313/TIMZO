@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Timzo Admin - Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="bg-gray-100 min-h-screen flex flex-col">
+
+    <!-- Navbar -->
+    <%- include('.././Partials/admin/navbar') %>
+
+    <div class="flex flex-1">
+      <!-- Sidebar -->
+      <%- include('.././Partials/admin/adminsidebar', { activePage: 'dashboard' }) %>
+
+      
+      <!-- Main Content -->
+      <main class="flex-1 ml-64 p-6"> <!-- ml-64 because sidebar is 64 width -->
+        <h1 class="text-2xl font-semibold mb-6">Dashboard</h1>
+
+        <!-- Summary Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-6">
+          <div class="bg-white p-4 rounded-xl shadow-md">
+            <h2 class="text-lg font-bold text-gray-700">Total Customers</h2>
+            <p class="text-2xl font-semibold mt-2">1,234</p>
+          </div>
+          <div class="bg-white p-4 rounded-xl shadow-md">
+            <h2 class="text-lg font-bold text-gray-700">Total Orders</h2>
+            <p class="text-2xl font-semibold mt-2">567</p>
+          </div>
+          <div class="bg-white p-4 rounded-xl shadow-md">
+            <h2 class="text-lg font-bold text-gray-700">Total Sales</h2>
+            <p class="text-2xl font-semibold mt-2">$34,890</p>
+          </div>
+          <div class="bg-white p-4 rounded-xl shadow-md">
+            <h2 class="text-lg font-bold text-gray-700">Pending</h2>
+            <p class="text-2xl font-semibold mt-2">12</p>
+          </div>
+        </div>
+
+        <!-- Charts & Monthly Activity -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div class="bg-white p-6 rounded-xl shadow-md">
+            <h2 class="text-lg font-bold mb-4">Sales Progress</h2>
+            <div class="text-center">
+              <div class="relative w-32 h-32 mx-auto">
+                <svg class="absolute w-full h-full transform -rotate-90">
+                  <circle cx="50%" cy="50%" r="45" stroke="#f3f4f6" stroke-width="10" fill="none" />
+                  <circle cx="50%" cy="50%" r="45" stroke="#3b82f6" stroke-width="10" fill="none" stroke-dasharray="282.74" stroke-dashoffset="85" />
+                </svg>
+                <div class="absolute inset-0 flex items-center justify-center text-xl font-bold">70%</div>
+              </div>
+              <div class="mt-4 text-sm">
+                <p>Revenue: $28,000</p>
+                <p>Target: $40,000</p>
+                <p>Today: $1,500</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-white p-6 rounded-xl shadow-md">
+            <h2 class="text-lg font-bold mb-4">Monthly Activity</h2>
+            <div class="grid grid-cols-12 gap-2 h-36">
+              <% const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun"]; 
+                 const heights = [20, 40, 60, 80, 50, 70]; 
+              %>
+              <% months.forEach((month, index) => { %>
+                <div class="flex flex-col items-center justify-end">
+                  <div class="bg-blue-400 w-6 rounded-md" style="height:<%= heights[index] %>px"></div>
+                  <span class="text-sm mt-1"><%= month %></span>
+                </div>
+              <% }) %>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- Footer -->
+    <%- include('.././Partials/admin/footer') %>
+
+  </body>
+</html>

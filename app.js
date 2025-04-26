@@ -6,7 +6,8 @@ const passport = require('./Config/passport')
 const dotenv = require("dotenv")
 dotenv.config()
 const db = require ("./Config/db")
-const userRouter = require('./Routes/userRouter')
+const adminrouter = require('./Routes/adminRoute/adminRouter')
+const userRouter = require('./Routes/userRoute/userRouter')
 const PORT = process.env.PORT || 3000;
 
 db()
@@ -24,9 +25,9 @@ app.use(session({
     saveUninitialized:true,
     cookie:{
         secure:false,
-        httpOnly:true,
+        httpOnly:true, 
         maxAge:72*60*60*1000
-    }
+    } 
 }))  
 
 app.use(passport.initialize());
@@ -37,12 +38,13 @@ app.use(express.static(path.join(__dirname, 'public')))
 
    
 app.use('/',userRouter) 
-app.use('/user',userRouter)
-   
+app.use('/user',userRouter) 
+app.use('/admin',adminrouter)
+    
 app.listen(PORT, ()=>{
     console.log(`server runnning as on :  http://localhost:${PORT}/`);
-    
+     
 })
  
  
-module.exports = app   
+module.exports = app    

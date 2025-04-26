@@ -12,8 +12,7 @@
 
 </head>
 <body>
-
-<!-- partials/navbar.ejs -->
+<!-- partials/navbar.ejs - For logged-in users -->
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
     <div class="container">
         <a class="navbar-brand" href="/">TIMZO</a>
@@ -26,16 +25,28 @@
                     <a class="nav-link active" aria-current="page" href="/">Home</a>
                 </li>
                 <li class="nav-item">
+                    <a class="nav-link" href="/collections">Collections</a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link" href="/sale">Sale</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/login">login</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/sign-up">Sign up</a>
+                <li class="nav-item dropdown d-lg-none">
+                    <a class="nav-link dropdown-toggle" href="#" id="mobileAccountDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        My Account
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="mobileAccountDropdown">
+                        <li><a class="dropdown-item" href="/profile"><i class="fas fa-user me-2"></i>Profile</a></li>
+                        <li><a class="dropdown-item" href="/orders"><i class="fas fa-box me-2"></i>Orders</a></li>
+                        <li><a class="dropdown-item" href="/wishlist"><i class="fas fa-heart me-2"></i>Wishlist</a></li>
+                        <li><a class="dropdown-item" href="/settings"><i class="fas fa-cog me-2"></i>Settings</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item text-danger" href="/logout"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                    </ul>
                 </li>
             </ul>
-            <form class="d-flex me-2">
+            
+            <!-- Search form -->
+            <form class="d-flex me-2 mb-2 mb-lg-0">
                 <div class="input-group">
                     <input class="form-control" type="search" placeholder="Search watches..." aria-label="Search">
                     <button class="btn btn-outline-light" type="submit">
@@ -43,14 +54,101 @@
                     </button>
                 </div>
             </form>
+            
+            <!-- User action buttons -->
             <div class="d-flex align-items-center">
-                <a href="/cart" class="btn btn-link text-white position-relative">
-                    <i class="fas fa-shopping-cart"></i>
-                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                        0
-                    </span>
+                <!-- Notifications -->
+                <a href="/notifications" class="btn btn-link text-white position-relative me-2 d-none d-lg-block">
+                    <i class="fas fa-bell"></i>
+                    <% if (user && user.unreadNotifications > 0) { %>
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                            <%= user.unreadNotifications > 9 ? '9+' : user.unreadNotifications %>
+                        </span>
+                    <% } %>
                 </a>
+                
+                <!-- Wishlist -->
+                <a href="/wishlist" class="btn btn-link text-white position-relative me-2">
+                    <i class="fas fa-heart"></i>
+                    <% if (user && user.wishlistCount > 0) { %>
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                            <%= user.wishlistCount > 9 ? '9+' : user.wishlistCount %>
+                        </span>
+                    <% } %>
+                </a>
+                
+                <!-- Shopping Cart -->
+                <a href="/cart" class="btn btn-link text-white position-relative me-3">
+                    <i class="fas fa-shopping-cart"></i>
+                    <% if (user && user.cartCount > 0) { %>
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                            <%= user.cartCount > 9 ? '9+' : user.cartCount %>
+                        </span>
+                    <% } %>
+                </a>
+                
+                <!-- User profile dropdown - visible only on larger screens -->
+                <div class="dropdown d-none d-lg-block">
+                    <a class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <% if (user && user.profileImage) { %>
+                            <img src="<%= user.profileImage %>" alt="Profile" class="rounded-circle me-2" width="32" height="32">
+                        <% } else { %>
+                            <div class="user-avatar me-2">
+                                <%= user ? user.firstName.charAt(0) + user.lastName.charAt(0) : 'U' %>
+                            </div>
+                        <% } %>
+                        <span><%= user ? user.firstName : 'User' %></span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                        <li><a class="dropdown-item" href="/profile"><i class="fas fa-user me-2"></i>My Profile</a></li>
+                        <li><a class="dropdown-item" href="/orders"><i class="fas fa-box me-2"></i>My Orders</a></li>
+                        <li><a class="dropdown-item" href="/wishlist"><i class="fas fa-heart me-2"></i>Wishlist</a></li>
+                        <li><a class="dropdown-item" href="/settings"><i class="fas fa-cog me-2"></i>Settings</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item text-danger" href="/logout"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                    </ul>
+                </div>
             </div>
         </div>
     </div>
 </nav>
+
+<style>
+    .user-avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background-color: #495057;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+        font-size: 12px;
+    }
+    
+    .dropdown-item i {
+        width: 18px;
+        text-align: center;
+    }
+    
+    @media (max-width: 991px) {
+        .navbar-nav {
+            padding-bottom: 10px;
+        }
+        
+        .dropdown-menu {
+            border: none;
+            background-color: rgba(255,255,255,0.05);
+            margin-left: 1rem;
+        }
+        
+        .dropdown-item {
+            color: rgba(255,255,255,0.8);
+        }
+        
+        .dropdown-divider {
+            border-color: rgba(255,255,255,0.1);
+        }
+    }
+</style>
