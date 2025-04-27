@@ -3,24 +3,26 @@ const { Schema } = mongoose
 
 const categorySchema = new Schema({
     name:{
-        type:String
+        type:String,
+        required: true,
+
 },
     type: {
     type:String,
-    required: true,
     trim: true
 },
     icon: {
     type: String,
     default: 'tag' // example: Bootstrap icon name or custom tag
 },
-    offer: {
+    categoryOffer: {  
     type: Number,
     default: 0
-},
+  },
     description: {
     type: String,
-    trim: true
+    trim: true,
+    required: true,
 },
     sales: {
     type: Number,

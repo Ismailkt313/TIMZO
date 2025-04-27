@@ -26,7 +26,7 @@
         <div class="flex flex-col md:flex-row items-center gap-8">
           <!-- Profile Photo -->
           <div class="flex-shrink-0">
-            <img src="https://via.placeholder.com/150" alt="User Profile" class="rounded-full w-40 h-40 object-cover shadow-md">
+            <img src="/images/th (2).jpeg" alt="" class="rounded-full w-40 h-40 object-cover shadow-md">
           </div>
 
           <!-- User Info -->
@@ -35,7 +35,7 @@
 
               <div>
                 <h5 class="font-semibold text-gray-700">Name</h5>
-                <p class="text-gray-600"><%= user.name %></p>
+                <p class="text-gray-600"><%= user.fullname %></p>
               </div>
 
               <div>
@@ -45,7 +45,7 @@
 
               <div>
                 <h5 class="font-semibold text-gray-700">Phone Number</h5>
-                <p class="text-gray-600"><%= user.phone %></p>
+                <p class="text-gray-600"><%= user.mobile %></p>
               </div>
 
               <div>
@@ -64,11 +64,11 @@
             <div class="flex gap-4 mt-8">
               <a href="/admin/update-user/<%= user._id %>" class="btn btn-primary flex-1">Update Profile</a>
 
-              <% if (user.isBlocked) { %>
-                <a href="/admin/unblock-user/<%= user._id %>" class="btn btn-success flex-1">Unblock User</a>
-              <% } else { %>
-                <a href="/admin/block-user/<%= user._id %>" class="btn btn-danger flex-1">Block User</a>
-              <% } %>
+              <button 
+                        class="btn btn-sm toggle-status-btn <%= user.isBlocked ? 'btn-danger' : 'btn-success' %>" 
+                        data-user-id="<%= user._id %>">
+                        <%= user.isBlocked ? 'Blocked' : 'Active' %>
+                      </button>
             </div>
 
           </div>
@@ -83,3 +83,41 @@
 
 </body>
 </html>
+
+<script>
+  document.querySelectorAll('.toggle-status-btn').forEach(button => {
+    button.addEventListener('click', async function () {
+      const userId = this.dataset.userId;
+      const btn = this;
+
+      try {
+        const response = await fetch(`/admin/toggle-user-status/${userId}`, {
+          method: 'PATCH',
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          const statusCell = btn.closest('tr').querySelector('td:nth-child(4)');
+          
+          if (data.isBlocked) {
+            btn.classList.remove('btn-success');
+            btn.classList.add('btn-danger');
+            btn.textContent = 'Blocked';
+            statusCell.innerHTML = '<span class="text-danger">Blocked</span>';
+          } else {
+            btn.classList.remove('btn-danger');
+            btn.classList.add('btn-success');
+            btn.textContent = 'Active';
+            statusCell.innerHTML = '<span class="text-success">Active</span>';
+          }
+        } else {
+          alert('Failed to toggle status.');
+        }
+      } catch (error) {
+        console.error(error);
+        swal('Something went wrong!');
+      }
+    });
+  });
+</script>

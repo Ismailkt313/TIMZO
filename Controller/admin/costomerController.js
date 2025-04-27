@@ -48,11 +48,13 @@ const loadProfile = async (req,res)=>{
 const profile = async (req,res)=>{
     try {
         const userId =  req.params.id;
-        const { fullname, email, isBlocked } = req.body;
+        const { fullname, email, isBlocked,mobile ,address} = req.body;
 
         await customer.findByIdAndUpdate(userId, {
           fullname,
+          mobile,
           email,
+          address,
           isBlocked: isBlocked === 'true'
         });
         res.redirect(`/admin/userprofile/${userId}`);

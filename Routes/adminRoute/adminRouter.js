@@ -13,7 +13,11 @@ router.get('/userprofile/:id',costomerController.loadProfile)
 router.post('/updateuser/:id',costomerController.profile)
 router.patch('/toggle-user-status/:id',costomerController.block)
 router.get('/categories',categoyController.loadcategories)
-router.post('/addcategories',categoyController.addcategory)
+router.post('/addCategory',categoyController.addcategory)
 router.get('/addcategories',categoyController.loadaddcategory)
+router.post('/addCategoryOffer',categoyController.addcategoryOffer)
+router.post('/removeCategoryOfffer',categoyController.removecategoryoffer)
+router.get("/listcategory",categoyController.getlistcategory)
+router.get("/unlistcategory",categoyController.getunlistcategory)
 
 module.exports = router 

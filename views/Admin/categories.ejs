@@ -58,7 +58,7 @@
                   <td><%= category.stock %></td>
                   <td>
                     <% if (category.isListed) { %>
-                      <span class="text-success">Listed</span>
+                      <span class="text-success" >Listed</span>
                     <% } else { %>
                       <span class="text-danger">Unlisted</span>
                     <% } %>
@@ -67,13 +67,13 @@
                     <a href="/admin/categories/edit/<%= category._id %>" class="btn btn-sm btn-outline-warning" title="Edit">
                       <i class="bi bi-pencil-square"></i>
                     </a>
-
-                    <form action="/admin/categories/toggle/<%= category._id %>" method="POST" style="display:inline;">
-                      <button type="submit" class="btn btn-sm <%= category.isListed ? 'btn-danger' : 'btn-success' %>">
-                        <%= category.isListed ? 'Unlist' : 'List' %>
-                      </button>
-                    </form>
-
+                  
+                    <% if (category.isListed) { %>
+                      <a href="/admin/listcategory?id=<%= category._id %>" class="btn btn-danger btn-sm">Unlist</a>
+                    <% } else { %>
+                      <a href="/admin/unlistcategory?id=<%= category._id %>" class="btn btn-success btn-sm">List</a>
+                    <% } %>
+                  
                     <form action="/admin/categories/delete/<%= category._id %>" method="POST" style="display:inline;" onsubmit="return confirm('Are you sure to delete this category?')">
                       <button type="submit" class="btn btn-sm btn-outline-danger">
                         <i class="bi bi-trash"></i>

@@ -1,53 +1,74 @@
 const mongoose = require('mongoose');
-const { Schema } = mongoose;
 
-const productSchema = new Schema({
-  name: {
-    type: String,
-    required: true,
-    trim: true
-  },
-  brand: {
-    type: String,
-    trim: true
-  },
-  price: {
-    type: Number,
-    required: true
-  },
-  offerPrice: {
-    type: Number,
-    default: 0
-  },
-  description: {
-    type: String,
-    trim: true
-  },
-  images: {
-    type: [String], // Array of image URLs or filenames
-    required: true
-  },
-  category: {
-    type: Schema.Types.ObjectId,
-    ref: 'Category',
-    required: true
-  },
-  stock: {
-    type: Number,
-    default: 0
-  },
-  isListed: {
-    type: Boolean,
-    default: true
-  },
-  addedDate: {
-    type: Date,
-    default: Date.now
-  },
-  sales: {
-    type: Number,
-    default: 0
-  }
-});
+const productSchema = new mongoose.Schema({
+    name: {
+        type: String,
+        required: true,
+        trim: true
+    },
+    brand: {
+        type: String,
+        required: true,
+        trim: true
+    },
+    category: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Category',
+        required: true
+    },
+    description: {
+        type: String,
+        required: true,
+        trim: true
+    },
+    regularPrice: {
+        type: Number,
+        required: true,
+        min: 0
+    },
+    saleprice: {
+        type: Number,
+        min: 0
+    },
+    stock: {
+        type: Number,
+        required: true,
+        min: 0
+    },
+    color: {
+        type: [String], // example: ['Black', 'Silver', 'Rose Gold']
+        required: true
+    },
+    material: {
+        type: String,
+        required: true,
+        trim: true
+    },
+    waterResistance: {
+        type: String,
+        default: 'Not specified'
+    },
+    movementType: {
+        type: String,
+        enum: ['Quartz', 'Automatic', 'Mechanical', 'Solar', 'Smart'],
+        required: true
+    },
+    warranty: {
+        type: String,
+        default: '1 Year'
+    },
+    ProductOffer: {
+        type: Number,
+        default: 0
+    },
+    images: {
+        type: [String], 
+        required: true
+    },
+    isListed: {
+        type: Boolean,
+        default: true
+    }
+}, { timestamps: true });
 
 module.exports = mongoose.model('Product', productSchema);
