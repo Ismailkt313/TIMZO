@@ -20,12 +20,12 @@ const userSchema = new Schema({
   },
   password: {
     type: String,
-    required: false, // for Google signup users
+    required: false, 
   },
   googleId: {
     type: String,
     unique: true,
-    sparse: true, // avoids conflict if not all users have this field
+    sparse: true, 
   },
   otp: {
     code: { type: String },

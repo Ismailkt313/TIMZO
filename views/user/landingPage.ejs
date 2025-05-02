@@ -3,301 +3,236 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>
-        Timzo - Premium Watches</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Timzo - Premium Watches</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/landingPage.css">
     <link rel="icon" type="image/x-icon" href="/images/TIMZO.jpg">
-
-    <!-- Add in your HTML head or before </body> -->
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        .hero-section {
+            background: url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c') no-repeat center center;
+            background-size: cover;
+            position: relative;
+            padding: 100px 0;
+        }
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+        }
+        .hero-section .container {
+            position: relative;
+            z-index: 1;
+        }
+        .product-card { transition: transform 0.3s, box-shadow 0.3s; }
+        .product-card:hover { transform: translateY(-5px); box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+        .product-card a { text-decoration: none; color: inherit; }
+        .filter-section { background: #f8f9fa; padding: 1rem; border-radius: 8px; }
+        .filter-collapse { display: none; }
+        @media (max-width: 768px) {
+            .filter-section { margin-bottom: 1rem; }
+            .filter-collapse { display: block; }
+        }
+        .btn-gold { background-color: #ffd700; color: #000; }
+        .btn-gold:hover { background-color: #e6c200; }
+        .sale-banner {
+            background: url('https://images.unsplash.com/photo-1543163521-1bf539c55dd2') no-repeat center center;
+            background-size: cover;
+            position: relative;
+        }
+        .sale-banner::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+        }
+        .sale-banner .container {
+            position: relative;
+            z-index: 1;
+        }
+    </style>
 </head>
 <body>
-
-<!-- partials/navbar.ejs -->
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
-    <div class="container">
-        <a class="navbar-brand" href="/">TIMZO</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="/contact">Home</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/sale">Sale</a>
-                </li>
-                <% if(!user){ %>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/login">login</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/sign-up">Sign up</a>
-                    </li>
-                <% } %>
-                <% if(user){ %>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/logout">logout</a>
-                    </li>
-                    
-                <% } %>
-            </ul>
-            <form class="d-flex me-2">
-                <div class="input-group">
-                    <input class="form-control" type="search" placeholder="Search watches..." aria-label="Search">
-                    <button class="btn btn-outline-light" type="submit">
-                        <i class="fas fa-search"></i>
-                    </button>
-                </div>
-            </form>
-            <div class="d-flex align-items-center">
-                <% if(!user) { %>
-                <a href="/login" class="btn btn-link text-white position-relative">
-                    <i class="fas fa-shopping-cart" ></i>
-                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                        0
-                    </span>
-                </a>
-            <%}%>
-            <% if(user) { %>
-                <a href="/user/cart" class="btn btn-link text-white position-relative">
-                    <i class="fas fa-shopping-cart" ></i>
-                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                        0
-                    </span>
-                </a>
-            <%}%>
-            </div>
-        </div>
-    </div>
-</nav>
+    <%- include('.././Partials/user/navbar', { user: user, cartCount: cartCount, search: search }) %>
     
-    
-    
-
-    <!-- Hero Section -->
-    <section class="hero-section">
-        <div class="container">
-            <h1>NEW YEAR, <br>BIG SALE</h1>
-            <p>DISCOUNT UP TO 50%</p>
-            <button class="shop-btn">SHOP NOW</button>
+    <section class="hero-section text-white py-5">
+        <div class="container text-end">
+            <h1 class="display-4">NEW YEAR, <br>BIG SALE</h1>
+            <p class="lead">DISCOUNT UP TO 50%</p>
+            <a href="/products" class="btn btn-gold btn-lg">SHOP NOW</a>
         </div>
     </section>
 
-    <!-- New Arrivals Section -->
-    <section class="container">
-        <h2 class="section-title">New Arrivals</h2>
-        <div class="row">
+    <section class="container my-5">
+        <h2 class="section-title text-center mb-4">New Arrivals</h2>
+        <div class="row g-4">
             <% newArrivals.forEach(product => { %>
                 <div class="col-6 col-md-3">
-                    <div class="card product-card">
-                        <img src="<%= product.image %>" class="card-img-top" alt="<%= product.title %>">
-                        <div class="card-body">
-                            <h5 class="product-title"><%= product.title %></h5>
-                            <div class="rating">
-                                <% for(let i = 0; i < product.rating; i++) { %>
-                                    <i class="fas fa-star"></i>
-                                <% } %>
-                                <% for(let i = product.rating; i < 5; i++) { %>
-                                    <i class="far fa-star"></i>
-                                <% } %>
+                    <a href="/products/<%= product._id %>">
+                        <div class="card product-card border-0">
+                            <img src="<%= product.images[0] || '/images/placeholder.jpg' %>" class="card-img-top" alt="<%= product.name %>">
+                            <div class="card-body text-center">
+                                <h5 class="product-title"><%= product.name %></h5>
+                                <p class="text-muted"><%= product.brand.name %></p>
+                                <div class="rating">
+                                    <% for(let i = 0; i < Math.floor(product.rating); i++) { %>
+                                        <i class="fas fa-star text-warning"></i>
+                                    <% } %>
+                                    <% for(let i = Math.floor(product.rating); i < 5; i++) { %>
+                                        <i class="far fa-star text-muted"></i>
+                                    <% } %>
+                                </div>
+                                <p class="product-price fw-bold">$<%= product.salePrice.toFixed(2) %></p>
+                                <button class="btn btn-gold btn-sm add-to-cart" data-product-id="<%= product._id %>" onclick="event.stopPropagation();">Add to Cart</button>
                             </div>
-                            <p class="product-price">$<%= product.price.toFixed(2) %></p>
                         </div>
-                    </div>
+                    </a>
                 </div>
             <% }); %>
         </div>
     </section>
 
-    <!-- Sale Banner -->
-    <section class="sale-banner">
-        <div class="container">
+    <section class="sale-banner text-white py-4">
+        <div class="container text-center">
             <h2>SALE</h2>
-            <p>GRAB IT FAST</p>
+            <p>GRAB IT FAST - UP TO 50% OFF</p>
+            <a href="/products?sale=true" class="btn btn-gold">Shop Sale</a>
         </div>
     </section>
 
-    <!-- Trending Section -->
-    <section class="container">
-        <h2 class="section-title">Trending</h2>
-        <div class="row">
+    <section class="container my-5">
+        <h2 class="section-title text-center mb-4">Trending</h2>
+        <div class="row g-4">
             <% trendingProducts.forEach(product => { %>
-                <div class="col-6 col-md-4">
-                    <div class="card product-card">
-                        <img src="<%= product.image %>" class="card-img-top" alt="<%= product.title %>">
-                        <div class="card-body">
-                            <h5 class="product-title"><%= product.title %></h5>
-                            <div class="rating">
-                                <% for(let i = 0; i < product.rating; i++) { %>
-                                    <i class="fas fa-star"></i>
-                                <% } %>
-                                <% for(let i = product.rating; i < 5; i++) { %>
-                                    <i class="far fa-star"></i>
-                                <% } %>
+                <div class="col-6 col-md-3">
+                    <a href="/products/<%= product._id %>">
+                        <div class="card product-card border-0">
+                            <img src="<%= product.images[0] || '/images/placeholder.jpg' %>" class="card-img-top" alt="<%= product.name %>">
+                            <div class="card-body text-center">
+                                <h5 class="product-title"><%= product.name %></h5>
+                                <p class="text-muted"><%= product.brand.name %></p>
+                                <div class="rating">
+                                    <% for(let i = 0; i < Math.floor(product.rating); i++) { %>
+                                        <i class="fas fa-star text-warning"></i>
+                                    <% } %>
+                                    <% for(let i = Math.floor(product.rating); i < 5; i++) { %>
+                                        <i class="far fa-star text-muted"></i>
+                                    <% } %>
+                                </div>
+                                <p class="product-price fw-bold">$<%= product.salePrice.toFixed(2) %></p>
+                                <button class="btn btn-gold btn-sm add-to-cart" data-product-id="<%= product._id %>" onclick="event.stopPropagation();">Add to Cart</button>
                             </div>
-                            <p class="product-price">$<%= product.price.toFixed(2) %></p>
                         </div>
-                    </div>
+                    </a>
                 </div>
             <% }); %>
         </div>
     </section>
 
-    <!-- Explore More Section -->
-    <section class="container mb-5">
-        <h2 class="section-title">Explore More</h2>
-        <div class="row">
+    <section class="container my-5">
+        <h2 class="section-title text-center mb-4">Explore More</h2>
+        <div class="row g-4">
             <% exploreProducts.forEach(product => { %>
                 <div class="col-6 col-md-3">
-                    <div class="card product-card">
-                        <img src="<%= product.image %>" class="card-img-top" alt="<%= product.title %>">
-                        <div class="card-body">
-                            <h5 class="product-title"><%= product.title %></h5>
-                            <div class="rating">
-                                <% for(let i = 0; i < product.rating; i++) { %>
-                                    <i class="fas fa-star"></i>
-                                <% } %>
-                                <% for(let i = product.rating; i < 5; i++) { %>
-                                    <i class="far fa-star"></i>
-                                <% } %>
+                    <a href="/products/<%= product._id %>">
+                        <div class="card product-card border-0">
+                            <img src="<%= product.images[0] || '/images/placeholder.jpg' %>" class="card-img-top" alt="<%= product.name %>">
+                            <div class="card-body text-center">
+                                <h5 class="product-title"><%= product.name %></h5>
+                                <p class="text-muted"><%= product.brand.name %></p>
+                                <div class="rating">
+                                    <% for(let i = 0; i < Math.floor(product.rating); i++) { %>
+                                        <i class="fas fa-star text-warning"></i>
+                                    <% } %>
+                                    <% for(let i = Math.floor(product.rating); i < 5; i++) { %>
+                                        <i class="far fa-star text-muted"></i>
+                                    <% } %>
+                                </div>
+                                <p class="product-price fw-bold">$<%= product.salePrice.toFixed(2) %></p>
+                                <button class="btn btn-gold btn-sm add-to-cart" data-product-id="<%= product._id %>" onclick="event.stopPropagation();">Add to Cart</button>
                             </div>
-                            <p class="product-price">$<%= product.price.toFixed(2) %></p>
                         </div>
-                    </div>
+                    </a>
                 </div>
             <% }); %>
         </div>
     </section>
 
-    <!-- Features Section -->
-    <section class="container-fluid bg-light py-5">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-3">
-                    <div class="feature-item">
-                        <div class="feature-icon">
-                            <i class="fas fa-truck"></i>
-                        </div>
-                        <h5>FREE SHIPPING</h5>
-                        <p>On all orders over $99</p>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="feature-item">
-                        <div class="feature-icon">
-                            <i class="fas fa-shield-alt"></i>
-                        </div>
-                        <h5>HIGH QUALITY</h5>
-                        <p>2-year warranty included</p>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="feature-item">
-                        <div class="feature-icon">
-                            <i class="fas fa-exchange-alt"></i>
-                        </div>
-                        <h5>EASY RETURNS</h5>
-                        <p>30-day money back guarantee</p>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="feature-item">
-                        <div class="feature-icon">
-                            <i class="fas fa-headset"></i>
-                        </div>
-                        <h5>24/7 SUPPORT</h5>
-                        <p>Dedicated customer service</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+    <%- include('.././Partials/user/footer') %>
 
-    
-<!-- partials/footer.ejs -->
-<footer>
-    <div class="container">
-        <div class="row">
-            <div class="col-md-3 footer-links">
-                <h5>COMPANY</h5>
-                <ul>
-                    <li><a href="/about">About Us</a></li>
-                    <li><a href="/contact">Contact</a></li>
-                    <li><a href="/careers">Careers</a></li>
-                    <li><a href="/stores">Our Stores</a></li>
-                </ul>
-            </div>
-            <div class="col-md-3 footer-links">
-                <h5>HELP</h5>
-                <ul>
-                    <li><a href="/faq">FAQ</a></li>
-                    <li><a href="/shipping">Shipping</a></li>
-                    <li><a href="/returns">Returns</a></li>
-                    <li><a href="/order-status">Order Status</a></li>
-                </ul>
-            </div>
-            <div class="col-md-3 footer-links">
-                <h5>POLICIES</h5>
-                <ul>
-                    <li><a href="/terms">Terms of Use</a></li>
-                    <li><a href="/privacy">Privacy Policy</a></li>
-                    <li><a href="/warranty">Warranty</a></li>
-                </ul>
-            </div>
-            <div class="col-md-3 footer-links">
-                <h5>FOLLOW US</h5>
-                <div class="social-icons">
-                    <a href="#"><i class="fab fa-facebook-f"></i></a>
-                    <a href="#"><i class="fab fa-instagram"></i></a>
-                    <a href="#"><i class="fab fa-twitter"></i></a>
-                    <a href="#"><i class="fab fa-pinterest"></i></a>
-                </div>
-                <div class="mt-3">
-                    <p>Subscribe to our newsletter</p>
-                    <div class="input-group">
-                        <input type="email" class="form-control" placeholder="Your email" aria-label="Email">
-                        <button class="btn btn-dark" type="button">Subscribe</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="copyright">
-            <p>&copy; 2025 TIMZO. All rights reserved.</p>
-            <div class="payment-icons mt-2">
-                <i class="fab fa-cc-visa me-2"></i>
-                <i class="fab fa-cc-mastercard me-2"></i>
-                <i class="fab fa-cc-amex me-2"></i>
-                <i class="fab fa-cc-paypal me-2"></i>
-            </div>
-        </div>
-    </div>
-</footer>
-</body>
-</html>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Optional JavaScript for enhancing functionality
-        document.addEventListener('DOMContentLoaded', function() {
-            // Add smooth scrolling for links
+        document.addEventListener('DOMContentLoaded', () => {
             document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-                anchor.addEventListener('click', function(e) {
+                anchor.addEventListener('click', e => {
                     e.preventDefault();
-                    document.querySelector(this.getAttribute('href')).scrollIntoView({
-                        behavior: 'smooth'
-                    });
+                    document.querySelector(anchor.getAttribute('href')).scrollIntoView({ behavior: 'smooth' });
                 });
             });
-            
-            // Initialize any Bootstrap tooltips
-            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-            const tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
-                return new bootstrap.Tooltip(tooltipTriggerEl);
+
+            const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+            tooltipTriggerList.forEach(el => new bootstrap.Tooltip(el));
+
+            document.querySelectorAll('.add-to-cart').forEach(button => {
+                button.addEventListener('click', async () => {
+                    const productId = button.getAttribute('data-product-id');
+                    const isLoggedIn = <%= user ? 'true' : 'false' %>;
+                    if (!isLoggedIn) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Please Log In',
+                            text: 'You need to be logged in to add items to your cart.',
+                            showConfirmButton: true,
+                            confirmButtonText: 'Log In'
+                        }).then(result => {
+                            if (result.isConfirmed) window.location.href = '/login';
+                        });
+                        return;
+                    }
+
+                    try {
+                        const response = await fetch('/user/cart/add', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ productId, quantity: 1 })
+                        });
+                        const data = await response.json();
+                        if (data.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Added to Cart',
+                                text: 'Product added to your cart!',
+                                timer: 1500
+                            });
+                            const cartBadge = document.querySelector('.cart-count');
+                            if (cartBadge) {
+                                cartBadge.textContent = parseInt(cartBadge.textContent) + 1;
+                            }
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: data.message || 'Failed to add to cart'
+                            });
+                        }
+                    } catch (error) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'An error occurred while adding to cart'
+                        });
+                    }
+                });
             });
         });
     </script>
+</body>
+</html>

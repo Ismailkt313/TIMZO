@@ -9,27 +9,22 @@
 </head>
 <body class="bg-gray-100 pt-20">
 
-  <!-- Navbar -->
   <%- include('.././Partials/admin/navbar') %>
 
   <div class="flex min-h-screen">
-    <!-- Sidebar -->
     <div class="w-64 bg-dark text-white">
       <%- include('.././Partials/admin/adminsidebar', { activePage: 'users' }) %>
     </div>
 
-    <!-- Main Content -->
     <main class="flex-1 p-6">
       <div class="bg-white p-6 rounded-xl shadow-md max-w-4xl mx-auto">
         <h2 class="text-3xl font-bold mb-8 text-center">User Profile</h2>
 
         <div class="flex flex-col md:flex-row items-center gap-8">
-          <!-- Profile Photo -->
           <div class="flex-shrink-0">
             <img src="/images/th (2).jpeg" alt="" class="rounded-full w-40 h-40 object-cover shadow-md">
           </div>
 
-          <!-- User Info -->
           <div class="flex-1 w-full">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 
@@ -60,7 +55,6 @@
 
             </div>
 
-            <!-- Buttons -->
             <div class="flex gap-4 mt-8">
               <a href="/admin/update-user/<%= user._id %>" class="btn btn-primary flex-1">Update Profile</a>
 
@@ -78,7 +72,6 @@
     </main>
   </div>
 
-  <!-- Footer -->
   <%- include('.././Partials/admin/footer') %>
 
 </body>

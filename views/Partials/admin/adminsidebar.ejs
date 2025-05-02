@@ -1,4 +1,4 @@
-<div class="h-screen w-64 bg-gray-800 text-white fixed top-0 left-0 shadow-lg flex flex-col">
+<div class="h-screen w-64 bg-gray-800 text-white fixed top-0 left-0 shadow-lg flex flex-col ">
   <div class="p-6 text-2xl font-bold border-b border-gray-700">
     Timzo Admin
   </div>
@@ -14,10 +14,15 @@
              <%= activePage === 'users' ? 'bg-gray-700' : 'hover:bg-gray-700' %>">
       Users
     </a>
-    <a href="/admin/product"
+    <a href="/admin/getProduct"
       class="block px-4 py-2 rounded transition 
              <%= activePage === 'product' ? 'bg-gray-700' : 'hover:bg-gray-700' %>">
       product
+    </a>
+    <a href="/admin/brand"
+      class="block px-4 py-2 rounded transition 
+             <%= activePage === 'brand' ? 'bg-gray-700' : 'hover:bg-gray-700' %>">
+      brand
     </a>
     <a href="/admin/categories"
       class="block px-4 py-2 rounded transition 

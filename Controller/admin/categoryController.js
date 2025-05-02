@@ -5,7 +5,7 @@ const loadcategories = async (req,res)=>{
     try {
 
         const page = parseInt(req.query.page)||1
-        const limit = 4;
+        const limit = 10;
         const skip = (page-1)*limit
 
         let products = await Category.find({}).sort({createdAt:-1}).skip(skip).limit(limit)
@@ -17,7 +17,7 @@ const loadcategories = async (req,res)=>{
             totalPage : totalPages,
             totalcategories : totalcategories
         })
-    } catch (error) {
+    } catch (error) { 
         console.log(error)
         res.redirect('/error404')
     }
@@ -141,6 +141,8 @@ const getlistcategory = async (req, res) => {
     }
 };
 
+
+
 const getunlistcategory = async (req, res) => {
     try {
         let id = req.query.id;
@@ -151,6 +153,47 @@ const getunlistcategory = async (req, res) => {
         res.redirect('/error404');
     }
 };
+    
+const loadeditcategory = async (req,res)=>{
+    try {
+        const id = req.query.id
+    const category = await Category.findOne({_id:id})
+    res.render("Admin/editcategory",{category:category})
+    } catch (error) {
+        res.redirect('/error404')
+    }
+}
+const editcategory = async (req, res) => {
+    try {
+        const id = req.params.id;
+        const { categoryName, description } = req.body;
+
+        const existingcategory = await Category.findOne({ name: categoryName });
+
+        if (existingcategory) {
+            return res.status(400).json({ error: "Category exists, please choose another one" });
+        }
+
+        const updatecategory = await Category.findByIdAndUpdate(
+            id,
+            {
+                name: categoryName,
+                description: description,
+            },
+            { new: true }
+        );
+
+        if (updatecategory) {
+            res.redirect('/admin/categories'); 
+        } else {
+            res.status(404).json({ error: "Category not found" });
+        }
+
+    } catch (error) {
+        res.status(500).json({ error: "Internal server error" });
+    }
+};
+
 
 module.exports = {
     loadcategories,
@@ -159,5 +202,7 @@ module.exports = {
     addcategoryOffer,
     removecategoryoffer,
     getlistcategory,
-    getunlistcategory
+    getunlistcategory,
+    loadeditcategory,
+    editcategory
 }

@@ -4,7 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Verify OTP - Timzo</title>
-  <!-- Add in your HTML head or before </body> -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
   <style>
@@ -98,11 +97,11 @@
 
   <script>
     let timer = 60;
-    let countdown; // <-- to store the interval globally
+    let countdown;
     const timerDisplay = document.getElementById("timer");
   
     function startTimer() {
-      clearInterval(countdown); // prevent multiple intervals
+      clearInterval(countdown); 
       timer = 60;
       timerDisplay.textContent = "01:00";
   
@@ -120,7 +119,7 @@
       }, 1000);
     }
   
-    startTimer(); // Start when page loads
+    startTimer(); 
   
     function resendOTP() {
       fetch("/user/resend-otp", {
@@ -135,7 +134,7 @@
             timer: 1500,
             showConfirmButton: false
           });
-          startTimer(); // Restart the timer properly
+          startTimer(); 
         } else {
           Swal.fire({
             icon: "error",

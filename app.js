@@ -4,6 +4,7 @@ const path = require('path')
 const session = require('express-session')
 const passport = require('./Config/passport')
 const dotenv = require("dotenv")
+const nocache =require("nocache")
 dotenv.config()
 const db = require ("./Config/db")
 const adminrouter = require('./Routes/adminRoute/adminRouter')
@@ -11,12 +12,12 @@ const userRouter = require('./Routes/userRoute/userRouter')
 const PORT = process.env.PORT || 3000;
 
 db()
- 
-app.set('view engine','ejs')
+  
+app.set('view engine','ejs') 
 app.set('views', path.join(__dirname, 'views'))
 
- 
- 
+   
+app.use(nocache())
 app.use(express.json())
 app.use(express.urlencoded({extended:true}))
 app.use(session({
@@ -25,18 +26,18 @@ app.use(session({
     saveUninitialized:true,
     cookie:{
         secure:false,
-        httpOnly:true, 
+        httpOnly:true,  
         maxAge:72*60*60*1000
     } 
 }))  
 
 app.use(passport.initialize());
-app.use(passport.session())
+app.use(passport.session());
 
 
 app.use(express.static(path.join(__dirname, 'public')))
 
-   
+    
 app.use('/',userRouter) 
 app.use('/user',userRouter) 
 app.use('/admin',adminrouter)

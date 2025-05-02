@@ -10,7 +10,7 @@ const categorySchema = new Schema({
     type: {
     type:String,
     trim: true
-},
+}, 
     icon: {
     type: String,
     default: 'tag' // example: Bootstrap icon name or custom tag

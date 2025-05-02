@@ -51,7 +51,7 @@
     <%- include('.././Partials/admin/adminsidebar', { activePage: 'categories' }) %>
   </div>
   
-  <div class="Breadmb">
+  <!-- <div class="Breadmb"> -->
     <%- include('.././Partials/admin/navbar') %>
     <!-- Breadcrumb -->
     <!-- <nav class="flex px-5 py-3 text-gray-700 border border-gray-200 rounded-lg bg-gray-50" aria-label="Breadcrumb">
@@ -71,7 +71,8 @@
         </li>
       </ol>
     </nav> -->
-  </div>
+  <!-- </div> -->
+   
 
   <div class="main-content">
 
@@ -145,10 +146,10 @@
                         </td>
                         <td>
                           <div class="d-flex justify-content-center gap-2">
-                            <a href="/admin/categories/edit/<%= category._id %>" class="btn btn-sm btn-outline-warning" title="Edit">
+                            <a href="/admin/editcategory/?id=<%= category._id %>" class="btn btn-sm btn-outline-warning" title="Edit">
                               <i class="bi bi-pencil-square"></i>
                             </a>
-                  
+                    
                             <% if (category.isListed) { %>
                               <a href="/admin/listcategory?id=<%= category._id %>" class="btn btn-danger btn-sm" title="Unlist">
                                 Unlist
@@ -158,7 +159,7 @@
                                 List
                               </a>
                             <% } %>
-                  
+                    
                             <form action="/admin/categories/delete/<%= category._id %>" method="POST" style="display:inline;" onsubmit="return confirm('Are you sure to delete this category?')">
                               <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete">
                                 <i class="bi bi-trash"></i>
@@ -167,7 +168,7 @@
                           </div>
                         </td>
                       </tr>
-                    <% }); %>
+                    <% }); %>                    
                   </tbody>
                   
                 </table>
@@ -336,8 +337,7 @@
       })
     });
 
-    const data = await response.json(); // << await here also
-
+    const data = await response.json(); 
     if (response.ok && data.status === true) {
       Swal.fire(
         "Offer Removed",

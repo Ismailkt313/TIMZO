@@ -10,20 +10,18 @@
 </head>
 <body class="bg-gray-100">
 
-  <!-- Navbar -->
   <%- include('.././Partials/admin/navbar') %>
 
   <div class="flex min-h-screen">
-    <!-- Sidebar -->
+
     <div class="w-64 bg-dark text-white">
         <%- include('.././Partials/admin/adminsidebar', { activePage: 'categories' }) %>
     </div>
     <style>
         body {
-          padding-top: 70px; /* Adjust based on your navbar height */
+          padding-top: 70px; 
         }
       </style>
-    <!-- Main Content -->
     <main class="flex-1 p-6">
       
 
@@ -58,13 +56,13 @@
                   <td><%= category.stock %></td>
                   <td>
                     <% if (category.isListed) { %>
-                      <span class="text-success" >Listed</span>
+                      <span class="text-success">Listed</span>
                     <% } else { %>
                       <span class="text-danger">Unlisted</span>
                     <% } %>
                   </td>
                   <td class="flex gap-2 justify-center">
-                    <a href="/admin/categories/edit/<%= category._id %>" class="btn btn-sm btn-outline-warning" title="Edit">
+                    <a href="/admin/editcategory/?id=<%= category._id %>" class="btn btn-sm btn-outline-warning" title="Edit">
                       <i class="bi bi-pencil-square"></i>
                     </a>
                   
@@ -81,20 +79,53 @@
                     </form>
                   </td>
                 </tr>
-              <% }) %>
+              <% }); %>
             <% } else { %>
               <tr>
                 <td colspan="8">No categories found.</td>
               </tr>
-            <% } %>
+            <% } %>    
           </tbody>
         </table>
+        <div class="d-flex justify-content-center">
+          <nav aria-label="Page navigation">
+              <ul class="pagination">
+                  <% if (currentpage > 1) { %>
+                      <li class="page-item">
+                          <a class="page-link" href="/admin/categories?page=<%= currentpage - 1 %>">Previous</a>
+                      </li>
+                  <% } else { %>
+                      <li class="page-item disabled">
+                          <a class="page-link" href="#">Previous</a>
+                      </li>
+                  <% } %>
+    
+                  <% for (let i = 1; i <= totalPage; i++) { %>
+                      <li class="page-item <%= currentpage === i ? 'active' : '' %>">
+                          <a class="page-link" href="/admin/categories?page=<%= i %>"><%= i %></a>
+                      </li>
+                  <% } %>
+      
+                  <% if (currentpage < totalPage) { %>
+                      <li class="page-item">
+                          <a class="page-link" href="/admin/categories?page=<%= currentpage + 1 %>">Next</a>
+                      </li>
+                  <% } else { %>
+                      <li class="page-item disabled">
+                          <a class="page-link" href="#">Next</a>
+                      </li>
+                  <% } %>
+              </ul>
+          </nav>
+      </div>
+      
       </div>
     </main>
   </div>
 
   <!-- Footer -->
   <%- include('.././Partials/admin/footer') %>
+  
 
 </body>
 </html>

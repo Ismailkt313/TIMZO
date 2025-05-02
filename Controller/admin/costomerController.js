@@ -9,14 +9,14 @@ const loadUsers = async (req,res)=>{
     const skip = (page - 1) * limit
      console.log(skip);
      
-    const users = await customer.find().skip(skip).limit(limit) 
+    const users = await customer.find({}).sort({createdAt:-1}).skip(skip).limit(limit) 
     
     const totalUsers = await customer.countDocuments()
     const totalPages = Math.ceil(totalUsers / limit)
 
-    // Pass the users, currentPage, and totalPages to the view
+
     res.render('Admin/costomer', {
-      users,  // Ensure you're passing the 'users' array here
+      users,  
       currentPage: page,
       totalPages,
     })
@@ -75,7 +75,10 @@ const block = async (req,res)=>{
         res.status(200).json({
             success: true,
             isBlocked: user.isBlocked
+        
           });
+          console.log('its blocked');
+          
     } catch (error) {
         console.error(error);
         res.status(500).json({ success: false });

@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Brand Management</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    body {
+      padding-top: 70px; /* Fallback for larger screens */
+    }
+    .sidebar {
+      min-height: 100vh;
+      background-color: #f8f9fa;
+      border-right: 1px solid #dee2e6;
+    }
+    .content-area {
+      padding: 20px;
+    }
+    .pagination-container {
+      text-align: center;
+      margin-top: 20px;
+    }
+    .pagination a,
+    .pagination .current-page {
+      display: inline-block;
+      padding: 5px 10px;
+      margin: 0 2px;
+      border: 1px solid #ddd;
+      text-decoration: none;
+      color: #333;
+    }
+    .pagination a:hover {
+      background-color: #f5f5f5;
+    }
+    .input-upload img {
+      max-width: 100px;
+      margin-bottom: 10px;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 767px) {
+      body {
+        padding-top: 56px; /* Adjust for mobile navbar height */
+      }
+      .sidebar {
+        display: none; /* Hide sidebar on mobile */
+      }
+      .content-area {
+        padding: 15px; /* Reduce padding on mobile */
+        width: 100%;
+      }
+      .card-body {
+        padding: 15px; /* Reduce padding inside cards on mobile */
+      }
+      .table th, .table td {
+        font-size: 14px; /* Smaller font size for table on mobile */
+      }
+      .table img {
+        max-width: 50px; /* Smaller logo size on mobile */
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <%- include('.././Partials/admin/navbar') %>
+
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-md-2 sidebar">
+        <%- include('.././Partials/admin/adminsidebar', { activePage: 'brand' }) %>
+      </div>
+
+      <div class="col-md-10 col-12 content-area">
+        <section class="content-main">
+          <div class="content-header mb-4">
+            <h2 class="content-title card-title">Brand Management</h2>
+          </div>
+
+          <div class="row">
+            <div class="col-md-4 col-12 mb-4">
+              <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                  <h5 class="mb-0">Add New Brand</h5>
+                </div>
+                <div class="card-body">
+                  <form method="post" action="/admin/addbrand" enctype="multipart/form-data">
+                    <div class="mb-3">
+                      <label for="brandName" class="form-label">Brand Name</label>
+                      <input type="text" name="name" id="brandName" class="form-control" placeholder="Enter brand name" required>
+                    </div>
+                    <div class="mb-3">
+                      <label for="brandImage" class="form-label">Brand Image</label>
+                      <div class="input-upload">
+                        <img id="preview-image" src="#" alt="Image Preview" style="display:none;" />
+                        <input class="form-control" name="image" id="brandImage" type="file" onchange="previewImage(event)" required>
+                      </div>
+                    </div>
+                    <div class="d-grid">
+                      <button type="submit" class="btn btn-success">Create Brand</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-8 col-12 mb-4">
+              <div class="card shadow-sm">
+                <div class="card-header bg-secondary text-white">
+                  <h5 class="mb-0">Brands List</h5>
+                </div>
+                <div class="card-body">
+                  <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                      <thead class="table-light">
+                        <tr>
+                          <th>Brand</th>
+                          <th>Logo</th>
+                          <th>Status</th>
+                          <th>Action</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <% data.reverse().forEach((brand, index) => { %>
+                        <tr>
+                          <td><%= brand.name %></td>
+                          <td>
+                            <div style="width: 80px; height: auto; background-color: #f0f0f0;">
+                              <img src="<%= brand.image %>" alt="<%= brand.name %>" class="img-fluid" style="width: 100%; object-fit: contain;">
+                            </div>
+                          </td>
+                          <td>
+                            <% if (brand.isListed === false) { %>
+                            <span class="badge bg-danger px-3 py-2">active</span>
+                            <% } else { %>
+                            <span class="badge bg-success px-3 py-2">Active</span>
+                            <% } %>
+                          </td>
+                          <td>
+                            <div class="d-flex flex-wrap gap-2">
+                              <% if (brand.isListed === true) { %>
+                              <a href="/admin/blockBrand?id=<%= brand._id %>" class="btn btn-outline-danger btn-sm">Block</a>
+                              <% } else { %>
+                              <a href="/admin/unblockBrand?id=<%= brand._id %>" class="btn btn-outline-success btn-sm">Unblock</a>
+                              <% } %>
+                              <button onclick="return conformdelete()">
+                                <a href="/admin/deleteBrand?id=<%= brand._id %>" class="btn btn-outline-secondary btn-sm">Delete</a>
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                        <% }) %>
+                      </tbody>
+                    </table>
+                  </div>
+
+                  <div class="mt-4 flex justify-center gap-2">
+                    <% if (currentPage > 1) { %>
+                      <a class="px-3 py-1 bg-gray-300 rounded hover:bg-gray-400" href="/admin/brand?page=<%= currentPage - 1 %>">« Prev</a>
+                    <% } %>
+                    <% for (let i = 1; i <= totalPages; i++) { %>
+                      <a class="px-3 py-1 rounded <%= currentPage === i ? 'bg-blue-500 text-white' : 'bg-gray-200 hover:bg-gray-300' %>" href="/admin/brand?page=<%= i %>"><%= i %></a>
+                    <% } %>
+                    <% if (currentPage < totalPages) { %>
+                      <a class="px-3 py-1 bg-gray-300 rounded hover:bg-gray-400" href="/admin/brand?page=<%= currentPage + 1 %>">Next »</a>
+                    <% } %>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <%- include('.././Partials/admin/footer') %>
+
+  <script>
+    function previewImage(event) {
+      const reader = new FileReader();
+      reader.onload = function() {
+        const output = document.getElementById('preview-image');
+        output.src = reader.result;
+        output.style.display = 'block';
+      }
+      reader.readAsDataURL(event.target.files[0]);
+    }
+
+    function conformdelete() {
+      return confirm("Are you sure?");
+    }
+
+    // Dynamically adjust padding-top based on navbar height
+    window.addEventListener('load', adjustPadding);
+    window.addEventListener('resize', adjustPadding);
+
+    function adjustPadding() {
+      const navbar = document.querySelector('.navbar');
+      const body = document.querySelector('body');
+      if (navbar) {
+        const navbarHeight = navbar.offsetHeight;
+        body.style.paddingTop = `${navbarHeight}px`;
+      }
+    }
+  </script>
+</body>
+</html>

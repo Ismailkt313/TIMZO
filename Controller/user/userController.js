@@ -1,4 +1,8 @@
 const User = require('../../Model/userSchema')
+const Product = require("../../Model/productSchema")
+const Category = require("../../Model/categorySchema")
+const Brand = require("../../Model/brandschema")
+const Cart = require("../../Model/cartSchema")
 const nodemailer = require('nodemailer')
 const env = require('dotenv').config()
 const bcrypt = require("bcrypt")
@@ -7,65 +11,50 @@ const pageNotFound = async (req, res) => {
     try {
         res.render('error404')
     } catch (error) {
-        res.redirect('/error404')      ////enkk
+        res.redirect('/error404')    
     }
 }
-
 const loadlanding = async (req, res) => {
     try {
+        const categories = await Category.find({ isListed: true });
+        const brands = await Brand.find({ isListed: true });
+        const user = await User.find({isBlocked:false}) 
+        if(!user){
+            res.redirect("/user/login")
+        }
+        const newArrivals = await Product.find({ status: "available" })
+            .sort({ createdAt: -1 })
+            .limit(4)
+            .populate('brand')
+            .populate('category');
+        const trendingProducts = await Product.find({ status: "available" })
+            .sort({ createdAt: 1 })
+            .limit(4)
+            .populate('brand')
+            .populate('category');
+        const exploreProducts = await Product.find({ status: "available" })
+            .populate('brand')
+            .populate('category')
+            .limit(8);
 
-        const newArrivals = [
-            {
-                image: "/images/watch1.jpg",
-                title: "Classic Watch",
-                rating: 4,
-                price: 129.99
-            },
-            {
-                image: "/images/watch2.jpg",
-                title: "Modern Watch",
-                rating: 5,
-                price: 199.99
+        let cartCount = 0;
+        if (req.session.user) {
+            const cart = await Cart.findOne({ user: req.session.user._id });
+            if (cart) {
+                cartCount = cart.items.reduce((sum, item) => sum + item.quantity, 0);
             }
-        ];
-
-        const trendingProducts = [
-            {
-                image: "/images/watch3.jpg",
-                title: "Trending Watch A",
-                rating: 5,
-                price: 249.99 
-            },
-            {
-                image: "/images/watch4.jpg",
-                title: "Trending Watch B",
-                rating: 4,
-                price: 179.99
-            }
-        ];
-
-        const exploreProducts = [
-            {
-                image: "/images/watch5.jpg",
-                title: "Explorer Watch A",
-                rating: 3,
-                price: 149.99
-            },
-            {
-                image: "/images/watch6.jpg",
-                title: "Explorer Watch B",
-                rating: 5,
-                price: 229.99
-            }
-        ];
+        }
 
         return res.render('user/landingPage', {
             user: req.session.user || null,
-            newArrivals,
+            cartCount: cartCount,
+            newArrivals, 
             trendingProducts,
-            exploreProducts
+            exploreProducts,
+            categories,
+            brands,
+            search: req.query.search,
         });
- 
     } catch (error) {
         console.log('user homepage not found', error);
         res.status(500).send('server error');
@@ -83,7 +72,7 @@ const loadSignUp = async (req, res) => {
 
 
 function generateOtp() {
-    return Math.floor(100000 + Math.random() * 900000);    //////enk
+    return Math.floor(100000 + Math.random() * 900000);  
 }
 
 async function sendVerificationEmail(email, otp) {
@@ -121,7 +110,10 @@ async function sendVerificationEmail(email, otp) {
                 'X-Priority': '3',
                 'X-Mailer': 'Timzo Mailer'
             }
-        });
+        },(error,info)=>{
+            console.log(error)
+        }
+    )
 
 
 
@@ -168,7 +160,7 @@ const signup = async (req, res) => {
 
         const otp = generateOtp()
         const emailsent = await sendVerificationEmail(email, otp)
-
+        console.log(emailsent)
         if (!emailsent) {
             return res.json('email error')
         }
@@ -180,7 +172,7 @@ const signup = async (req, res) => {
         console.log('otp sented ', otp);
 
     } catch (error) {
-        console.error('❌ Error during signup:', error.message);
+        console.error('Error during signup:', error.message);
         res.status(500).redirect('/user/error404')
     }
 };
@@ -215,9 +207,9 @@ const verifyOtp = async (req, res) => {
                 mobile: user.mobile
             })
             await saveUserData.save()
-            req.session.user = saveUserData._id;
+            req.session.user = saveUserData
 
-            res.redirect("/user/home");
+            res.redirect("/user/");
         } else {
             res.render("user/verifyOtp", {
                 error: "Incorrect OTP. Please try again."
@@ -268,7 +260,6 @@ const loadlogin = async (req, res) => {
         if (!req.session.user) {
             return res.render('user/login', { error: null })
         } else {
-            //res.redirect('/user/home')
         }
 
     } catch (error) {
@@ -295,8 +286,8 @@ const login = async (req, res) => {
             return res.render('user/login', { error: "incorrect password" })
         }
 
-        req.session.user = finduser._id
-        res.redirect('/user/home')
+        req.session.user = finduser
+        res.redirect('/user/')
 
     } catch (error) {
 
@@ -402,67 +393,104 @@ const changepassword = async (req, res) => {
     }
 }
 
-
-const loadhome = async (req, res) => {
+const loadProducts = async (req, res) => {
     try {
+        const { search, category, brand, minPrice, maxPrice, sort } = req.query;
+        const query = { status: 'available' };
 
-        const newArrivals = [
-            {
-                image: "/images/watch1.jpg",
-                title: "Classic Watch",
-                rating: 4,
-                price: 129.99
-            },
-            {
-                image: "/images/watch2.jpg",
-                title: "Modern Watch",
-                rating: 5,
-                price: 199.99
+        if (search) {
+            const brandIds = await Brand.find({
+                name: { $regex: new RegExp('.*' + search + '.*', 'i') }
+            }).select('_id');
+            query.$or = [
+                { name: { $regex: new RegExp('.*' + search + '.*', 'i') } },
+                { brand: { $in: brandIds.map(id => id._id) } }
+            ];
+        }
+        if (category) query.category = category;
+        if (brand) query.brand = brand;
+        if (minPrice) query.salePrice = { $gte: parseFloat(minPrice) };
+        if (maxPrice) query.salePrice = { ...query.salePrice, $lte: parseFloat(maxPrice) };
+
+        const sortOptions = {
+            latest: { createdAt: -1 },
+            'price-asc': { salePrice: 1 },
+            'price-desc': { salePrice: -1 },
+            rating: { rating: -1 }
+        };
+
+        const products = await Product.find(query)
+            .sort(sortOptions[sort] || { createdAt: -1 })
+            .populate('brand')
+            .populate('category');
+
+        const categories = await Category.find({ isListed: true });
+        const brands = await Brand.find({ isListed: true });
+
+        let cartCount = 0;
+        if (req.session.user) {
+            const cart = await Cart.findOne({ user: req.session.user._id });
+            if (cart) {
+                cartCount = cart.items.reduce((sum, item) => sum + item.quantity, 0);
             }
-        ];
+        }
 
-        const trendingProducts = [
-            {
-                image: "/images/watch3.jpg",
-                title: "Trending Watch A",
-                rating: 5,
-                price: 249.99
-            },
-            {
-                image: "/images/watch4.jpg",
-                title: "Trending Watch B",
-                rating: 4,
-                price: 179.99
-            }
-        ];
-
-        const exploreProducts = [
-            {
-                image: "/images/watch5.jpg",
-                title: "Explorer Watch A",
-                rating: 3,
-                price: 149.99
-            },
-            {
-                image: "/images/watch6.jpg",
-                title: "Explorer Watch B",
-                rating: 5,
-                price: 229.99
-            }
-        ];
-
-        return res.render('user/landingPage', {
-            user: req.session.user,
-            newArrivals,
-            trendingProducts,
-            exploreProducts
+        res.render('user/products', {
+            user: req.session.user || null,
+            cartCount,
+            newArrivals: products.slice(0, 8),
+            trendingProducts: products.slice(8, 16),
+            exploreProducts: products.slice(16, 28),
+            categories,
+            brands,
+            search: search || '',
+            category: category || '',
+            brandId: brand || '',
+            minPrice: minPrice || '',
+            maxPrice: maxPrice || '',
+            sort: sort || ''
         });
-
     } catch (error) {
-        console.log('user homepage not found', error);
-        res.status(500).send('server error');
+        console.error('Error loading products:', error);
+        res.status(500).render('user/error', { error: 'Failed to load products' });
     }
 };
+
+const loadProductDetails = async (req, res) => {
+    try {
+        const user = await User.findOne({isBlocked:false})
+        const productId = req.params.id;
+        const product = await Product.findById(productId)
+            .populate('brand')
+            .populate('category');
+        
+         if(!user){
+            res.redirect("/user/login")
+         }
+
+        if (!product) {
+            return res.status(404).render('error404', { error: 'Product not found' });
+        }
+
+        let cartCount = 0;
+        if (req.session.user) {
+            const cart = await Cart.findOne({ user: req.session.user._id });
+            if (cart) {
+                cartCount = cart.items.reduce((sum, item) => sum + item.quantity, 0);
+            }
+        }
+
+        res.render('user/productDetails', {
+            user: req.session.user || null,
+            cartCount,
+            product
+        });
+    } catch (error) {
+        console.error('Error loading product details:', error);
+        res.status(500).render('user/error', { error: 'Failed to load product details' });
+    }
+};
+
 
 const loadlogout = async (req, res) => {
     try {
@@ -489,6 +517,7 @@ module.exports = {
     forgotpasswordotp,
     loadchangepassword,
     changepassword,
-    loadhome,
+    loadProducts,
+    loadProductDetails,
     loadlogout
 }

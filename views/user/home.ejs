@@ -1,7 +1,6 @@
 
 <%- include('../../views/Partials/user/navbar') %>
 
-<!-- Hero Section -->
 <section class="hero-section">
     <div class="container">
         <h1>NEW YEAR, <br>BIG SALE</h1>
@@ -10,7 +9,6 @@
     </div>
 </section>
 
-<!-- New Arrivals Section -->
 <section class="container">
     <h2 class="section-title">New Arrivals</h2>
     <div class="row">
@@ -36,7 +34,6 @@
     </div>
 </section>
 
-<!-- Sale Banner -->
 <section class="sale-banner">
     <div class="container">
         <h2>SALE</h2>
@@ -44,7 +41,6 @@
     </div>
 </section>
 
-<!-- Trending Section -->
 <section class="container">
     <h2 class="section-title">Trending</h2>
     <div class="row">
@@ -70,7 +66,6 @@
     </div>
 </section>
 
-<!-- Explore More Section -->
 <section class="container mb-5">
     <h2 class="section-title">Explore More</h2>
     <div class="row">
@@ -96,7 +91,6 @@
     </div>
 </section>
 
-<!-- Features Section -->
 <section class="container-fluid bg-light py-5">
     <div class="container">
         <div class="row">
@@ -144,9 +138,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    // Optional JavaScript for enhancing functionality
     document.addEventListener('DOMContentLoaded', function() {
-        // Add smooth scrolling for links
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function(e) {
                 e.preventDefault();
@@ -156,7 +148,6 @@
             });
         });
         
-        // Initialize any Bootstrap tooltips
         const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
         const tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
             return new bootstrap.Tooltip(tooltipTriggerEl);

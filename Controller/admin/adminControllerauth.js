@@ -1,7 +1,6 @@
 const Admin = require('../../Model/userSchema');
 const bcrypt = require('bcrypt');
 
-// Load admin login page
 const loadsign = async (req, res) => {
     try {
         res.render('Admin/adminlogin', { error: null });
@@ -10,7 +9,6 @@ const loadsign = async (req, res) => {
     }
 };
 
-// Admin login logic
 const login = async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -25,24 +23,25 @@ const login = async (req, res) => {
             return res.render('Admin/adminlogin', { error: 'Invalid credentials' });
         }
 
-        req.session.admin = admin; // Store admin session
+        req.session.admin = { id: admin._id, email: admin.email };
+        res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private')
         res.redirect('/admin/dashboard');
     } catch (error) {
         res.redirect('/user/error404');
     }
 };
 
-// Admin logout
+
 const logout = async (req, res) => {
     try {
-        delete req.session.admin; // Only destroy admin session part
-        res.redirect('/admin/login'); // Redirect to login
+        delete req.session.admin; 
+        res.redirect('/admin/login'); 
     } catch (error) {
         res.redirect('/user/error404');
     }
 };
  
-// Admin dashboard
+
 const loaddashboard = async (req, res) => {
     try {
         res.render('Admin/admindashbord');
@@ -56,6 +55,6 @@ const loaddashboard = async (req, res) => {
 module.exports = {
     loadsign,
     login,
-    logout,        // Make sure to export logout!
+    logout,        
     loaddashboard
 };

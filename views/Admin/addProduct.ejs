@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Add Watch - TIMZO Admin</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .error-message { color: #dc3545; font-size: 0.875rem; }
+    .thumbnails-container { display: flex; overflow-x: auto; gap: 10px; margin-top: 10px; }
+    .thumbnail { position: relative; }
+    .thumbnail img { width: 60px; height: auto; border: 1px solid #ddd; border-radius: 4px; }
+    .remove-icon { position: absolute; top: -5px; right: -5px; background: #dc3545; color: white; border-radius: 50%; width: 20px; height: 20px; text-align: center; cursor: pointer; font-size: 14px; }
+    .sidebar { width: 250px; min-height: 100vh; background-color: #1a202c; color: white; padding: 1rem; position: fixed; }
+    .main-content { margin-left: 250px; padding: 2rem; background-color: #f7fafc; }
+    .content-header { margin-bottom: 1rem; }
+    body { padding-top: 70px; }
+    .content-header h2 { font-size: 1.5rem; font-weight: 700; color: #2d3748; }
+    .card { border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    .btn-primary { background-color: #2b6cb0; border-color: #2b6cb0; }
+    .btn-primary:hover { background-color: #2c5282; border-color: #2c5282; }
+    .form-control, .form-select { border-radius: 6px; }
+    .crop-container { position: relative; display: none; margin-top: 10px; }
+    .crop-box { position: absolute; border: 2px dashed #2b6cb0; cursor: move; }
+    .crop-box .resize-handle { position: absolute; width: 10px; height: 10px; background: #2b6cb0; cursor: nwse-resize; bottom: -5px; right: -5px; }
+
+    /* Responsive Adjustments */
+    @media (max-width: 767px) {
+      .sidebar {
+        display: none;
+      }
+      .main-content {
+        margin-left: 0;
+        padding: 1rem;
+      }
+      body {
+        padding-top: 56px;
+      }
+      .form-control, .form-select {
+        font-size: 0.9rem;
+      }
+      .content-header h2 {
+        font-size: 1.25rem;
+      }
+      .btn-primary {
+        width: 100%;
+      }
+      .thumbnail img {
+        width: 50px;
+      }
+      .crop-container canvas {
+        max-width: 100%;
+      }
+    }
+  </style>
+</head>
+<body class="d-flex">
+  <aside class="sidebar">
+    <%- include('../Partials/admin/adminsidebar', { activePage: 'product' }) %>
+  </aside>
+  <div class="flex-grow-1 main-content">
+    <%- include('../Partials/admin/navbar') %>
+    <section class="content-main">
+      <div class="content-header">
+        <h2 class="content-title">Add New Watch</h2>
+      </div>
+      <% if (error) { %>
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+          <%= error %>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      <% } %>
+      <div class="card mb-4">
+        <div class="card-body">
+          <form method="post" action="/admin/addproducts" enctype="multipart/form-data" onsubmit="return validateForm()">
+            <div class="mb-4">
+              <label for="product_name" class="form-label">Watch Name</label>
+              <input type="text" placeholder="e.g., TIMZO Chrono X" name="productName" class="form-control" id="product_name" value="<%= formData.productName || '' %>" />
+              <div id="productName-error" class="error-message"></div>
+            </div>
+            <div class="mb-4">
+              <label class="form-label">Brand</label>
+              <select class="form-select" name="brand">
+                <option value="">Select Brand</option>
+                <% brand.forEach(b => { %>
+                  <option value="<%= b._id %>" <%= formData.brand === b._id.toString() ? 'selected' : '' %>><%= b.name %></option>
+                <% }) %>
+              </select>
+              <div id="brand-error" class="error-message"></div>
+            </div>
+            <div class="mb-4">
+              <label class="form-label">Category</label>
+              <select class="form-select" name="category">
+                <option value="">Select Category</option>
+                <% cat.forEach(c => { %>
+                  <option value="<%= c._id %>" <%= formData.category === c._id.toString() ? 'selected' : '' %>><%= c.name %></option>
+                <% }) %>
+              </select>
+              <div id="category-error" class="error-message"></div>
+            </div>
+            <div class="mb-4">
+              <label for="descriptionid" class="form-label">Description</label>
+              <textarea placeholder="Describe the watch..." name="description" class="form-control" id="descriptionid" rows="4"><%= formData.description || '' %></textarea>
+              <div id="description-error" class="error-message"></div>
+            </div>
+            <div class="row">
+              <div class="col-lg-4 mb-4">
+                <label class="form-label">Regular Price</label>
+                <input placeholder="$" name="regularPrice" type="text" class="form-control" value="<%= formData.regularPrice || '' %>" />
+                <div id="regularPrice-error" class="error-message"></div>
+              </div>
+              <div class="col-lg-4 mb-4">
+                <label class="form-label">Sale Price</label>
+                <input placeholder="$" name="salePrice" type="text" class="form-control" value="<%= formData.salePrice || '' %>" />
+                <div id="salePrice-error" class="error-message"></div>
+              </div>
+              <div class="col-lg-4 mb-4">
+                <label class="form-label">Stock</label>
+                <input name="stock" type="text" class="form-control" value="<%= formData.stock || '' %>" />
+                <div id="stock-error" class="error-message"></div>
+              </div>
+            </div>
+            <div class="mb-4">
+              <label class="form-label">Color</label>
+              <input name="color" type="text" placeholder="e.g., Black" class="form-control" value="<%= formData.color || '' %>" />
+              <div id="color-error" class="error-message"></div>
+            </div>
+            <div class="mb-4">
+              <label class="form-label">Material</label>
+              <input name="material" type="text" placeholder="e.g., Stainless Steel" class="form-control" value="<%= formData.material || '' %>" />
+              <div id="material-error" class="error-message"></div>
+            </div>
+            <div class="mb-4">
+              <label class="form-label">Water Resistance</label>
+              <select class="form-select" name="waterResistance">
+                <option value="Not specified" <%= formData.waterResistance === 'Not specified' ? 'selected' : '' %>>Not specified</option>
+                <option value="30m" <%= formData.waterResistance === '30m' ? 'selected' : '' %>>30m</option>
+                <option value="50m" <%= formData.waterResistance === '50m' ? 'selected' : '' %>>50m</option>
+                <option value="100m" <%= formData.waterResistance === '100m' ? 'selected' : '' %>>100m</option>
+                <option value="200m" <%= formData.waterResistance === '200m' ? 'selected' : '' %>>200m</option>
+                <option value="300m" <%= formData.waterResistance === '300m' ? 'selected' : '' %>>300m</option>
+              </select>
+              <div id="waterResistance-error" class="error-message"></div>
+            </div>
+            <div class="mb-4">
+              <label class="form-label">Warranty</label>
+              <select class="form-select" name="warranty">
+                <option value="1 Year" <%= formData.warranty === '1 Year' ? 'selected' : '' %>>1 Year</option>
+                <option value="2 Years" <%= formData.warranty === '2 Years' ? 'selected' : '' %>>2 Years</option>
+                <option value="3 Years" <%= formData.warranty === '3 Years' ? 'selected' : '' %>>3 Years</option>
+                <option value="Limited Lifetime" <%= formData.warranty === 'Limited Lifetime' ? 'selected' : '' %>>Limited Lifetime</option>
+              </select>
+              <div id="warranty-error" class="error-message"></div>
+            </div>
+            <div class="mb-4">
+              <label class="form-label">Movement Type</label>
+              <select class="form-select" name="movementType">
+                <option value="" <%= !formData.movementType ? 'selected' : '' %>>Select Movement Type</option>
+                <option value="Quartz" <%= formData.movementType === 'Quartz' ? 'selected' : '' %>>Quartz</option>
+                <option value="Automatic" <%= formData.movementType === 'Automatic' ? 'selected' : '' %>>Automatic</option>
+                <option value="Manual" <%= formData.movementType === 'Manual' ? 'selected' : '' %>>Manual</option>
+                <option value="Solar" <%= formData.movementType === 'Solar' ? 'selected' : '' %>>Solar</option>
+              </select>
+              <div id="movementType-error" class="error-message"></div>
+            </div>
+            <div class="card mb-4">
+              <div class="card-header">
+                <h4>Watch Images (Up to 4)</h4>
+              </div>
+              <div class="card-body">
+                <div class="row">
+                  <% for (let i = 1; i <= 4; i++) { %>
+                    <div class="col-md-6 mb-3">
+                      <label for="input<%= i %>">Image <%= i %></label>
+                      <input class="form-control" type="file" name="images" id="input<%= i %>" accept="image/*" onchange="viewImage(event, <%= i %>)" />
+                      <img src="" alt="" id="imgView<%= i %>" class="mt-2" style="max-height: 150px; display: none;" />
+                      <div class="crop-container" id="cropContainer<%= i %>">
+                        <canvas id="cropCanvas<%= i %>"></canvas>
+                        <div class="crop-box" id="cropBox<%= i %>">
+                          <div class="resize-handle"></div>
+                        </div>
+                        <button type="button" class="btn btn-success btn-sm mt-2" onclick="saveCrop(<%= i %>)">Save Crop</button>
+                        <input type="hidden" name="cropData<%= i %>" id="cropData<%= i %>" value="">
+                      </div>
+                    </div>
+                  <% } %>
+                </div>
+                <div id="images-error" class="error-message"></div>
+                <div id="thumbnailsContainer" class="thumbnails-container"></div>
+              </div>
+            </div>
+            <button class="btn btn-md rounded btn-primary" type="submit">Add Watch</button>
+          </form>
+        </div>
+      </div>
+    </section>
+    <%- include('../Partials/admin/footer') %>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    let currentCropIndex = null;
+    let cropData = {};
+
+    function viewImage(event, index) {
+      const input = event.target;
+      if (!input.files[0]) return;
+      const reader = new FileReader();
+      reader.onload = function () {
+        const dataURL = reader.result;
+        const image = document.getElementById(`imgView${index}`);
+        image.src = dataURL;
+        image.style.display = 'block';
+
+        // Setup cropping
+        const cropContainer = document.getElementById(`cropContainer${index}`);
+        cropContainer.style.display = 'block';
+        setupCropper(index, image);
+        handleFileSelect();
+      };
+      reader.readAsDataURL(input.files[0]);
+    }
+
+    function setupCropper(index, image) {
+      const canvas = document.getElementById(`cropCanvas${index}`);
+      const ctx = canvas.getContext('2d');
+      const cropBox = document.getElementById(`cropBox${index}`);
+      const cropDataInput = document.getElementById(`cropData${index}`);
+
+      const img = new Image();
+      img.src = image.src;
+      img.onload = function () {
+        const maxWidth = 300;
+        const maxHeight = 200;
+        const ratio = Math.min(maxWidth / img.width, maxHeight / img.height);
+        canvas.width = img.width * ratio;
+        canvas.height = img.height * ratio;
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+        let cropWidth = Math.min(150, canvas.width * 0.5);
+        let cropHeight = Math.min(150, canvas.height * 0.5);
+        let cropX = (canvas.width - cropWidth) / 2;
+        let cropY = (canvas.height - cropHeight) / 2;
+
+        cropBox.style.width = `${cropWidth}px`;
+        cropBox.style.height = `${cropHeight}px`;
+        cropBox.style.left = `${cropX}px`;
+        cropBox.style.top = `${cropY}px`;
+
+        cropData[index] = { x: cropX, y: cropY, width: cropWidth, height: cropHeight };
+        cropDataInput.value = JSON.stringify(cropData[index]);
+
+        let isDragging = false;
+        let isResizing = false;
+        let startX, startY;
+
+        cropBox.addEventListener('mousedown', (e) => {
+          if (e.target.classList.contains('resize-handle')) {
+            isResizing = true;
+          } else {
+            isDragging = true;
+          }
+          startX = e.clientX;
+          startY = e.clientY;
+        });
+
+        document.addEventListener('mousemove', (e) => {
+          if (isDragging) {
+            const dx = e.clientX - startX;
+            const dy = e.clientY - startY;
+            cropX = Math.max(0, Math.min(cropX + dx, canvas.width - cropWidth));
+            cropY = Math.max(0, Math.min(cropY + dy, canvas.height - cropHeight));
+            cropBox.style.left = `${cropX}px`;
+            cropBox.style.top = `${cropY}px`;
+            startX = e.clientX;
+            startY = e.clientY;
+            cropData[index].x = cropX;
+            cropData[index].y = cropY;
+            cropDataInput.value = JSON.stringify(cropData[index]);
+          } else if (isResizing) {
+            const dx = e.clientX - startX;
+            const dy = e.clientY - startY;
+            cropWidth = Math.max(50, Math.min(cropWidth + dx, canvas.width - cropX));
+            cropHeight = Math.max(50, Math.min(cropHeight + dy, canvas.height - cropY));
+            cropBox.style.width = `${cropWidth}px`;
+            cropBox.style.height = `${cropHeight}px`;
+            startX = e.clientX;
+            startY = e.clientY;
+            cropData[index].width = cropWidth;
+            cropData[index].height = cropHeight;
+            cropDataInput.value = JSON.stringify(cropData[index]);
+          }
+        });
+
+        document.addEventListener('mouseup', () => {
+          isDragging = false;
+          isResizing = false;
+        });
+      };
+    }
+
+    function saveCrop(index) {
+      const cropContainer = document.getElementById(`cropContainer${index}`);
+      cropContainer.style.display = 'none';
+    }
+
+    const selectedImages = [];
+    document.querySelectorAll('input[name="images"]').forEach(input => {
+      input.addEventListener('change', handleFileSelect);
+    });
+
+    function handleFileSelect() {
+      const thumbnailsContainer = document.getElementById('thumbnailsContainer');
+      thumbnailsContainer.innerHTML = '';
+      selectedImages.length = 0;
+      document.querySelectorAll('input[name="images"]').forEach(input => {
+        if (input.files[0]) {
+          const file = input.files[0];
+          selectedImages.push(file);
+          const thumbnail = document.createElement('div');
+          thumbnail.classList.add('thumbnail');
+          const img = document.createElement('img');
+          img.src = URL.createObjectURL(file);
+          img.alt = 'thumbnail';
+          const removeIcon = document.createElement('span');
+          removeIcon.classList.add('remove-icon');
+          removeIcon.innerHTML = '×';
+          removeIcon.onclick = function () {
+            const index = selectedImages.indexOf(file);
+            if (index !== -1) {
+              selectedImages.splice(index, 1);
+              input.value = '';
+              thumbnail.remove();
+              document.getElementById(`imgView${input.id.replace('input', '')}`).style.display = 'none';
+              document.getElementById(`cropContainer${input.id.replace('input', '')}`).style.display = 'none';
+            }
+          };
+          thumbnail.appendChild(img);
+          thumbnail.appendChild(removeIcon);
+          thumbnailsContainer.appendChild(thumbnail);
+        }
+      });
+    }
+
+    function validateForm() {
+      clearErrorMessages();
+      const fields = {
+        productName: { value: document.getElementsByName('productName')[0].value, errorId: 'productName-error' },
+        description: { value: document.getElementById('descriptionid').value, errorId: 'description-error' },
+        brand: { value: document.getElementsByName('brand')[0].value, errorId: 'brand-error' },
+        category: { value: document.getElementsByName('category')[0].value, errorId: 'category-error' },
+        regularPrice: { value: document.getElementsByName('regularPrice')[0].value, errorId: 'regularPrice-error' },
+        salePrice: { value: document.getElementsByName('salePrice')[0].value, errorId: 'salePrice-error' },
+        stock: { value: document.getElementsByName('stock')[0].value, errorId: 'stock-error' },
+        color: { value: document.getElementsByName('color')[0].value, errorId: 'color-error' },
+        movementType: { value: document.getElementsByName('movementType')[0].value, errorId: 'movementType-error' }
+      };
+      const images = document.querySelectorAll('input[name="images"]');
+      let isValid = true;
+
+      if (!fields.productName.value.trim()) {
+        displayErrorMessage(fields.productName.errorId, 'Please enter a watch name.');
+        isValid = false;
+      } else if (!/^[a-zA-Z0-9\s]+$/.test(fields.productName.value.trim())) {
+        displayErrorMessage(fields.productName.errorId, 'Watch name should contain only alphanumeric characters.');
+        isValid = false;
+      }
+
+      if (!fields.description.value.trim()) {
+        displayErrorMessage(fields.description.errorId, 'Please enter a description.');
+        isValid = false;
+      } else if (!/^[a-zA-Z0-9\s.,!:/+\-()@#'"[\]{}&%°]+$/.test(fields.description.value.trim())) {
+        displayErrorMessage(fields.description.errorId, 'Description contains invalid characters.');
+        isValid = false;
+      }
+
+      if (!fields.brand.value) {
+        displayErrorMessage(fields.brand.errorId, 'Please select a brand.');
+        isValid = false;
+      }
+
+      if (!fields.category.value) {
+        displayErrorMessage(fields.category.errorId, 'Please select a category.');
+        isValid = false;
+      }
+
+      if (!/^\d+(\.\d{1,2})?$/.test(fields.regularPrice.value) || parseFloat(fields.regularPrice.value) <= 0) {
+        displayErrorMessage(fields.regularPrice.errorId, 'Please enter a valid positive price.');
+        isValid = false;
+      }
+
+      if (!/^\d+(\.\d{1,2})?$/.test(fields.salePrice.value) || parseFloat(fields.salePrice.value) < 0) {
+        displayErrorMessage(fields.salePrice.errorId, 'Please enter a valid non-negative price.');
+        isValid = false;
+      }
+
+      if (parseFloat(fields.regularPrice.value) <= parseFloat(fields.salePrice.value)) {
+        displayErrorMessage(fields.regularPrice.errorId, 'Regular price must be greater than sale price.');
+        isValid = false;
+      }
+
+      if (!/^\d+$/.test(fields.stock.value) || parseInt(fields.stock.value) < 0) {
+        displayErrorMessage(fields.stock.errorId, 'Please enter a valid non-negative stock quantity.');
+        isValid = false;
+      }
+
+      if (!fields.color.value.trim()) {
+        displayErrorMessage(fields.color.errorId, 'Please enter a color.');
+        isValid = false;
+      }
+
+      if (!fields.movementType.value) {
+        displayErrorMessage(fields.movementType.errorId, 'Please select a movement type.');
+        isValid = false;
+      }
+
+      let hasImage = false;
+      images.forEach(input => {
+        if (input.files.length > 0) hasImage = true;
+      });
+      if (!hasImage) {
+        displayErrorMessage('images-error', 'Please select at least one image.');
+        isValid = false;
+      }
+
+      return isValid;
+    }
+
+    function displayErrorMessage(elementId, message) {
+      const errorElement = document.getElementById(elementId);
+      errorElement.innerText = message;
+      errorElement.style.display = 'block';
+    }
+
+    function clearErrorMessages() {
+      document.querySelectorAll('.error-message').forEach(element => {
+        element.innerText = '';
+        element.style.display = 'none';
+      });
+    }
+
+    window.addEventListener('load', adjustPadding);
+    window.addEventListener('resize', adjustPadding);
+
+    function adjustPadding() {
+      const navbar = document.querySelector('.navbar');
+      const body = document.querySelector('body');
+      if (navbar) {
+        const navbarHeight = navbar.offsetHeight;
+        body.style.paddingTop = `${navbarHeight}px`;
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TIMZO</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/landingPage.css">
+    <link rel="icon" type="image/x-icon" href="/images/TIMZO.jpg">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        .filter-section {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        .filter-section .form-control,
+        .filter-section .form-select {
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            padding: 8px 12px;
+            transition: border-color 0.3s ease;
+        }
+        .filter-section .form-control:focus,
+        .filter-section .form-select:focus {
+            border-color: #6f42c1; 
+            box-shadow: 0 0 5px rgba(111, 66, 193, 0.2);
+        }
+        .filter-section .btn-primary {
+            background-color: #6f42c1;
+            border-color: #6f42c1;
+            transition: background-color 0.3s ease;
+        }
+        .filter-section .btn-primary:hover {
+            background-color: #563d7c;
+            border-color: #563d7c;
+        }
+        .filter-collapse {
+            display: none;
+        }
+        @media (max-width: 768px) {
+            .filter-section {
+                margin-bottom: 1rem;
+            }
+            .filter-collapse {
+                display: block;
+            }
+        }
+        .product-card {
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        .product-card a {
+            text-decoration: none;
+            color: inherit;
+        }
+        .btn-gold {
+            background-color: #ffd700;
+            color: #000;
+            border: none;
+            transition: background-color 0.3s ease;
+        }
+        .btn-gold:hover {
+            background-color: #e6c200;
+        }
+    </style>
+</head>
+<body>
+    <%- include('.././Partials/user/navbar', { user: user, cartCount: cartCount, search: search }) %>
+
+    <section class="container my-4">
+        <div class="filter-section">
+            <button class="btn btn-primary filter-collapse mb-2" type="button" data-bs-toggle="collapse" data-bs-target="#filterCollapse" aria-expanded="false" aria-controls="filterCollapse">
+                Filters <i class="fas fa-filter"></i>
+            </button>
+            <div class="collapse show" id="filterCollapse">
+                <form id="filterForm" action="/products" method="get">
+                    <div class="row g-3 align-items-center">
+                        <div class="col-md-3">
+                            <input type="text" name="search" class="form-control" placeholder="Search watches..." value="<%= search || '' %>">
+                        </div>
+                        <div class="col-md-2">
+                            <select name="category" class="form-select">
+                                <option value="">All Categories</option>
+                                <% categories.forEach(cat => { %>
+                                    <option value="<%= cat._id %>" <%= category === cat._id.toString() ? 'selected' : '' %>><%= cat.name %></option>
+                                <% }) %>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <select name="brand" class="form-select">
+                                <option value="">All Brands</option>
+                                <% brands.forEach(brand => { %>
+                                    <option value="<%= brand._id %>" <%= brandId === brand._id.toString() ? 'selected' : '' %>><%= brand.name %></option>
+                                <% }) %>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <input type="number" name="minPrice" class="form-control" placeholder="Min Price" value="<%= minPrice || '' %>">
+                        </div>
+                        <div class="col-md-2">
+                            <input type="number" name="maxPrice" class="form-control" placeholder="Max Price" value="<%= maxPrice || '' %>">
+                        </div>
+                        <div class="col-md-2">
+                            <select name="sort" class="form-select">
+                                <option value="">Sort By</option>
+                                <option value="latest" <%= sort === 'latest' ? 'selected' : '' %>>Latest</option>
+                                <option value="price-asc" <%= sort === 'price-asc' ? 'selected' : '' %>>Price: Low to High</option>
+                                <option value="price-desc" <%= sort === 'price-desc' ? 'selected' : '' %>>Price: High to Low</option>
+                                <option value="rating" <%= sort === 'rating' ? 'selected' : '' %>>Top Rated</option>
+                            </select>
+                        </div>
+                        <div class="col-md-1">
+                            <button type="submit" class="btn btn-primary w-100">Apply</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <section class="container my-4">
+        <h4 class="mb-3">Products</h4>
+        <div class="row g-4">
+            <% if (newArrivals.length === 0) { %>
+                <div class="col-12">
+                    <p class="text-muted">No products found matching the filters.</p>
+                </div>
+            <% } else { %>
+                <% newArrivals.forEach(product => { %>
+                    <div class="col-6 col-md-3">
+                        <a href="/products/<%= product._id %>">
+                            <div class="card product-card border-0">
+                                <img src="<%= product.images[0] || '/images/placeholder.jpg' %>" class="card-img-top" alt="<%= product.name %>">
+                                <div class="card-body text-center">
+                                    <h5 class="product-title"><%= product.name %></h5>
+                                    <p class="text-muted"><%= product.brand.name %></p>
+                                    <div class="rating">
+                                        <% for(let i = 0; i < Math.floor(product.rating); i++) { %>
+                                            <i class="fas fa-star text-warning"></i>
+                                        <% } %>
+                                        <% for(let i = Math.floor(product.rating); i < 5; i++) { %>
+                                            <i class="far fa-star text-muted"></i>
+                                        <% } %>
+                                    </div>
+                                    <p class="product-price fw-bold">$<%= product.salePrice.toFixed(2) %></p>
+                                    <button class="btn btn-gold btn-sm add-to-cart" data-product-id="<%= product._id %>" onclick="event.stopPropagation();">Add to Cart</button>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                <% }); %>
+            <% } %>
+        </div>
+    </section>
+
+    <%- include('.././Partials/user/footer') %>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.add-to-cart').forEach(button => {
+                button.addEventListener('click', async () => {
+                    const productId = button.getAttribute('data-product-id');
+                    const isLoggedIn = <%= user ? 'true' : 'false' %>;
+                    if (!isLoggedIn) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Please Log In',
+                            text: 'You need to be logged in to add items to your cart.',
+                            showConfirmButton: true,
+                            confirmButtonText: 'Log In'
+                        }).then(result => {
+                            if (result.isConfirmed) window.location.href = '/login';
+                        });
+                        return;
+                    }
+
+                    try {
+                        const response = await fetch('/user/cart/add', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ productId, quantity: 1 })
+                        });
+                        const data = await response.json();
+                        if (data.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Added to Cart',
+                                text: 'Product added to your cart!',
+                                timer: 1500
+                            });
+                            const cartBadge = document.querySelector('.cart-count');
+                            if (cartBadge) {
+                                cartBadge.textContent = parseInt(cartBadge.textContent) + 1;
+                            }
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: data.message || 'Failed to add to cart'
+                            });
+                        }
+                    } catch (error) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'An error occurred while adding to cart'
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

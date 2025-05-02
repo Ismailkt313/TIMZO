@@ -10,19 +10,17 @@
   
   <body class="bg-gray-100 min-h-screen flex flex-col">
 
-    <!-- Navbar -->
+ 
     <%- include('.././Partials/admin/navbar') %>
 
     <div class="flex flex-1">
-      <!-- Sidebar -->
+
       <%- include('.././Partials/admin/adminsidebar', { activePage: 'dashboard' }) %>
 
-      
-      <!-- Main Content -->
-      <main class="flex-1 ml-64 p-6"> <!-- ml-64 because sidebar is 64 width -->
+
+      <main class="flex-1 ml-64 p-6"> 
         <h1 class="text-2xl font-semibold mb-6">Dashboard</h1>
 
-        <!-- Summary Cards -->
         <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-6">
           <div class="bg-white p-4 rounded-xl shadow-md">
             <h2 class="text-lg font-bold text-gray-700">Total Customers</h2>
@@ -42,7 +40,6 @@
           </div>
         </div>
 
-        <!-- Charts & Monthly Activity -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div class="bg-white p-6 rounded-xl shadow-md">
             <h2 class="text-lg font-bold mb-4">Sales Progress</h2>
@@ -65,12 +62,12 @@
           <div class="bg-white p-6 rounded-xl shadow-md">
             <h2 class="text-lg font-bold mb-4">Monthly Activity</h2>
             <div class="grid grid-cols-12 gap-2 h-36">
-              <% const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun"]; 
-                 const heights = [20, 40, 60, 80, 50, 70]; 
+              <% const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun","jul"]; 
+                 const heights = [20, 40, 60, 80, 50, 70, 100]; 
               %>
               <% months.forEach((month, index) => { %>
                 <div class="flex flex-col items-center justify-end">
-                  <div class="bg-blue-400 w-6 rounded-md" style="height:<%= heights[index] %>px"></div>
+                  <div class="bg-blue-400 w-6 rounded-md" style="height: <%= heights[index] %>px"></div>
                   <span class="text-sm mt-1"><%= month %></span>
                 </div>
               <% }) %>
@@ -80,7 +77,7 @@
       </main>
     </div>
 
-    <!-- Footer -->
+
     <%- include('.././Partials/admin/footer') %>
 
   </body>

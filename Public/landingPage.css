@@ -1,152 +1,105 @@
+/* .hero-section {
+    background: url('/images/hero-bg.jpg') no-repeat center center/cover;
+    min-height: 500px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: white;
+}
+.hero-section h1 {
+    font-size: 4rem;
+    font-weight: 700;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+.hero-section p {
+    font-size: 1.5rem;
+    margin-bottom: 2rem;
+}
 
+/* Section Titles */
+/* .section-title {
+    font-size: 2.5rem;
+    font-weight: 600;
+    position: relative;
+    display: inline-block;
+}
+.section-title::after {
+    content: '';
+    width: 50px;
+    height: 3px;
+    background: #ffd700;
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+} */
 
-    body {
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-    .navbar-brand {
-        font-weight: 700;
-        letter-spacing: 1px;
-    }
-    .hero-section {
-        background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('/images/hero-watches.jpg');
-        background-size: cover;
-        background-position: center;
-        color: white;
-        padding: 100px 0;
-        text-align: center;
-    }
-    .hero-section h1 {
-        font-size: 3rem;
-        font-weight: 700;
-        margin-bottom: 0.5rem;
-        color: gold;
-    }
-    .hero-section p {
-        font-size: 1.5rem;
-        margin-bottom: 2rem;
-    }
-    .shop-btn {
-        background-color: gold;
-        color: #000;
-        padding: 10px 30px;
-        border: none;
-        border-radius: 30px;
-        font-weight: 600;
-        transition: all 0.3s;
-    }
-    .shop-btn:hover {
-        background-color: #e6c200;
-        transform: translateY(-3px);
-    }
-    .section-title {
-        text-align: center;
-        margin: 50px 0 30px;
-        font-weight: 600;
-        position: relative;
-    }
-    .section-title:after {
-        content: '';
-        position: absolute;
-        bottom: -10px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 50px;
-        height: 2px;
-        background-color: gold;
-    }
-    .product-card {
-        border: none;
-        border-radius: 10px;
-        overflow: hidden;
-        transition: transform 0.3s, box-shadow 0.3s;
-        margin-bottom: 20px;
-    }
-    .product-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-    }
-    .product-card img {
-        height: 200px;
-        object-fit: contain;
-        padding: 20px;
-    }
-    .product-title {
-        font-weight: 500;
-        margin-bottom: 5px;
-    }
-    .product-price {
-        color: #333;
-        font-weight: 600;
-    }
-    .rating {
-        color: gold;
-        margin-bottom: 10px;
-    }
-    .sale-banner {
-        background-color: #000;
-        color: white;
-        padding: 50px 0;
-        text-align: center;
-        margin: 50px 0;
-    }
-    .sale-banner h2 {
-        font-size: 2.5rem;
-        margin-bottom: 10px;
-    }
-    .sale-banner p {
-        font-size: 1.5rem;
-        margin-bottom: 0;
-    }
-    footer {
-        background-color: #f8f9fa;
-        padding: 50px 0 20px;
-    }
-    .footer-links h5 {
-        font-weight: 600;
-        margin-bottom: 20px;
-    }
-    .footer-links ul {
-        list-style: none;
-        padding-left: 0;
-    }
-    .footer-links li {
-        margin-bottom: 10px;
-    }
-    .footer-links a {
-        color: #666;
-        text-decoration: none;
-        transition: color 0.3s;
-    }
-    .footer-links a:hover {
-        color: #000;
-    }
-    .social-icons a {
-        display: inline-block;
-        width: 36px;
-        height: 36px;
-        background-color: #ddd;
-        border-radius: 50%;
-        text-align: center;
-        line-height: 36px;
-        margin-right: 10px;
-        transition: background-color 0.3s;
-    }
-    .social-icons a:hover {
-        background-color: gold;
-    }
-    .copyright {
-        margin-top: 40px;
-        border-top: 1px solid #ddd;
-        padding-top: 20px;
-        text-align: center;
-        color: #666;
-    }
-    .feature-item {
-        text-align: center;
-        margin-bottom: 30px;
-    }
-    .feature-icon {
-        font-size: 2rem;
-        color: gold;
-        margin-bottom: 15px;
-    }
+/* Product Cards */
+/* .product-card {
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+.product-title {
+    font-size: 1.2rem;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+.product-price {
+    font-size: 1.1rem;
+    color: #333;
+} */
+
+/* Sale Banner */
+/* .sale-banner {
+    background: #222;
+    color: white;
+    text-align: center;
+    padding: 2rem 0;
+}
+.sale-banner h2 {
+    font-size: 2rem;
+    font-weight: 600;
+}
+.sale-banner p {
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+} */
+
+/* Features Section */
+/* .feature-item {
+    padding: 1rem;
+}
+.feature-icon i {
+    font-size: 2rem;
+}
+.feature-item h5 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-top: 1rem;
+}
+.feature-item p {
+    font-size: 0.9rem;
+    color: #666;
+} */
+
+/* Footer */
+/* .footer-links h5 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+.footer-links ul li {
+    margin-bottom: 0.5rem;
+}
+.social-icons a {
+    font-size: 1.2rem;
+    margin-right: 0.5rem;
+}
+.payment-icons i {
+    font-size: 1.5rem;
+    margin-right: 0.5rem;
+}  */
