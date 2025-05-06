@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <title>Timzo Admin - Customers</title>
@@ -7,23 +8,68 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
-<body class="bg-gray-100">
 
+<body class="bg-gray-100">
   <%- include('.././Partials/admin/navbar') %>
   
+  <style>
+    body {
+      padding-top: 100px; 
+    }
+    .search-container {
+      max-width: 500px;
+      margin: 0 auto 2rem auto;
+      position: relative;
+    }
+    .search-input {
+      border-radius: 20px;
+      padding: 0.5rem 1rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .search-input:focus {
+      box-shadow: 0 0 0 3px rgba(43, 108, 176, 0.2);
+      border-color: #2b6cb0;
+    }
+    .table-container {
+      max-height: auto;
+      overflow-y: auto;
+    }
+    .pagination {
+      margin-top: 1rem;
+    }
+    @media (max-width: 767px) {
+      .search-container {
+        max-width: 100%;
+        padding: 0 1rem;
+      }
+      .search-input {
+        font-size: 0.9rem;
+      }
+    }
+  </style>
 
   <div class="flex min-h-screen">
     <div class="w-64 bg-dark text-white">
-      <%- include('.././Partials/admin/adminsidebar',{ activePage: 'users' }) %>
+      <%- include('.././Partials/admin/adminsidebar', { activePage: 'users' }) %>
     </div>
     
-
     <main class="flex-1 p-6">
-      <h1 class="text-2xl font-bold mb-6">Customers</h1>
+      <h1 class="text-2xl font-bold mb-6 text-center">Customers</h1>
 
-      <div class="bg-white p-4 rounded-xl shadow-md overflow-auto">
-        <table class="table table-bordered table-hover text-center">
+      <div class="search-container">
+        <input 
+          class="form-control search-input" 
+          type="search" 
+          id="searchInput" 
+          placeholder="Search customers by name or email..." 
+          aria-label="Search"
+        >
+      </div>
+
+      <div class="bg-white p-4 rounded-xl shadow-md table-container">
+        <table class="table table-bordered table-hover text-center" id="customersTable">
           <thead class="table-dark">
             <tr>
               <th>#</th>
@@ -35,56 +81,56 @@
               <th>View</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody id="customersTableBody">
             <% if (users.length > 0) { %>
               <% users.forEach((user, index) => { %>
                 <tr>
-                    <td><%= (currentPage - 1) * 10 + index + 1 %></td>
-                    <td><%= user.fullname %></td>
-                    <td><%= user.email %></td>
-                    <td>
-                      <% if (user.isBlocked) { %>
-                        <span class="text-danger">Blocked</span>
-                      <% } else { %>
-                        <span class="text-success">Active</span>
-                      <% } %>
-                    </td>
-                    <td><%= user.createdAt.toDateString() %></td>
-                    <td>
-                      <button 
-                        class="btn btn-sm toggle-status-btn <%= user.isBlocked ? 'btn-danger' : 'btn-success' %>" 
-                        data-user-id="<%= user._id %>">
-                        <%= user.isBlocked ? 'Blocked' : 'Active' %>
-                      </button>
-                    </td>
-                    
-                    <td> 
-                      <a href="/admin/userprofile/<%= user._id %>" class="btn btn-sm btn-outline-primary" title="View Profile">
-                        <i class="bi bi-eye " ></i>
-                      </a>
-                    </td>
-                  </tr>
-                  
+                  <td><%= (currentPage - 1) * 10 + index + 1 %></td>
+                  <td><%= user.fullname %></td>
+                  <td><%= user.email %></td>
+                  <td>
+                    <% if (user.isBlocked) { %>
+                      <span class="text-danger">Blocked</span>
+                    <% } else { %>
+                      <span class="text-success">Active</span>
+                    <% } %>
+                  </td>
+                  <td><%= user.createdAt.toDateString() %></td>
+                  <td>
+                    <button class="btn btn-sm toggle-status-btn <%= user.isBlocked ? 'btn-danger' : 'btn-success' %>"
+                      data-user-id="<%= user._id %>" data-status="<%= user.isBlocked ? 'unblock' : 'block' %>">
+                      <%= user.isBlocked ? 'Blocked' : 'Active' %>
+                    </button>
+                  </td>
+                  <td>
+                    <a href="/admin/userprofile/<%= user._id %>" class="btn btn-sm btn-outline-primary" title="View Profile">
+                      <i class="bi bi-eye"></i>
+                    </a>
+                  </td>
+                </tr>
               <% }) %>
             <% } else { %>
               <tr>
-                <td colspan="6">No users found.</td>
+                <td colspan="7">No users found.</td>
               </tr>
             <% } %>
           </tbody>
         </table>
 
-        <div class="mt-4 flex justify-center gap-2">
+        <div class="pagination flex justify-center gap-2" id="pagination">
           <% if (currentPage > 1) { %>
-            <a class="px-3 py-1 bg-gray-300 rounded hover:bg-gray-400" href="/admin/users?page=<%= currentPage - 1 %>">« Prev</a>
+            <a class="px-3 py-1 bg-gray-300 rounded hover:bg-gray-400"
+              href="/admin/users?page=<%= currentPage - 1 %>">« Prev</a>
           <% } %>
-
           <% for (let i = 1; i <= totalPages; i++) { %>
-            <a class="px-3 py-1 rounded <%= currentPage === i ? 'bg-blue-500 text-white' : 'bg-gray-200 hover:bg-gray-300' %>" href="/admin/users?page=<%= i %>"><%= i %></a>
+            <a class="px-3 py-1 rounded <%= currentPage === i ? 'bg-blue-500 text-white' : 'bg-gray-200 hover:bg-gray-300' %>"
+              href="/admin/users?page=<%= i %>">
+              <%= i %>
+            </a>
           <% } %>
-
           <% if (currentPage < totalPages) { %>
-            <a class="px-3 py-1 bg-gray-300 rounded hover:bg-gray-400" href="/admin/users?page=<%= currentPage + 1 %>">Next »</a>
+            <a class="px-3 py-1 bg-gray-300 rounded hover:bg-gray-400"
+              href="/admin/users?page=<%= currentPage + 1 %>">Next »</a>
           <% } %>
         </div>
       </div>
@@ -92,44 +138,161 @@
   </div>
 
   <%- include('.././Partials/admin/footer') %>
-  <script>
-  document.querySelectorAll('.toggle-status-btn').forEach(button => {
-    button.addEventListener('click', async function () {
-      const userId = this.dataset.userId;
-      const btn = this;
 
+  <script>
+    // Debounce function to limit API calls
+    function debounce(func, delay) {
+      let timeoutId;
+      return function (...args) {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => func.apply(this, args), delay);
+      };
+    }
+
+    // Function to fetch and update the table with search results
+    const updateTable = debounce(async (query) => {
       try {
-        const response = await fetch(`/admin/toggle-user-status/${userId}`, {
-          method: 'PATCH',
+        const response = await fetch(`/admin/search-users?query=${encodeURIComponent(query)}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json'
+          }
         });
 
         const data = await response.json();
+        const tbody = document.getElementById('customersTableBody');
+        const pagination = document.getElementById('pagination');
 
-        if (data.success) {
-          const statusCell = btn.closest('tr').querySelector('td:nth-child(4)');
-          
-          if (data.isBlocked) {
-            btn.classList.remove('btn-success');
-            btn.classList.add('btn-danger');
-            btn.textContent = 'Blocked';
-            statusCell.innerHTML = '<span class="text-danger">Blocked</span>';
-          } else {
-            btn.classList.remove('btn-danger');
-            btn.classList.add('btn-success');
-            btn.textContent = 'Active';
-            statusCell.innerHTML = '<span class="text-success">Active</span>';
+        // Clear existing table rows
+        tbody.innerHTML = '';
+
+        if (data.users.length > 0) {
+          data.users.forEach((user, index) => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+              <td>${index + 1}</td>
+              <td>${user.fullname}</td>
+              <td>${user.email}</td>
+              <td>
+                <span class="text-${user.isBlocked ? 'danger' : 'success'}">
+                  ${user.isBlocked ? 'Blocked' : 'Active'}
+                </span>
+              </td>
+              <td>${new Date(user.createdAt).toDateString()}</td>
+              <td>
+                <button class="btn btn-sm toggle-status-btn ${user.isBlocked ? 'btn-danger' : 'btn-success'}"
+                  data-user-id="${user._id}" data-status="${user.isBlocked ? 'unblock' : 'block'}">
+                  ${user.isBlocked ? 'Blocked' : 'Active'}
+                </button>
+              </td>
+              <td>
+                <a href="/admin/userprofile/${user._id}" class="btn btn-sm btn-outline-primary" title="View Profile">
+                  <i class="bi bi-eye"></i>
+                </a>
+              </td>
+            `;
+            tbody.appendChild(row);
+          });
+
+          // Update pagination
+          pagination.innerHTML = '';
+          if (data.currentPage > 1) {
+            const prevLink = document.createElement('a');
+            prevLink.className = 'px-3 py-1 bg-gray-300 rounded hover:bg-gray-400';
+            prevLink.href = `/admin/users?page=${data.currentPage - 1}&query=${encodeURIComponent(query)}`;
+            prevLink.textContent = '« Prev';
+            pagination.appendChild(prevLink);
+          }
+
+          for (let i = 1; i <= data.totalPages; i++) {
+            const pageLink = document.createElement('a');
+            pageLink.className = `px-3 py-1 rounded ${data.currentPage === i ? 'bg-blue-500 text-white' : 'bg-gray-200 hover:bg-gray-300'}`;
+            pageLink.href = `/admin/users?page=${i}&query=${encodeURIComponent(query)}`;
+            pageLink.textContent = i;
+            pagination.appendChild(pageLink);
+          }
+
+          if (data.currentPage < data.totalPages) {
+            const nextLink = document.createElement('a');
+            nextLink.className = 'px-3 py-1 bg-gray-300 rounded hover:bg-gray-400';
+            nextLink.href = `/admin/users?page=${data.currentPage + 1}&query=${encodeURIComponent(query)}`;
+            nextLink.textContent = 'Next »';
+            pagination.appendChild(nextLink);
           }
         } else {
-          alert('Failed to toggle status.');
+          tbody.innerHTML = '<tr><td colspan="7">No users found.</td></tr>';
+          pagination.innerHTML = '';
         }
+
+        // Reattach event listeners to the new toggle buttons
+        attachToggleListeners();
       } catch (error) {
-        console.error(error);
-        alert('Something went wrong!');
+        console.error('Error fetching search results:', error);
+        Swal.fire('Error', 'Failed to fetch search results.', 'error');
       }
+    }, 300); // 300ms debounce delay
+
+    // Function to attach event listeners to toggle buttons
+    function attachToggleListeners() {
+      document.querySelectorAll('.toggle-status-btn').forEach(button => {
+        button.addEventListener('click', async function () {
+          const userId = this.dataset.userId;
+          const currentStatus = this.dataset.status;
+          const btn = this;
+
+          const result = await Swal.fire({
+            text: `This will ${currentStatus === 'block' ? 'block' : 'unblock'} the user.`,
+            title: `Are you sure?`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: `Yes, ${currentStatus}`,
+            cancelButtonText: 'Cancel'
+          });
+
+          if (!result.isConfirmed) return;
+
+          try {
+            const response = await fetch(`/admin/toggle-user-status/${userId}`, {
+              method: 'PATCH',
+              headers: {
+                'Content-Type': 'application/json'
+              }
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+              const isBlocked = data.isBlocked;
+              btn.textContent = isBlocked ? 'Blocked' : 'Active';
+              btn.classList.toggle('btn-danger', isBlocked);
+              btn.classList.toggle('btn-success', !isBlocked);
+              btn.dataset.status = isBlocked ? 'unblock' : 'block';
+
+              const statusCell = btn.closest('tr').querySelector('td:nth-child(4)');
+              if (statusCell) {
+                statusCell.innerHTML = `<span class="text-${isBlocked ? 'danger' : 'success'}">${isBlocked ? 'Blocked' : 'Active'}</span>`;
+              }
+
+              Swal.fire('Success!', `User has been ${isBlocked ? 'blocked' : 'unblocked'}.`, 'success');
+            } else {
+              Swal.fire('Failed', 'Operation unsuccessful.', 'error');
+            }
+          } catch (error) {
+            console.error(error);
+            Swal.fire('Error', 'Something went wrong!', 'error');
+          }
+        });
+      });
+    }
+
+    // Attach initial event listeners
+    attachToggleListeners();
+
+    // Add event listener for live search
+    document.getElementById('searchInput').addEventListener('input', function (e) {
+      const query = e.target.value.trim();
+      updateTable(query);
     });
-  });
-</script>
-
-
+  </script>
 </body>
 </html>

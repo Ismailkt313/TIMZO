@@ -1,232 +1,423 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Products - TIMZO Admin</title>
+  <title>Timzo Admin - Products</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.css">
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <style>
-    body { padding-top: 70px; min-height: 100vh; display: flex; }
-    .sidebar { width: 250px; background-color: #343a40; color: white; position: fixed; top: 0; bottom: 0; }
-    .main-content { margin-left: 250px; padding: 20px; width: 100%; }
-    .content-title { font-size: 24px; font-weight: bold; color: #333; margin-bottom: 20px; }
-    .card { border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-    .btn-gold { background-color: #ffd700; color: #000; }
-    .btn-gold:hover { background-color: #e6c200; }
-    .table th, .table td { vertical-align: middle; }
-    .pagination a { padding: 8px 12px; margin: 0 4px; border: 1px solid #ddd; text-decoration: none; }
-    .pagination .active { background-color: #007bff; color: white; border-color: #007bff; }
+    .deleted-row {
+      background-color: #f8d7da;
+    }
+
+    .blocked-row {
+      background-color: #ffeeba;
+    }
   </style>
 </head>
-<body>
-  <aside class="sidebar">
-    <%- include('../Partials/admin/adminsidebar', { activePage: 'product' }) %>
-  </aside>
-  <div class="main-content">
-    <%- include('.././Partials/admin/navbar') %>
-    <section class="content-main">
-      <div class="content-header mb-4 d-flex justify-content-between align-items-center">
-        <h2 class="content-title">Products</h2>
-        <a href="/admin/product" class="btn btn-sm btn-gold">
-          <i class="bi bi-plus-circle"></i> Create New
-        </a>
+
+<body class="bg-gray-100">
+  <%- include('.././Partials/admin/navbar') %>
+
+    <div class="flex min-h-screen">
+      <div class="w-64 bg-dark text-white">
+        <%- include('.././Partials/admin/adminsidebar', { activePage: 'product' }) %>
       </div>
-      <header class="mb-4 text-center">
-        <form action="/admin/products" method="get" class="d-inline">
-          <div class="input-group input-group-sm rounded-pill" style="width: 500px; margin: 0 auto;">
-            <input type="text" class="form-control border-0 rounded-pill" placeholder="Search products or brands" name="search" value="<%= search || '' %>">
-            <button class="btn btn-primary rounded-pill ms-2" type="submit">Search</button>
+      <style>
+        body {
+          padding-top: 70px;
+        }
+      </style>
+      <main class="flex-1 p-6">
+        <div class="bg-white p-4 rounded-xl shadow-md overflow-auto">
+          <div class="flex justify-between items-center mb-6">
+            <h1 class="text-2xl font-bold">Products</h1>
+            <div class="d-flex align-items-center gap-2">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="showDeleted" <%=showDeleted ? 'checked' : '' %>
+                onchange="toggleDeletedView()">
+                <label class="form-check-label" for="showDeleted">Show Deleted Products</label>
+              </div>
+              <a href="/admin/product" class="btn btn-primary">+ Add Product</a>
+            </div>
           </div>
-        </form>
-      </header>
-      <div class="card">
-        <div class="card-body">
-          <% if (data && data.length > 0) { %>
-            <div class="table-responsive">
-              <table class="table table-hover table-striped">
-                <thead class="table-dark">
-                  <tr>
-                    <th>Product Name</th>
-                    <th>Brand</th>
-                    <th>Category</th>
-                    <th>Sale Price</th>
-                    <th>Offer Price</th>
-                    <th>Offer</th>
-                    <th>Quantity</th>
-                    <th>Action</th>
-                    <th>Delete</th>
-                    <th>Edit</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <% data.forEach(product => { %>
-                    <tr>
-                      <td><%= product.name %></td>
-                      <td><%= product.brand ? product.brand.name : 'N/A' %></td>
-                      <td><%= product.category ? product.category.name : 'N/A' %></td>
-                      <td>$<%= product.salePrice ? product.salePrice.toFixed(2) : '0.00' %></td>
-                      <td>
-                        <% if (product.ProductOffer && product.ProductOffer > 0) { %>
-                          $<%= (product.salePrice * (1 - product.ProductOffer / 100)).toFixed(2) %>
-                        <% } else { %>
-                          -
-                        <% } %>
-                      </td>
-                      <td>
-                        <% if (product.ProductOffer && product.ProductOffer > 0) { %>
-                          <span><%= product.ProductOffer %>%</span>
-                          <button class="btn btn-warning btn-sm ms-2" onclick="removeOffer('<%= product._id %>')">Remove Offer</button>
+
+          <table class="table table-bordered table-hover text-center">
+            <thead class="table-dark">
+              <tr>
+                <th>#</th>
+                <th>Name</th>
+                <th>Brand</th>
+                <th>Category</th>
+                <th>Offer (%)</th>
+                <th>Regular Price</th>
+                <th>Sale Price</th>
+                <th>Stock</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% if (data.length> 0) { %>
+                <% data.forEach((product, index)=> { %>
+                  <tr class="<%= product.isDeleted ? 'deleted-row' : product.isBlocked ? 'blocked-row' : '' %>">
+                    <td>
+                      <%= (currentPage - 1) * 5 + index + 1 %>
+                    </td>
+                    <td>
+                      <%= product.name %>
+                    </td>
+                    <td>
+                      <%= product.brand.name %>
+                    </td>
+                    <td>
+                      <%= product.category.name %>
+                    </td>
+                    <td>
+                      <% if (product.ProductOffer && product.ProductOffer> 0) { %>
+                        <span>
+                          <%= product.ProductOffer %>%
+                        </span>
+                        <button class="btn btn-warning btn-sm ms-2 remove-offer-btn" data-id="<%= product._id %>">Remove
+                          Offer</button>
                         <% } else { %>
                           <span>0%</span>
-                          <button class="btn btn-info btn-sm ms-2" onclick="addOffer('<%= product._id %>')">Add Offer</button>
-                        <% } %>
-                      </td>
-                      <td><%= product.stock || 0 %></td>
-                      <td>
-                        <% if (product.status === 'available') { %>
-                          <button class="btn btn-danger btn-sm" onclick="toggleStatus('<%= product._id %>', 'block')">Block</button>
+                          <button class="btn btn-info btn-sm ms-2 add-offer-btn" data-id="<%= product._id %>">Add
+                            Offer</button>
+                          <% } %>
+                    </td>
+                    <td>
+                      <%= product.regularPrice %>
+                    </td>
+                    <td>
+                      <%= product.salePrice %>
+                    </td>
+                    <td>
+                      <%= product.stock %>
+                    </td>
+                    <td>
+                      <span class="product-status text-<%= product.isBlocked ? 'danger' : 'success' %>">
+                        <%= product.isBlocked ? 'Blocked' : 'Active' %>
+                      </span>
+                    </td>
+                    <td class="flex gap-2 justify-center">
+                      <a href="/admin/editProduct/<%= product._id %>" class="btn btn-sm btn-outline-warning"
+                        title="Edit">
+                        <i class="bi bi-pencil-square"></i>
+                      </a>
+                      <button class="btn btn-sm toggle-product-btn btn-<%= product.isBlocked ? 'success' : 'danger' %>"
+                        data-id="<%= product._id %>" data-action="<%= product.isBlocked ? 'unblock' : 'block' %>">
+                        <%= product.isBlocked ? 'Unblock' : 'Block' %>
+                      </button>
+                      <% if (product.isDeleted) { %>
+                        <div class="d-flex gap-2">
+                          <button class="btn btn-sm btn-success undo-delete-btn" data-id="<%= product._id %>">
+                            <i class="bi bi-arrow-counterclockwise"></i>
+                          </button>
+                          <button class="btn btn-sm btn-danger permanently-delete-btn" data-id="<%= product._id %>">
+                            <i class="bi bi-trash-fill"></i>
+                          </button>
+                        </div>
                         <% } else { %>
-                          <button class="btn btn-success btn-sm" onclick="toggleStatus('<%= product._id %>', 'unblock')">Unblock</button>
+                          <button class="btn btn-sm btn-outline-danger soft-delete-btn" data-id="<%= product._id %>">
+                            <i class="bi bi-trash"></i>
+                          </button>
+                          <% } %>
+                    </td>
+                  </tr>
+                  <% }); %>
+                    <% } else { %>
+                      <tr>
+                        <td colspan="10">No products found.</td>
+                      </tr>
+                      <% } %>
+            </tbody>
+          </table>
+          <div class="d-flex justify-content-center">
+            <nav aria-label="Page navigation">
+              <ul class="pagination">
+                <% if (currentPage> 1) { %>
+                  <li class="page-item">
+                    <a class="page-link"
+                      href="/admin/getProduct?page=<%= currentPage - 1 %>&showDeleted=<%= showDeleted ? 'true' : 'false' %>">Previous</a>
+                  </li>
+                  <% } else { %>
+                    <li class="page-item disabled">
+                      <a class="page-link" href="#">Previous</a>
+                    </li>
+                    <% } %>
+
+                      <% for (let i=1; i <=totalPages; i++) { %>
+                        <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+                          <a class="page-link"
+                            href="/admin/getProduct?page=<%= i %>&showDeleted=<%= showDeleted ? 'true' : 'false' %>">
+                            <%= i %>
+                          </a>
+                        </li>
                         <% } %>
-                      </td>
-                      <td>
-                        <a href="/admin/deleteproduct?id=<%= product._id %>" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this product?');">
-                            <i class="bi bi-trash"></i> Delete
-                          </a>                           
-                      </td>
-                      <td>
-                        <a href="/admin/editproduct?id=<%= product._id %>" class="btn btn-sm btn-gold">
-                          <i class="bi bi-pencil-square"></i> Edit
-                        </a>
-                      </td>
-                    </tr>
-                  <% }) %>
-                </tbody>
-              </table>
-            </div>
-          <% } else { %>
-            <div class="text-center py-4">
-              <p class="text-muted">No products found.</p>
-            </div>
-          <% } %>
+
+                          <% if (currentPage < totalPages) { %>
+                            <li class="page-item">
+                              <a class="page-link"
+                                href="/admin/getProduct?page=<%= currentPage + 1 %>&showDeleted=<%= showDeleted ? 'true' : 'false' %>">Next</a>
+                            </li>
+                            <% } else { %>
+                              <li class="page-item disabled">
+                                <a class="page-link" href="#">Next</a>
+                              </li>
+                              <% } %>
+              </ul>
+            </nav>
+          </div>
         </div>
-      </div>
-      <% if (totalPages > 1) { %>
-        <div class="pagination-container mt-4 text-center">
-          <% if (currentPage > 1) { %>
-            <a href="?page=<%= currentPage - 1 %>&search=<%= search || '' %>" class="btn btn-outline-primary btn-sm mx-1">« Previous</a>
-          <% } %>
-          <% for (let i = 1; i <= totalPages; i++) { %>
-            <% if (i === currentPage) { %>
-              <span class="btn btn-primary btn-sm mx-1 active"><%= i %></span>
-            <% } else { %>
-              <a href="?page=<%= i %>&search=<%= search || '' %>" class="btn btn-outline-primary btn-sm mx-1"><%= i %></a>
-            <% } %>
-          <% } %>
-          <% if (currentPage < totalPages) { %>
-            <a href="?page=<%= currentPage + 1 %>&search=<%= search || '' %>" class="btn btn-outline-primary btn-sm mx-1">Next »</a>
-          <% } %>
-        </div>
-      <% } %>
-    </section>
+      </main>
+    </div>
+
     <%- include('.././Partials/admin/footer') %>
-  </div>
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-  <script>
-    async function addOffer(productId) {
-      const { value: percentage } = await Swal.fire({
-        title: 'Add Offer',
-        input: 'number',
-        inputLabel: 'Offer Percentage',
-        inputPlaceholder: 'Enter percentage',
-        showCancelButton: true,
-        inputValidator: (value) => {
-          if (!value || value <= 0 || value > 100) {
-            return 'Please enter a valid percentage (1-100)';
-          }
-        }
-      });
 
-      if (percentage) {
-        try {
-          const response = await fetch('/admin/addProductOffer', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ productId, percentage })
+      <script>
+        function toggleDeletedView() {
+          const showDeleted = document.getElementById('showDeleted').checked;
+          const currentUrl = new URL(window.location.href);
+          currentUrl.searchParams.set('showDeleted', showDeleted.toString());
+          window.location.href = currentUrl.toString();
+        }
+
+        document.querySelectorAll('.toggle-product-btn').forEach(button => {
+          button.addEventListener('click', async () => {
+            const productId = button.dataset.id;
+            const action = button.dataset.action;
+
+            const result = await Swal.fire({
+              title: `Are you sure?`,
+              text: `This will ${action === 'block' ? 'block' : 'unblock'} the product.`,
+              icon: 'warning',
+              showCancelButton: true,
+              confirmButtonText: `Yes, ${action}`,
+              cancelButtonText: 'Cancel'
+            });
+
+            if (!result.isConfirmed) return;
+
+            try {
+              const response = await fetch(`/admin/${action}Product?id=${productId}`, {
+                method: 'POST'
+              });
+
+              const data = await response.json();
+
+              if (data.success) {
+                button.classList.toggle('btn-success');
+                button.classList.toggle('btn-danger');
+                button.textContent = action === 'block' ? 'Unblock' : 'Block';
+                button.dataset.action = action === 'block' ? 'unblock' : 'block';
+
+                const statusSpan = button.closest('tr').querySelector('.product-status');
+                if (statusSpan) {
+                  statusSpan.textContent = action === 'block' ? 'Blocked' : 'Active';
+                  statusSpan.classList.remove('text-success', 'text-danger');
+                  statusSpan.classList.add(action === 'block' ? 'text-danger' : 'text-success');
+                }
+
+                const row = button.closest('tr');
+                row.classList.toggle('blocked-row');
+
+                Swal.fire('Success!', `Product ${action === 'block' ? 'blocked' : 'unblocked'} successfully.`, 'success');
+              } else {
+                Swal.fire('Failed!', 'Operation failed.', 'error');
+              }
+            } catch (err) {
+              console.error(err);
+              Swal.fire('Error!', 'Something went wrong.', 'error');
+            }
           });
-          const data = await response.json();
-          if (data.success) {
-            Swal.fire('Success', data.message, 'success').then(() => location.reload());
-          } else {
-            Swal.fire('Error', data.message || 'Failed to add offer', 'error');
-          }
-        } catch (error) {
-          Swal.fire('Error', 'An error occurred while adding the offer', 'error');
-        }
-      }
-    }
+        });
 
-    async function removeOffer(productId) {
-      const result = await Swal.fire({
-        title: 'Are you sure?',
-        text: 'This will remove the offer from the product.',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'Yes, remove it!',
-        cancelButtonText: 'Cancel'
-      });
+        document.querySelectorAll('.soft-delete-btn').forEach(button => {
+          button.addEventListener('click', async () => {
+            const productId = button.dataset.id;
 
-      if (result.isConfirmed) {
-        try {
-          const response = await fetch('/admin/removeProductOffer', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ productId })
+            const result = await Swal.fire({
+              title: 'Are you sure?',
+              text: 'This will soft-delete the product. You can restore it later.',
+              icon: 'warning',
+              showCancelButton: true,
+              confirmButtonText: 'Yes, delete it!',
+              cancelButtonText: 'Cancel'
+            });
+
+            if (!result.isConfirmed) return;
+
+            try {
+              const response = await fetch(`/admin/softDeleteProduct?id=${productId}`, {
+                method: 'POST'
+              });
+
+              const data = await response.json();
+
+              if (data.success) {
+                Swal.fire('Deleted!', data.message, 'success').then(() => {
+                  location.reload();
+                });
+              } else {
+                Swal.fire('Failed!', data.message || 'Product deletion failed.', 'error');
+              }
+            } catch (err) {
+              console.error(err);
+              Swal.fire('Error!', 'Something went wrong.', 'error');
+            }
           });
-          const data = await response.json();
-          if (data.success) {
-            Swal.fire('Success', data.message, 'success').then(() => location.reload());
-          } else {
-            Swal.fire('Error', data.message || 'Failed to remove offer', 'error');
-          }
-        } catch (error) {
-          Swal.fire('Error', 'An error occurred while removing the offer', 'error');
-        }
-      }
-    }
+        });
 
-    async function toggleStatus(productId, action) {
-      const result = await Swal.fire({
-        title: `Are you sure?`,
-        text: `This will ${action === 'block' ? 'block' : 'unblock'} the product.`,
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: `Yes, ${action} it!`,
-        cancelButtonText: 'Cancel'
-      });
+        document.querySelectorAll('.undo-delete-btn').forEach(button => {
+          button.addEventListener('click', async () => {
+            const productId = button.dataset.id;
 
-      if (result.isConfirmed) {
-        try {
-          const response = await fetch(`/admin/toggleProductStatus/${productId}`, {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ action })
+            const result = await Swal.fire({
+              title: 'Are you sure?',
+              text: 'This will restore the product.',
+              icon: 'warning',
+              showCancelButton: true,
+              confirmButtonText: 'Yes, restore it!',
+              cancelButtonText: 'Cancel'
+            });
+
+            if (!result.isConfirmed) return;
+
+            try {
+              const response = await fetch(`/admin/undoDeleteProduct?id=${productId}`, {
+                method: 'POST'
+              });
+
+              const data = await response.json();
+
+              if (data.success) {
+                Swal.fire('Restored!', data.message, 'success').then(() => {
+                  location.reload();
+                });
+              } else {
+                Swal.fire('Failed!', data.message || 'Product restoration failed.', 'error');
+              }
+            } catch (err) {
+              console.error(err);
+              Swal.fire('Error!', 'Something went wrong.', 'error');
+            }
           });
-          const data = await response.json();
-          if (data.success) {
-            Swal.fire('Success', data.message, 'success').then(() => location.reload());
-          } else {
-            Swal.fire('Error', data.message || 'Failed to toggle status', 'error');
-          }
-        } catch (error) {
-          Swal.fire('Error', 'An error occurred while toggling the product status', 'error');
-        }
-      }
-    }
-  </script>
+        });
+
+        document.querySelectorAll('.permanently-delete-btn').forEach(button => {
+          button.addEventListener('click', async () => {
+            const productId = button.dataset.id;
+
+            const result = await Swal.fire({
+              title: 'Are you sure?',
+              text: 'This will permanently delete the product and cannot be undone!',
+              icon: 'warning',
+              showCancelButton: true,
+              confirmButtonText: 'Yes, permanently delete it!',
+              confirmButtonColor: '#dc3545',
+              cancelButtonText: 'Cancel'
+            });
+
+            if (!result.isConfirmed) return;
+
+            try {
+              const response = await fetch(`/admin/permanentlyDeleteProduct?id=${productId}`, {
+                method: 'POST'
+              });
+
+              const data = await response.json();
+
+              if (data.success) {
+                Swal.fire('Deleted!', data.message, 'success').then(() => {
+                  button.closest('tr').remove();
+                });
+              } else {
+                Swal.fire('Failed!', data.message || 'Product deletion failed.', 'error');
+              }
+            } catch (err) {
+              console.error(err);
+              Swal.fire('Error!', 'Something went wrong.', 'error');
+            }
+          });
+        });
+
+        document.querySelectorAll('.add-offer-btn').forEach(button => {
+          button.addEventListener('click', async () => {
+            const productId = button.dataset.id;
+
+            const { value: percentage } = await Swal.fire({
+              title: 'Add Offer',
+              input: 'number',
+              inputLabel: 'Offer Percentage',
+              inputPlaceholder: 'Enter percentage',
+              showCancelButton: true,
+              inputValidator: (value) => {
+                if (!value || value <= 0 || value > 100) {
+                  return 'Please enter a valid percentage (1-100)';
+                }
+              }
+            });
+
+            if (percentage) {
+              try {
+                const response = await fetch('/admin/addProductOffer', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ productId, percentage })
+                });
+
+                const data = await response.json();
+                if (data.status) {
+                  Swal.fire('Success', data.message, 'success').then(() => location.reload());
+                } else {
+                  Swal.fire('Error', data.message || 'Failed to add offer', 'error');
+                }
+              } catch (error) {
+                Swal.fire('Error', 'An error occurred while adding the offer', 'error');
+              }
+            }
+          });
+        });
+
+        document.querySelectorAll('.remove-offer-btn').forEach(button => {
+          button.addEventListener('click', async () => {
+            const productId = button.dataset.id;
+
+            const result = await Swal.fire({
+              title: 'Are you sure?',
+              text: 'This will remove the offer from the product.',
+              icon: 'warning',
+              showCancelButton: true,
+              confirmButtonText: 'Yes, remove it!',
+              cancelButtonText: 'Cancel'
+            });
+
+            if (result.isConfirmed) {
+              try {
+                const response = await fetch('/admin/removeProductOffer', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ productId })
+                });
+
+                const data = await response.json();
+                if (data.status) {
+                  Swal.fire('Success', data.message, 'success').then(() => location.reload());
+                } else {
+                  Swal.fire('Error', data.message || 'Failed to remove offer', 'error');
+                }
+              } catch (error) {
+                Swal.fire('Error', 'An error occurred while removing the offer', 'error');
+              }
+            }
+          });
+        });
+      </script>
 </body>
+
 </html>

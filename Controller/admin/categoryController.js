@@ -1,55 +1,46 @@
-const Category =require ('../../Model/categorySchema')
+const Category = require('../../Model/categorySchema');
 const Product = require('../../Model/productSchema');
 
-const loadcategories = async (req,res)=>{
+const loadcategories = async (req, res) => {
     try {
-
-        const page = parseInt(req.query.page)||1
+        const page = parseInt(req.query.page) || 1;
         const limit = 10;
-        const skip = (page-1)*limit
+        const skip = (page - 1) * limit;
+        const showDeleted = req.query.showDeleted === 'true';
 
-        let products = await Category.find({}).sort({createdAt:-1}).skip(skip).limit(limit)
-        const totalcategories = await Category.countDocuments()
-        const totalPages = Math.ceil(totalcategories/limit);
-        res.render('Admin/categories',{
-            categories: products,
-            currentpage :page,
-            totalPage : totalPages,
-            totalcategories : totalcategories
-        })
-    } catch (error) { 
-        console.log(error)
-        res.redirect('/error404')
-    }
-}
+        const query = {};
+        query.isDeleted = showDeleted;
 
-const  addcategory = async(req,res)=>{
-    const {name , description} = req.body
-    try {
-        const existingcategory = await Category.find({name})
-        if(existingcategory.length > 0){
-            return res.status(400).json({error:"catogery already exists"})
-        }
-        const newCategory = new Category({
-            name,
-            description
-        })
-        await newCategory.save()
-        return res.json({message:"category added successfully"})
+        let categories = await Category.find(query)
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(limit);
 
+        const totalcategories = await Category.countDocuments(query);
+        const totalPages = Math.ceil(totalcategories / limit);
+
+        res.render('Admin/categories', {
+            categories: categories,
+            currentpage: page,
+            totalPage: totalPages,
+            totalcategories: totalcategories,
+            showDeleted
+        });
     } catch (error) {
-        return res.json({message:'Internal Server error'})
+        console.log(error);
+        res.redirect('/error404');
     }
-}
-const loadaddcategory = async(req,res)=>{
+};
+
+const loadaddcategory = async (req, res) => {
     try {
         const itemsPerPage = 5;
         const page = parseInt(req.query.page) || 1;
 
-        const totalItems = await Category.countDocuments();
+        const totalItems = await Category.countDocuments({ isDeleted: false });
         const totalPages = Math.ceil(totalItems / itemsPerPage);
 
-        const categories = await Category.find()
+        const categories = await Category.find({ isDeleted: false })
             .skip((page - 1) * itemsPerPage)
             .limit(itemsPerPage);
 
@@ -59,12 +50,30 @@ const loadaddcategory = async(req,res)=>{
             totalPages,
             errorMessage: null
         });
-
     } catch (error) {
         console.log(error.message);
         res.status(500).send('Internal Server Error');
     }
-}
+};
+
+const addcategory = async (req, res) => {
+    const { name, description } = req.body;
+    try {
+        const existingcategory = await Category.find({ name, isDeleted: false });
+        if (existingcategory.length > 0) {
+            return res.status(400).json({ error: "Category already exists" });
+        }
+        const newCategory = new Category({
+            name,
+            description,
+            isDeleted: false
+        });
+        await newCategory.save();
+        return res.json({ message: "Category added successfully" });
+    } catch (error) {
+        return res.json({ message: 'Internal Server error' });
+    }
+};
 
 const addcategoryOffer = async (req, res) => {
     try {
@@ -72,8 +81,8 @@ const addcategoryOffer = async (req, res) => {
         const categoryId = req.body.categoryId;
 
         const category = await Category.findById(categoryId);
-        if (!category) {
-            return res.status(404).json({ status: false, message: "Category not found" });
+        if (!category || category.isDeleted) {
+            return res.status(404).json({ status: false, message: "Category not found or has been deleted" });
         }
 
         const products = await Product.find({ category: category._id });
@@ -87,94 +96,217 @@ const addcategoryOffer = async (req, res) => {
 
         for (const product of products) {
             product.ProductOffer = 0;
-            product.saleprice = Math.floor(product.regularPrice * (1 - (percentage / 100)));
+            product.salePrice = Math.floor(product.regularPrice * (1 - (percentage / 100)));
             await product.save();
         }
 
         res.json({ status: true, message: "Category offer applied successfully" });
-
     } catch (error) {
         console.error(error);
         res.status(500).json({ status: false, message: 'Internal server error' });
     }
 };
+
 const removecategoryoffer = async (req, res) => {
     try {
-      const { categoryId } = req.body;
-  
-      const category = await Category.findById(categoryId);
-      if (!category) {
-        return res.status(404).json({ status: false, message: "Category not found" });
-      }
-  
-      const products = await Product.find({ category: category._id });
-  
-      if (products.length > 0) {
-        await Promise.all(
-          products.map(product => {
-            product.saleprice = product.regularPrice;
-            product.ProductOffer = 0;
-            return product.save();
-          })
+        const { categoryId } = req.body;
+        console.log('Received categoryId:', categoryId);
+
+        // Validate categoryId
+        if (!categoryId) {
+            return res.status(400).json({ status: false, message: "Category ID is required" });
+        }
+
+        const category = await Category.findById(categoryId);
+        console.log('Found category:', category);
+
+        if (!category || category.isDeleted) {
+            return res.status(404).json({ status: false, message: "Category not found or has been deleted" });
+        }
+
+        // Check if there's an offer to remove
+        if (!category.categoryOffer || category.categoryOffer === 0) {
+            return res.status(400).json({ status: false, message: "No offer to remove for this category" });
+        }
+
+        const products = await Product.find({ category: category._id });
+        console.log('Found products:', products.length);
+
+        if (products.length > 0) {
+            const updatedProducts = await Promise.all(
+                products.map(async (product) => {
+                    console.log(`Updating product ${product._id}: salePrice from ${product.salePrice} to ${product.regularPrice}`);
+                    product.salePrice = product.regularPrice;
+                    product.ProductOffer = 0;
+                    await product.save();
+                    return product;
+                })
+            );
+            console.log('Updated products:', updatedProducts.length);
+        }
+
+        const updateResult = await Category.updateOne(
+            { _id: categoryId },
+            { $set: { categoryOffer: 0 } }
         );
-      }
-  
-      category.categoryOffer = 0;
-      await category.save();
-  
-      res.json({ status: true, message: "Category offer removed successfully" });
-  
+        console.log('Category update result:', updateResult);
+
+        // Verify the update
+        const updatedCategory = await Category.findById(categoryId);
+        console.log('Updated category:', updatedCategory);
+
+        if (updatedCategory.categoryOffer !== 0) {
+            return res.status(500).json({ status: false, message: "Failed to remove category offer" });
+        }
+
+        res.json({ status: true, message: "Category offer removed successfully" });
     } catch (error) {
-      console.error(error);
-      res.status(500).json({ status: false, message: 'Internal server error' });
-    }
-  };
-  
-const getlistcategory = async (req, res) => {
-    try {
-        let id = req.query.id;
-        await Category.updateOne({ _id: id }, { $set: { isListed: false } });
-        res.redirect('/admin/categories');
-    } catch (error) {
-        console.error(error);
-        res.redirect('/error404');
+        console.error('Error in removecategoryoffer:', error);
+        res.status(500).json({ status: false, message: 'Internal server error' });
     }
 };
 
-
+const getlistcategory = async (req, res) => {
+    try {
+        let id = req.query.id;
+        const category = await Category.findById(id);
+        if (!category || category.isDeleted) {
+            return res.status(404).json({ success: false, message: "Category not found or has been deleted" });
+        }
+        await Category.updateOne({ _id: id }, { $set: { isListed: false } });
+        res.status(200).json({ success: true });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false });
+    }
+};
 
 const getunlistcategory = async (req, res) => {
     try {
         let id = req.query.id;
+        const category = await Category.findById(id);
+        if (!category || category.isDeleted) {
+            return res.status(404).json({ success: false, message: "Category not found or has been deleted" });
+        }
         await Category.updateOne({ _id: id }, { $set: { isListed: true } });
-        res.redirect('/admin/categories');
+        res.status(200).json({ success: true });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false });
+    }
+};
+
+const softDeleteCategory = async (req, res) => {
+    try {
+        const categoryId = req.query.id;
+        const category = await Category.findById(categoryId);
+        if (!category) {
+            return res.status(404).json({ success: false, message: 'Category not found' });
+        }
+
+        category.isDeleted = true;
+        category.deletedAt = new Date();
+        await category.save();
+
+        res.status(200).json({ success: true, message: 'Category soft-deleted successfully' });
+    } catch (error) {
+        console.error('Error soft-deleting category:', error);
+        res.status(500).json({ success: false, message: 'Failed to soft-delete category' });
+    }
+};
+
+const undoDeleteCategory = async (req, res) => {
+    try {
+        const categoryId = req.query.id;
+        const category = await Category.findById(categoryId);
+        if (!category) {
+            return res.status(404).json({ success: false, message: 'Category not found' });
+        }
+
+        category.isDeleted = false;
+        category.deletedAt = null;
+        await category.save();
+
+        res.status(200).json({ success: true, message: 'Category restored successfully' });
+    } catch (error) {
+        console.error('Error restoring category:', error);
+        res.status(500).json({ success: false, message: 'Failed to restore category' });
+    }
+};
+
+const 
+permanentlyDeleteCategory = async (req, res) => {
+    try {
+        const categoryId = req.query.id;
+        const category = await Category.findById(categoryId);
+        if (!category) {
+            return res.status(404).json({ success: false, message: 'Category not found' });
+        }
+
+        if (!category.isDeleted) {
+            return res.status(400).json({ success: false, message: 'Category must be soft-deleted before permanent deletion' });
+        }
+
+        const products = await Product.find({ category: category._id });
+        if (products.length > 0) {
+            return res.status(400).json({ success: false, message: 'Cannot delete category with associated products' });
+        }
+
+        await Category.findByIdAndDelete(categoryId);
+
+        res.status(200).json({ success: true, message: 'Category permanently deleted' });
+    } catch (error) {
+        console.error('Error permanently deleting category:', error);
+        res.status(500).json({ success: false, message: 'Failed to permanently delete category' });
+    }
+};
+
+const loadeditcategory = async (req, res) => {
+    try {
+        const id = req.params.id;
+        const category = await Category.findOne({ _id: id, isDeleted: false });
+
+        if (!category) {
+            return res.redirect('/error404');
+        }
+
+        res.render("Admin/editcategory", { 
+            category,
+            error: null // Pass error as null initially
+        });
     } catch (error) {
         console.error(error);
         res.redirect('/error404');
     }
 };
-    
-const loadeditcategory = async (req,res)=>{
-    try {
-        const id = req.query.id
-    const category = await Category.findOne({_id:id})
-    res.render("Admin/editcategory",{category:category})
-    } catch (error) {
-        res.redirect('/error404')
-    }
-}
+
 const editcategory = async (req, res) => {
     try {
         const id = req.params.id;
         const { categoryName, description } = req.body;
 
-        const existingcategory = await Category.findOne({ name: categoryName });
-
-        if (existingcategory) {
-            return res.status(400).json({ error: "Category exists, please choose another one" });
+        const category = await Category.findById(id);
+        if (!category || category.isDeleted) {
+            return res.status(404).render('Admin/editcategory', { 
+                category,
+                error: "Category not found or has been deleted"
+            });
         }
 
-        const updatecategory = await Category.findByIdAndUpdate(
+        const existingcategory = await Category.findOne({ 
+            name: categoryName, 
+            isDeleted: false, 
+            _id: { $ne: id } 
+        });
+
+        if (existingcategory) {
+            return res.status(400).render('Admin/editcategory', { 
+                category,
+                error: "Category name already exists, please choose another one"
+            });
+        }
+
+        const updatedCategory = await Category.findByIdAndUpdate(
             id,
             {
                 name: categoryName,
@@ -183,17 +315,22 @@ const editcategory = async (req, res) => {
             { new: true }
         );
 
-        if (updatecategory) {
-            res.redirect('/admin/categories'); 
+        if (updatedCategory) {
+            res.redirect('/admin/categories');
         } else {
-            res.status(404).json({ error: "Category not found" });
+            res.status(404).render('Admin/editcategory', { 
+                category,
+                error: "Category not found"
+            });
         }
-
     } catch (error) {
-        res.status(500).json({ error: "Internal server error" });
+        console.error('Error updating category:', error);
+        res.status(500).render('Admin/editcategory', { 
+            category: { _id: req.params.id, name: req.body.categoryName, description: req.body.description },
+            error: "Internal server error"
+        });
     }
 };
-
 
 module.exports = {
     loadcategories,
@@ -204,5 +341,8 @@ module.exports = {
     getlistcategory,
     getunlistcategory,
     loadeditcategory,
-    editcategory
-}
+    editcategory,
+    softDeleteCategory,
+    undoDeleteCategory,
+    permanentlyDeleteCategory
+};

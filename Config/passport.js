@@ -21,8 +21,9 @@ passport.use(new GoogleStrategy({
             email: profile.emails[0].value,
             googleId: profile.id,
         });
-
+         
         await newUser.save();
+        req.session.user = user
         return done(null, newUser);
     } catch (error) {
         return done(error, null);

@@ -8,6 +8,7 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
   <style>
     body {
@@ -143,14 +144,19 @@
                           </td>
                           <td>
                             <div class="d-flex flex-wrap gap-2">
-                              <% if (brand.isListed === true) { %>
-                              <a href="/admin/blockBrand?id=<%= brand._id %>" class="btn btn-outline-danger btn-sm">Block</a>
-                              <% } else { %>
-                              <a href="/admin/unblockBrand?id=<%= brand._id %>" class="btn btn-outline-success btn-sm">Unblock</a>
-                              <% } %>
-                              <button onclick="return conformdelete()">
-                                <a href="/admin/deleteBrand?id=<%= brand._id %>" class="btn btn-outline-secondary btn-sm">Delete</a>
+                              <button 
+                                class="btn btn-outline-<%= brand.isListed ? 'danger' : 'success' %> btn-sm toggle-brand-btn"
+                                data-id="<%= brand._id %>"
+                                data-action="<%= brand.isListed ? 'block' : 'unblock' %>">
+                                <%= brand.isListed ? 'Block' : 'Unblock' %>
                               </button>
+                            
+                              <button 
+                                class="btn btn-outline-secondary btn-sm delete-brand-btn" 
+                                data-id="<%= brand._id %>">
+                                Delete
+                              </button>
+                            </div>                            
                             </div>
                           </td>
                         </tr>
@@ -182,6 +188,95 @@
   <%- include('.././Partials/admin/footer') %>
 
   <script>
+
+
+  // Block/Unblock Brand
+  document.querySelectorAll('.toggle-brand-btn').forEach(button => {
+    button.addEventListener('click', async () => {
+      const brandId = button.dataset.id;
+      const action = button.dataset.action; // 'block' or 'unblock'
+
+      const result = await Swal.fire({
+        title: `Are you sure?`,
+        text: `This will ${action} the brand.`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: `Yes, ${action}`,
+        cancelButtonText: 'Cancel'
+      });
+
+      if (!result.isConfirmed) return;
+
+      try {
+        const response = await fetch(`/admin/${action}Brand?id=${brandId}`, {
+          method: 'PATCH'
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          // Update UI
+          // Update button text and class
+button.textContent = action === 'block' ? 'Unblock' : 'Block';
+button.classList.toggle('btn-outline-danger');
+button.classList.toggle('btn-outline-success');
+button.dataset.action = action === 'block' ? 'unblock' : 'block';
+
+// ✅ Update the status badge text and color
+const statusCell = button.closest('tr').querySelector('td span.badge');
+if (statusCell) {
+  statusCell.textContent = action === 'block' ? 'Blocked' : 'Active';
+  statusCell.classList.remove('bg-success', 'bg-danger');
+  statusCell.classList.add(action === 'block' ? 'bg-danger' : 'bg-success');
+}
+
+// Success popup
+Swal.fire('Success!', `Brand ${action}ed successfully.`, 'success');
+        } else {
+          Swal.fire('Failed!', 'Operation unsuccessful.', 'error');
+        }
+      } catch (err) {
+        console.error(err);
+        Swal.fire('Error!', 'Something went wrong.', 'error');
+      }
+    });
+  });
+
+  // Delete Brand
+  document.querySelectorAll('.delete-brand-btn').forEach(button => {
+    button.addEventListener('click', async () => {
+      const brandId = button.dataset.id;
+
+      const result = await Swal.fire({
+        title: 'Are you sure?',
+        text: 'This will permanently delete the brand!',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, delete it!',
+        cancelButtonText: 'Cancel'
+      });
+
+      if (!result.isConfirmed) return;
+
+      try {
+        const response = await fetch(`/admin/deleteBrand?id=${brandId}`, {
+          method: 'DELETE'
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          Swal.fire('Deleted!', 'Brand has been deleted.', 'success')
+            .then(() => location.reload()); // or remove the element from DOM
+        } else {
+          Swal.fire('Failed!', 'Brand deletion failed.', 'error');
+        }
+      } catch (err) {
+        console.error(err);
+        Swal.fire('Error!', 'Something went wrong.', 'error');
+      }
+    });
+  });
     function previewImage(event) {
       const reader = new FileReader();
       reader.onload = function() {

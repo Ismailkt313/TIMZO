@@ -11,15 +11,15 @@ const pageNotFound = async (req, res) => {
     try {
         res.render('error404')
     } catch (error) {
-        res.redirect('/error404')    
+        res.redirect('/error404')
     }
 }
 const loadlanding = async (req, res) => {
     try {
         const categories = await Category.find({ isListed: true });
         const brands = await Brand.find({ isListed: true });
-        const user = await User.find({isBlocked:false}) 
-        if(!user){
+        const user = await User.find({ isBlocked: false })
+        if (!user) {
             res.redirect("/user/login")
         }
         const newArrivals = await Product.find({ status: "available" })
@@ -48,7 +48,7 @@ const loadlanding = async (req, res) => {
         return res.render('user/landingPage', {
             user: req.session.user || null,
             cartCount: cartCount,
-            newArrivals, 
+            newArrivals,
             trendingProducts,
             exploreProducts,
             categories,
@@ -72,7 +72,7 @@ const loadSignUp = async (req, res) => {
 
 
 function generateOtp() {
-    return Math.floor(100000 + Math.random() * 900000);  
+    return Math.floor(100000 + Math.random() * 900000);
 }
 
 async function sendVerificationEmail(email, otp) {
@@ -110,10 +110,8 @@ async function sendVerificationEmail(email, otp) {
                 'X-Priority': '3',
                 'X-Mailer': 'Timzo Mailer'
             }
-        },(error,info)=>{
-            console.log(error)
         }
-    )
+        )
 
 
 
@@ -254,9 +252,9 @@ const resendOtp = async (req, res) => {
 
 
 const loadlogin = async (req, res) => {
-    try { 
-        
-        
+    try {
+
+
         if (!req.session.user) {
             return res.render('user/login', { error: null })
         } else {
@@ -380,7 +378,6 @@ const changepassword = async (req, res) => {
 
         const hashedPassword = await bcrypt.hash(password, 10)
         await User.findOneAndUpdate({ email }, { password: hashedPassword });
-        console.log(hashedPassword);
         req.session.verifiedEmail = null;
         req.session.secondOtp = null;
         res.redirect('/user/login');
@@ -392,12 +389,12 @@ const changepassword = async (req, res) => {
 
     }
 }
-
 const loadProducts = async (req, res) => {
     try {
         const { search, category, brand, minPrice, maxPrice, sort } = req.query;
         const query = { status: 'available' };
 
+        // Search by product name or brand name
         if (search) {
             const brandIds = await Brand.find({
                 name: { $regex: new RegExp('.*' + search + '.*', 'i') }
@@ -407,11 +404,19 @@ const loadProducts = async (req, res) => {
                 { brand: { $in: brandIds.map(id => id._id) } }
             ];
         }
+
+        // Filter by category and brand
         if (category) query.category = category;
         if (brand) query.brand = brand;
-        if (minPrice) query.salePrice = { $gte: parseFloat(minPrice) };
-        if (maxPrice) query.salePrice = { ...query.salePrice, $lte: parseFloat(maxPrice) };
 
+        // Filter by price range
+        if (minPrice || maxPrice) {
+            query.salePrice = {};
+            if (minPrice) query.salePrice.$gte = parseFloat(minPrice);
+            if (maxPrice) query.salePrice.$lte = parseFloat(maxPrice);
+        }
+
+        // Sort options
         const sortOptions = {
             latest: { createdAt: -1 },
             'price-asc': { salePrice: 1 },
@@ -419,14 +424,17 @@ const loadProducts = async (req, res) => {
             rating: { rating: -1 }
         };
 
+        // Fetch products
         const products = await Product.find(query)
             .sort(sortOptions[sort] || { createdAt: -1 })
             .populate('brand')
             .populate('category');
 
+        // Fetch categories and brands for filters
         const categories = await Category.find({ isListed: true });
         const brands = await Brand.find({ isListed: true });
 
+        // Calculate cart count if user is logged in
         let cartCount = 0;
         if (req.session.user) {
             const cart = await Cart.findOne({ user: req.session.user._id });
@@ -435,6 +443,7 @@ const loadProducts = async (req, res) => {
             }
         }
 
+        // Render the products page
         res.render('user/products', {
             user: req.session.user || null,
             cartCount,
@@ -458,40 +467,127 @@ const loadProducts = async (req, res) => {
 
 const loadProductDetails = async (req, res) => {
     try {
-        const user = await User.findOne({isBlocked:false})
-        const productId = req.params.id;
-        const product = await Product.findById(productId)
-            .populate('brand')
-            .populate('category');
-        
-         if(!user){
-            res.redirect("/user/login")
-         }
-
-        if (!product) {
-            return res.status(404).render('error404', { error: 'Product not found' });
-        }
-
-        let cartCount = 0;
-        if (req.session.user) {
-            const cart = await Cart.findOne({ user: req.session.user._id });
-            if (cart) {
-                cartCount = cart.items.reduce((sum, item) => sum + item.quantity, 0);
-            }
-        }
-
-        res.render('user/productDetails', {
-            user: req.session.user || null,
-            cartCount,
-            product
+      const productId = req.params.id;
+      const userId = req.session.user?._id;
+  
+      // Fetch product
+      const product = await Product.findById(productId).populate('brand');
+      if (!product || product.isDeleted || product.isBlocked || product.status !== 'available') {
+        return res.status(404).render('user/error', {
+          message: 'Product not found or unavailable',
+          user: req.session.user || null,
+          search: req.query.search || '',
+          cartCount: 0
         });
+      }
+  
+      // Initialize variables
+      let cartCount = 0;
+      let total = 0;
+      let cart = null;
+  
+      // Fetch cart if user is logged in
+      if (userId) {
+        cart = await Cart.findOne({ user: userId }).populate('items.product');
+        if (cart) {
+          cart.items = cart.items.filter(item => {
+            if (
+              item.product &&
+              !item.product.isDeleted &&
+              !item.product.isBlocked &&
+              item.product.status === 'available'
+            ) {
+              total += item.product.salePrice * item.quantity;
+              return true;
+            }
+            return false;
+          });
+          await cart.save();
+          cartCount = cart.items.reduce((sum, item) => sum + item.quantity, 0);
+        }
+      }
+  
+      // Initialize session for recently viewed
+      req.session.recentlyViewed = req.session.recentlyViewed || [];
+  
+      // Add current product to recently viewed (exclude duplicates)
+      if (!req.session.recentlyViewed.includes(productId)) {
+        req.session.recentlyViewed.push(productId);
+        if (req.session.recentlyViewed.length > 10) {
+          req.session.recentlyViewed.shift(); // Keep last 10
+        }
+      }
+  
+      // Debug session
+      console.log('Session Recently Viewed:', req.session.recentlyViewed);
+  
+      // Validate recently viewed IDs
+      const validRecentlyViewedIds = [];
+      for (const id of req.session.recentlyViewed) {
+        try {
+          const prod = await Product.findOne({
+            _id: id,
+            isDeleted: false,
+            isBlocked: false,
+            status: 'available'
+          });
+          if (prod && id !== productId) {
+            validRecentlyViewedIds.push(id);
+          } else {
+            console.log(`Invalid or unavailable product ID in recently viewed: ${id}`);
+          }
+        } catch (err) {
+          console.log(`Error validating product ID ${id}:`, err.message);
+        }
+      }
+  
+      // Update session with valid IDs
+      req.session.recentlyViewed = validRecentlyViewedIds;
+  
+      // Fetch recently viewed products
+      const recentlyViewed = await Product.find({
+        _id: { $in: validRecentlyViewedIds },
+        isDeleted: false,
+        isBlocked: false,
+        status: 'available'
+      }).populate('brand').limit(6);
+  
+      // Fetch "You May Also Like" products
+      const youMayAlsoLike = await Product.find({
+        $or: [
+          { category: product.category || { $exists: true } },
+          { brand: product.brand?._id }
+        ],
+        _id: { $ne: productId, $nin: validRecentlyViewedIds },
+        isDeleted: false,
+        isBlocked: false,
+        status: 'available'
+      }).populate('brand').limit(6);
+  
+  
+      // Render product details page
+      res.render('user/productdetails', {
+        product,
+        cart,
+        total,
+        youMayAlsoLike,
+        recentlyViewed,
+        user: req.session.user || null,
+        search: req.query.search || '',
+        cartCount
+      });
     } catch (error) {
-        console.error('Error loading product details:', error);
-        res.status(500).render('user/error', { error: 'Failed to load product details' });
+      console.error('Error loading product details:', error);
+      res.status(500).render('user/error', {
+        message: 'An error occurred while loading the product details.',
+        user: req.session.user || null,
+        search: req.query.search || '',
+        cartCount: 0
+      });
     }
-};
-
-
+  };
+  
+  
 const loadlogout = async (req, res) => {
     try {
         req.session.user = null;

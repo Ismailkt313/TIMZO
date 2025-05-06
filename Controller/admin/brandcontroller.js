@@ -53,9 +53,9 @@ const blockBrand = async (req,res)=>{
     try {
         const id = req.query.id;
         await Brand.updateOne({_id:id},{$set:{isListed:false}})
-        res.redirect('/admin/brand')
+        res.status(200).json({ success: true });
     } catch (error) {
-         
+        res.status(500).json({ success: false, message: 'Server error' });
     }
 }
 
@@ -63,9 +63,9 @@ const unblockBrand = async (req,res)=>{
     try {
         const id = req.query.id;
         await Brand.updateOne({_id:id},{$set:{isListed:true}})
-        res.redirect('/admin/brand')
+        res.status(200).json({ success: true });
     } catch (error) {
-        
+        res.status(500).json({ success: false, message: 'Server error' });
     }
 }
 
@@ -76,12 +76,12 @@ const deleteBrand = async (req,res)=>{
         if(!id){
             res.status(400).redirect('/error404')
         }
-
+       
         await Brand.deleteOne({_id:id})
-        res.redirect('/admin/brand')
+        res.status(200).json({ success: true });
         
     } catch (error) {
-        
+        res.status(500).json({ success: false, message: 'Server error' });
     }
 }
 

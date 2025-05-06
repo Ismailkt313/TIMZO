@@ -1,96 +1,126 @@
-let customer = require('../../Model/userSchema')
+const customer = require('../../Model/userSchema');
 
-
-
-const loadUsers = async (req,res)=>{
+const loadUsers = async (req, res) => {
     try {
-        const page = parseInt(req.query.page) || 1
-    const limit = 10
-    const skip = (page - 1) * limit
-     console.log(skip);
-     
-    const users = await customer.find({}).sort({createdAt:-1}).skip(skip).limit(limit) 
-    
-    const totalUsers = await customer.countDocuments()
-    const totalPages = Math.ceil(totalUsers / limit)
+        const page = parseInt(req.query.page) || 1;
+        const limit = 10;
+        const skip = (page - 1) * limit;
+        console.log('Skip value:', skip);
 
+        const users = await customer.find({})
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(limit);
 
-    res.render('Admin/costomer', {
-      users,  
-      currentPage: page,
-      totalPages,
-    })
-  } catch (error) {
-        res.redirect('/user/error404')
-    }
-}
+        const totalUsers = await customer.countDocuments();
+        const totalPages = Math.ceil(totalUsers / limit);
 
-const loadProfile = async (req,res)=>{
-    try {
-
-        const userId = req.params.id;  
-        const user = await customer.findById(userId); 
-        console.log(user);
-        
-        if (!user) {
-          return res.redirect('/admin/users');  
-        }
-        res.render('Admin/userProfile',{ 
-            user,
-            orders:null,
-        
-        })
+        res.render('Admin/costomer', {
+            users,
+            currentPage: page,
+            totalPages,
+        });
     } catch (error) {
-        res.redirect('/user/error404')
+        console.error('Error loading users:', error);
+        res.redirect('/user/error404');
     }
-}
+};
 
-const profile = async (req,res)=>{
+const loadProfile = async (req, res) => {
     try {
-        const userId =  req.params.id;
-        const { fullname, email, isBlocked,mobile ,address} = req.body;
+        const userId = req.params.id;
+        const user = await customer.findById(userId);
+        console.log('User profile:', user);
+
+        if (!user) {
+            return res.redirect('/admin/users');
+        }
+        res.render('Admin/userProfile', {
+            user,
+            orders: null,
+        });
+    } catch (error) {
+        console.error('Error loading profile:', error);
+        res.redirect('/user/error404');
+    }
+};
+
+const profile = async (req, res) => {
+    try {
+        const userId = req.params.id;
+        const { fullname, email, isBlocked, mobile, address } = req.body;
 
         await customer.findByIdAndUpdate(userId, {
-          fullname,
-          mobile,
-          email,
-          address,
-          isBlocked: isBlocked === 'true'
+            fullname,
+            mobile,
+            email,
+            address,
+            isBlocked: isBlocked === 'true'
         });
         res.redirect(`/admin/userprofile/${userId}`);
     } catch (error) {
-        console.error(error);
+        console.error('Error updating profile:', error);
         res.redirect('/user/error404');
     }
-}
+};
 
-const block = async (req,res)=>{
+const searchUsers = async (req, res) => {
     try {
-        const user = await customer.findById(req.params.id)
-        if(!user){
-            return res.status(404).render('error404')
+        const query = req.query.query ? req.query.query.trim() : '';
+        const page = parseInt(req.query.page) || 1;
+        const limit = 10;
+
+        const users = await customer.find({
+            $or: [
+                { fullname: { $regex: query, $options: 'i' } },
+                { email: { $regex: query, $options: 'i' } }
+            ]
+        })
+            .limit(limit)
+            .skip((page - 1) * limit)
+            .exec();
+
+        const totalUsers = await customer.countDocuments({
+            $or: [
+                { fullname: { $regex: query, $options: 'i' } },
+                { email: { $regex: query, $options: 'i' } }
+            ]
+        });
+
+        res.json({
+            users,
+            currentPage: page,
+            totalPages: Math.ceil(totalUsers / limit)
+        });
+    } catch (error) {
+        console.error('Error searching users:', error);
+        res.status(500).json({ error: 'Failed to search users' });
+    }
+};
+
+const block = async (req, res) => {
+    try {
+        const user = await customer.findById(req.params.id);
+        if (!user) {
+            return res.status(404).render('error404');
         }
-        user.isBlocked = !user.isBlocked
-        await user.save()
+        user.isBlocked = !user.isBlocked;
+        await user.save();
         res.status(200).json({
             success: true,
             isBlocked: user.isBlocked
-        
-          });
-          console.log('its blocked');
-          
+        });
+        console.log('User block status updated:', user.isBlocked);
     } catch (error) {
-        console.error(error);
+        console.error('Error toggling block status:', error);
         res.status(500).json({ success: false });
-        
     }
-}
-
-
+};
 
 module.exports = {
     loadUsers,
     loadProfile,
     profile,
-    block
-}
+    block,
+    searchUsers
+};

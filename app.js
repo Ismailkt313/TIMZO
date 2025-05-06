@@ -15,9 +15,9 @@ db()
   
 app.set('view engine','ejs') 
 app.set('views', path.join(__dirname, 'views'))
-
+ 
    
-app.use(nocache())
+app.use(nocache()) 
 app.use(express.json())
 app.use(express.urlencoded({extended:true}))
 app.use(session({
@@ -39,9 +39,9 @@ app.use(express.static(path.join(__dirname, 'public')))
 
     
 app.use('/',userRouter) 
-app.use('/user',userRouter) 
-app.use('/admin',adminrouter)
-    
+app.use('/user',userRouter)  
+app.use('/admin',adminrouter) 
+     
 app.listen(PORT, ()=>{
     console.log(`server runnning as on :  http://localhost:${PORT}/`);
      

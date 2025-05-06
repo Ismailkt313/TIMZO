@@ -7,13 +7,15 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <style>
+    .deleted-row { background-color: #f8d7da; }
+  </style>
 </head>
 <body class="bg-gray-100">
-
   <%- include('.././Partials/admin/navbar') %>
 
   <div class="flex min-h-screen">
-
     <div class="w-64 bg-dark text-white">
         <%- include('.././Partials/admin/adminsidebar', { activePage: 'categories' }) %>
     </div>
@@ -21,15 +23,19 @@
         body {
           padding-top: 70px; 
         }
-      </style>
+    </style>
     <main class="flex-1 p-6">
-      
-
       <div class="bg-white p-4 rounded-xl shadow-md overflow-auto">
         <div class="flex justify-between items-center mb-6">
             <h1 class="text-2xl font-bold">Categories</h1>
-            <a href="/admin/addcategories" class="btn btn-primary">+ Add Category</a>
-          </div>
+            <div class="d-flex align-items-center gap-2">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="showDeleted" <%= showDeleted ? 'checked' : '' %> onchange="toggleDeletedView()">
+                <label class="form-check-label" for="showDeleted">Show Deleted Categories</label>
+              </div>
+              <a href="/admin/addcategories" class="btn btn-primary">+ Add Category</a>
+            </div>
+        </div>
         
         <table class="table table-bordered table-hover text-center">
           <thead class="table-dark">
@@ -47,36 +53,50 @@
           <tbody>
             <% if (categories.length > 0) { %>
               <% categories.forEach((category, index) => { %>
-                <tr>
+                <tr class="<%= category.isDeleted ? 'deleted-row' : '' %>">
                   <td><%= index + 1 %></td>
                   <td><%= category.name %></td>
-                  <td><%= category.offer %></td>
-                  <td><%= category.description || '-' %></td>
-                  <td><%= category.sales %></td>
-                  <td><%= category.stock %></td>
                   <td>
-                    <% if (category.isListed) { %>
-                      <span class="text-success">Listed</span>
+                    <% if (category.categoryOffer && category.categoryOffer > 0) { %>
+                      <span><%= category.categoryOffer %>%</span>
+                      <button class="btn btn-warning btn-sm ms-2 remove-offer-btn" data-id="<%= category._id %>">Remove Offer</button>
                     <% } else { %>
-                      <span class="text-danger">Unlisted</span>
+                      <span>0%</span>
+                      <button class="btn btn-info btn-sm ms-2 add-offer-btn" data-id="<%= category._id %>">Add Offer</button>
                     <% } %>
                   </td>
+                  <td><%= category.description || '-' %></td>
+                  <td><%= category.sales || 0 %></td>
+                  <td><%= category.stock || 0 %></td>
+                  <td>
+                    <span class="category-status text-<%= category.isListed ? 'success' : 'danger' %>">
+                      <%= category.isListed ? 'Listed' : 'Unlisted' %>
+                    </span>
+                  </td>
                   <td class="flex gap-2 justify-center">
-                    <a href="/admin/editcategory/?id=<%= category._id %>" class="btn btn-sm btn-outline-warning" title="Edit">
+                    <a href="/admin/editcategory/<%= category._id %>" class="btn btn-sm btn-outline-warning" title="Edit">
                       <i class="bi bi-pencil-square"></i>
                     </a>
-                  
-                    <% if (category.isListed) { %>
-                      <a href="/admin/listcategory?id=<%= category._id %>" class="btn btn-danger btn-sm">Unlist</a>
+                    <button 
+                      class="btn btn-sm toggle-category-btn btn-<%= category.isListed ? 'danger' : 'success' %>" 
+                      data-id="<%= category._id %>" 
+                      data-action="<%= category.isListed ? 'unlist' : 'list' %>">
+                      <%= category.isListed ? 'Unlist' : 'List' %>
+                    </button>
+                    <% if (category.isDeleted) { %>
+                      <div class="d-flex gap-2">
+                        <button class="btn btn-sm btn-success undo-delete-btn" data-id="<%= category._id %>">
+                          <i class="bi bi-arrow-counterclockwise"></i>
+                        </button>
+                        <button class="btn btn-sm btn-danger permanently-delete-btn" data-id="<%= category._id %>">
+                          <i class="bi bi-trash-fill"></i>
+                        </button>
+                      </div>
                     <% } else { %>
-                      <a href="/admin/unlistcategory?id=<%= category._id %>" class="btn btn-success btn-sm">List</a>
-                    <% } %>
-                  
-                    <form action="/admin/categories/delete/<%= category._id %>" method="POST" style="display:inline;" onsubmit="return confirm('Are you sure to delete this category?')">
-                      <button type="submit" class="btn btn-sm btn-outline-danger">
+                      <button class="btn btn-sm btn-outline-danger soft-delete-btn" data-id="<%= category._id %>">
                         <i class="bi bi-trash"></i>
                       </button>
-                    </form>
+                    <% } %>
                   </td>
                 </tr>
               <% }); %>
@@ -92,7 +112,7 @@
               <ul class="pagination">
                   <% if (currentpage > 1) { %>
                       <li class="page-item">
-                          <a class="page-link" href="/admin/categories?page=<%= currentpage - 1 %>">Previous</a>
+                          <a class="page-link" href="/admin/categories?page=<%= currentpage - 1 %>&showDeleted=<%= showDeleted ? 'true' : 'false' %>">Previous</a>
                       </li>
                   <% } else { %>
                       <li class="page-item disabled">
@@ -102,13 +122,13 @@
     
                   <% for (let i = 1; i <= totalPage; i++) { %>
                       <li class="page-item <%= currentpage === i ? 'active' : '' %>">
-                          <a class="page-link" href="/admin/categories?page=<%= i %>"><%= i %></a>
+                          <a class="page-link" href="/admin/categories?page=<%= i %>&showDeleted=<%= showDeleted ? 'true' : 'false' %>"><%= i %></a>
                       </li>
                   <% } %>
       
                   <% if (currentpage < totalPage) { %>
                       <li class="page-item">
-                          <a class="page-link" href="/admin/categories?page=<%= currentpage + 1 %>">Next</a>
+                          <a class="page-link" href="/admin/categories?page=<%= currentpage + 1 %>&showDeleted=<%= showDeleted ? 'true' : 'false' %>">Next</a>
                       </li>
                   <% } else { %>
                       <li class="page-item disabled">
@@ -117,15 +137,255 @@
                   <% } %>
               </ul>
           </nav>
-      </div>
-      
+        </div>
       </div>
     </main>
   </div>
 
-  <!-- Footer -->
   <%- include('.././Partials/admin/footer') %>
   
+  <script>
+    // Toggle Show Deleted Categories
+    function toggleDeletedView() {
+      const showDeleted = document.getElementById('showDeleted').checked;
+      const currentUrl = new URL(window.location.href);
+      currentUrl.searchParams.set('showDeleted', showDeleted.toString());
+      window.location.href = currentUrl.toString();
+    }
 
+    // List/Unlist Category
+    document.querySelectorAll('.toggle-category-btn').forEach(button => {
+      button.addEventListener('click', async () => {
+        const categoryId = button.dataset.id;
+        const action = button.dataset.action;
+
+        const result = await Swal.fire({
+          title: `Are you sure?`,
+          text: `This will ${action === 'list' ? 'list' : 'unlist'} the category.`,
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonText: `Yes, ${action}`,
+          cancelButtonText: 'Cancel'
+        });
+
+        if (!result.isConfirmed) return;
+
+        try {
+          const response = await fetch(`/admin/${action}category?id=${categoryId}`, {
+            method: 'PATCH'
+          });
+
+          const data = await response.json();
+
+          if (data.success) {
+            button.classList.toggle('btn-success');
+            button.classList.toggle('btn-danger');
+            button.textContent = action === 'list' ? 'Unlist' : 'List';
+            button.dataset.action = action === 'list' ? 'unlist' : 'list';
+
+            const statusSpan = button.closest('tr').querySelector('.category-status');
+            if (statusSpan) {
+              statusSpan.textContent = action === 'list' ? 'Listed' : 'Unlisted';
+              statusSpan.classList.remove('text-success', 'text-danger');
+              statusSpan.classList.add(action === 'list' ? 'text-success' : 'text-danger');
+            }
+
+            Swal.fire('Success!', `Category ${action === 'list' ? 'listed' : 'unlisted'} successfully.`, 'success');
+          } else {
+            Swal.fire('Failed!', 'Operation failed.', 'error');
+          }
+        } catch (err) {
+          console.error(err);
+          Swal.fire('Error!', 'Something went wrong.', 'error');
+        }
+      });
+    });
+
+    // Soft Delete Category
+    document.querySelectorAll('.soft-delete-btn').forEach(button => {
+      button.addEventListener('click', async () => {
+        const categoryId = button.dataset.id;
+
+        const result = await Swal.fire({
+          title: 'Are you sure?',
+          text: 'This will soft-delete the category. You can restore it later.',
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonText: 'Yes, delete it!',
+          cancelButtonText: 'Cancel'
+        });
+
+        if (!result.isConfirmed) return;
+
+        try {
+          const response = await fetch(`/admin/softDeleteCategory?id=${categoryId}`, {
+            method: 'POST'
+          });
+
+          const data = await response.json();
+
+          if (data.success) {
+            Swal.fire('Deleted!', data.message, 'success').then(() => {
+              location.reload();
+            });
+          } else {
+            Swal.fire('Failed!', data.message || 'Category deletion failed.', 'error');
+          }
+        } catch (err) {
+          console.error(err);
+          Swal.fire('Error!', 'Something went wrong.', 'error');
+        }
+      });
+    });
+
+    // Undo Delete Category
+    document.querySelectorAll('.undo-delete-btn').forEach(button => {
+      button.addEventListener('click', async () => {
+        const categoryId = button.dataset.id;
+
+        const result = await Swal.fire({
+          title: 'Are you sure?',
+          text: 'This will restore the category.',
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonText: 'Yes, restore it!',
+          cancelButtonText: 'Cancel'
+        });
+
+        if (!result.isConfirmed) return;
+
+        try {
+          const response = await fetch(`/admin/undoDeleteCategory?id=${categoryId}`, {
+            method: 'POST'
+          });
+
+          const data = await response.json();
+
+          if (data.success) {
+            Swal.fire('Restored!', data.message, 'success').then(() => {
+              location.reload();
+            });
+          } else {
+            Swal.fire('Failed!', data.message || 'Category restoration failed.', 'error');
+          }
+        } catch (err) {
+          console.error(err);
+          Swal.fire('Error!', 'Something went wrong.', 'error');
+        }
+      });
+    });
+
+    // Permanently Delete Category
+    document.querySelectorAll('.permanently-delete-btn').forEach(button => {
+      button.addEventListener('click', async () => {
+        const categoryId = button.dataset.id;
+
+        const result = await Swal.fire({
+          title: 'Are you sure?',
+          text: 'This will permanently delete the category and cannot be undone!',
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonText: 'Yes, permanently delete it!',
+          cancelButtonText: 'Cancel',
+          confirmButtonColor: '#dc3545'
+        });
+
+        if (!result.isConfirmed) return;
+
+        try {
+          const response = await fetch(`/admin/permanentlyDeleteCategory?id=${categoryId}`, {
+            method: 'POST'
+          });
+
+          const data = await response.json();
+
+          if (data.success) {
+            Swal.fire('Deleted!', data.message, 'success').then(() => {
+              button.closest('tr').remove();
+            });
+          } else {
+            Swal.fire('Failed!', data.message || 'Category deletion failed.', 'error');
+          }
+        } catch (err) {
+          console.error(err);
+          Swal.fire('Error!', 'Something went wrong.', 'error');
+        }
+      });
+    });
+
+    // Add Category Offer
+    document.querySelectorAll('.add-offer-btn').forEach(button => {
+      button.addEventListener('click', async () => {
+        const categoryId = button.dataset.id;
+
+        const { value: percentage } = await Swal.fire({
+          title: 'Add Offer',
+          input: 'number',
+          inputLabel: 'Offer Percentage',
+          inputPlaceholder: 'Enter percentage',
+          showCancelButton: true,
+          inputValidator: (value) => {
+            if (!value || value <= 0 || value > 100) {
+              return 'Please enter a valid percentage (1-100)';
+            }
+          }
+        });
+
+        if (percentage) {
+          try {
+            const response = await fetch('/admin/addcategoryOffer', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ categoryId, percentage })
+            });
+
+            const data = await response.json();
+            if (data.status) {
+              Swal.fire('Success', data.message, 'success').then(() => location.reload());
+            } else {
+              Swal.fire('Error', data.message || 'Failed to add offer', 'error');
+            }
+          } catch (error) {
+            Swal.fire('Error', 'An error occurred while adding the offer', 'error');
+          }
+        }
+      });
+    });
+
+    // Remove Category Offer
+    document.querySelectorAll('.remove-offer-btn').forEach(button => {
+      button.addEventListener('click', async () => {
+        const categoryId = button.dataset.id;
+
+        const result = await Swal.fire({
+          title: 'Are you sure?',
+          text: 'This will remove the offer from the category and reset associated product prices.',
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonText: 'Yes, remove it!',
+          cancelButtonText: 'Cancel'
+        });
+
+        if (result.isConfirmed) {
+          try {
+            const response = await fetch('/admin/removeCategoryOffer', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ categoryId })
+            });
+
+            const data = await response.json();
+            if (data.status) {
+              Swal.fire('Success', data.message, 'success').then(() => location.reload());
+            } else {
+              Swal.fire('Error', data.message || 'Failed to remove offer', 'error');
+            }
+          } catch (error) {
+            Swal.fire('Error', 'An error occurred while removing the offer', 'error');
+          }
+        }
+      });
+    });
+  </script>
 </body>
 </html>

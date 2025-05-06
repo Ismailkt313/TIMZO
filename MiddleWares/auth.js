@@ -23,26 +23,14 @@ const userAuth = (req, res, next) => {
 
 
 
+const adminAuth = (req, res, next) => {
+    if (req.session.admin) {
+        next();
+    } else {
+        res.redirect("/admin/login");
+    }
+};
 
-const adminAuth = (req,res,next)=>{
-    if(req.session.admin){
-    const Admin = User.findOne({isAdmin:true})
-    
-    .then(data=>{
-        if(data){
-            next()
-        }else{
-            res.redirect("/admin/login")
-        }
-    })
-    .catch(error=>{
-        console.log("Error auth in adninauth middleware",error)
-        res.status(500).send("internal server error")
-    })
-  }else{
-    res.redirect("/admin/login")
-  }
-}
 
 module.exports={
     userAuth,

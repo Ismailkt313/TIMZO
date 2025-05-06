@@ -98,74 +98,10 @@ const addProducts = async (req, res) => {
             throw new Error('At least one image is required');
         }
 
-        const croppedImages = [];
+        const imageUrls = [];
         for (let i = 0; i < req.files.length; i++) {
             const file = req.files[i];
-            const cropData = cropDataArray[i];
-            console.log(`Processing file ${i + 1}:`, file.originalname);
-            console.log('Temporary file path:', file.path);
-            console.log('Crop data:', cropData);
-
-            const timestamp = new Date().getTime();
-            const fileName = `timzo-watch-${timestamp}-${path.basename(file.originalname, path.extname(file.originalname))}.jpg`;
-            const outputPath = path.join(uploadDir, fileName);
-
-            try {
-                let sharpInstance = sharp(file.path);
-
-                // Get original image dimensions
-                const metadata = await sharpInstance.metadata();
-                console.log('Original image dimensions:', metadata.width, 'x', metadata.height);
-
-                // Calculate scaling factor (based on canvas size in frontend)
-                const canvasWidth = 300; // As set in frontend
-                const canvasHeight = 200; // As set in frontend
-                const scaleX = metadata.width / canvasWidth;
-                const scaleY = metadata.height / canvasHeight;
-
-                // Apply crop if coordinates are provided
-                if (cropData) {
-                    const cropX = Math.round(cropData.x * scaleX);
-                    const cropY = Math.round(cropData.y * scaleY);
-                    const cropWidth = Math.round(cropData.width * scaleX);
-                    const cropHeight = Math.round(cropData.height * scaleY);
-
-                    console.log('Applying crop:', { cropX, cropY, cropWidth, cropHeight });
-
-                    sharpInstance = sharpInstance.extract({
-                        left: cropX,
-                        top: cropY,
-                        width: cropWidth,
-                        height: cropHeight
-                    });
-                }
-
-                // Resize to final dimensions
-                await sharpInstance
-                    .resize({
-                        width: 300,
-                        height: 300,
-                        fit: 'cover',
-                        position: 'center'
-                    })
-                    .toFormat('jpeg')
-                    .jpeg({ quality: 80 })
-                    .toFile(outputPath);
-
-                console.log('Image cropped and saved to:', outputPath);
-
-                if (fs.existsSync(file.path)) {
-                    fs.unlinkSync(file.path);
-                    console.log('Deleted temporary file:', file.path);
-                } else {
-                    console.log('Temporary file not found for deletion:', file.path);
-                }
-
-                croppedImages.push(`/uploads/products/${fileName}`);
-            } catch (sharpError) {
-                console.error('Error processing image with sharp:', sharpError);
-                throw new Error(`Failed to process image: ${file.originalname}`);
-            }
+            imageUrls.push(file.path); // Cloudinary URL
         }
 
         const newProduct = new Product({
@@ -181,8 +117,11 @@ const addProducts = async (req, res) => {
             waterResistance,
             warranty,
             movementType,
-            images: croppedImages,
-            status: 'available'
+            images: imageUrls,
+            status: 'available',
+            isDeleted: false,
+            isBlocked: false,
+            ProductOffer: 0
         });
 
         await newProduct.save();
@@ -206,6 +145,7 @@ const getProduct = async (req, res) => {
         const search = req.query.search ? req.query.search.trim() : '';
         const page = parseInt(req.query.page) || 1;
         const limit = 5;
+        const showDeleted = req.query.showDeleted === 'true';
 
         if (page < 1) {
             return res.status(400).render('Admin/error404', { error: 'Invalid page number' });
@@ -215,24 +155,22 @@ const getProduct = async (req, res) => {
             name: { $regex: new RegExp('.*' + search + '.*', 'i') }
         }).select('_id');
 
-        const productData = await Product.find({
+        const query = {
             $or: [
                 { name: { $regex: new RegExp('.*' + search + '.*', 'i') } },
                 { brand: { $in: brandIds.map(id => id._id) } }
-            ]
-        })
+            ],
+            isDeleted: showDeleted
+        };
+
+        const productData = await Product.find(query)
             .limit(limit)
             .skip((page - 1) * limit)
             .populate('category')
             .populate('brand')
             .exec();
 
-        const count = await Product.countDocuments({
-            $or: [
-                { name: { $regex: new RegExp('.*' + search + '.*', 'i') } },
-                { brand: { $in: brandIds.map(id => id._id) } }
-            ]
-        });
+        const count = await Product.countDocuments(query);
 
         const categories = await Category.find({ isListed: true });
         const brands = await Brand.find({ isListed: true });
@@ -247,7 +185,8 @@ const getProduct = async (req, res) => {
             totalPages: Math.ceil(count / limit),
             cat: categories,
             brand: brands,
-            search
+            search,
+            showDeleted
         });
     } catch (error) {
         console.error('Error listing products:', error);
@@ -255,8 +194,293 @@ const getProduct = async (req, res) => {
     }
 };
 
+const addProductOffer = async (req, res) => {
+    try {
+        const { productId, percentage } = req.body;
+        const product = await Product.findById(productId);
+
+        if (!product || product.isDeleted) {
+            return res.status(404).json({ status: false, message: "Product not found or has been deleted" });
+        }
+
+        const category = await Category.findById(product.category);
+        if (category && category.categoryOffer > percentage) {
+            return res.json({ status: false, message: "Category offer is higher than the product offer" });
+        }
+
+        product.ProductOffer = parseInt(percentage);
+        product.salePrice = Math.floor(product.regularPrice * (1 - (percentage / 100)));
+        await product.save();
+
+        res.json({ status: true, message: "Product offer applied successfully" });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ status: false, message: 'Internal server error' });
+    }
+};
+
+const removeProductOffer = async (req, res) => {
+    try {
+        const { productId } = req.body;
+        const product = await Product.findById(productId);
+
+        if (!product || product.isDeleted) {
+            return res.status(404).json({ status: false, message: "Product not found or has been deleted" });
+        }
+
+        const category = await Category.findById(product.category);
+        const categoryOffer = category ? category.categoryOffer : 0;
+
+        product.ProductOffer = 0;
+        product.salePrice = Math.floor(product.regularPrice * (1 - (categoryOffer / 100)));
+        await product.save();
+
+        res.json({ status: true, message: "Product offer removed successfully" });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ status: false, message: 'Internal server error' });
+    }
+};
+
+const blockProduct = async (req, res) => {
+    try {
+        const productId = req.query.id;
+        const product = await Product.findById(productId);
+        if (!product || product.isDeleted) {
+            return res.status(404).json({ success: false, message: 'Product not found or has been deleted' });
+        }
+
+        product.isBlocked = true;
+        await product.save();
+
+        res.status(200).json({ success: true, message: 'Product blocked successfully' });
+    } catch (error) {
+        console.error('Error blocking product:', error);
+        res.status(500).json({ success: false, message: 'Failed to block product' });
+    }
+};
+
+const unblockProduct = async (req, res) => {
+    try {
+        const productId = req.query.id;
+        const product = await Product.findById(productId);
+        if (!product || product.isDeleted) {
+            return res.status(404).json({ success: false, message: 'Product not found or has been deleted' });
+        }
+
+        product.isBlocked = false;
+        await product.save();
+
+        res.status(200).json({ success: true, message: 'Product unblocked successfully' });
+    } catch (error) {
+        console.error('Error unblocking product:', error);
+        res.status(500).json({ success: false, message: 'Failed to unblock product' });
+    }
+};
+
+const softDeleteProduct = async (req, res) => {
+    try {
+        const productId = req.query.id;
+        const product = await Product.findById(productId);
+        if (!product) {
+            return res.status(404).json({ success: false, message: 'Product not found' });
+        }
+
+        product.isDeleted = true;
+        product.deletedAt = new Date();
+        await product.save();
+
+        res.status(200).json({ success: true, message: 'Product soft-deleted successfully' });
+    } catch (error) {
+        console.error('Error soft-deleting product:', error);
+        res.status(500).json({ success: false, message: 'Failed to soft-delete product' });
+    }
+};
+
+const undoDeleteProduct = async (req, res) => {
+    try {
+        const productId = req.query.id;
+        const product = await Product.findById(productId);
+        if (!product) {
+            return res.status(404).json({ success: false, message: 'Product not found' });
+        }
+
+        product.isDeleted = false;
+        product.deletedAt = null;
+        await product.save();
+
+        res.status(200).json({ success: true, message: 'Product restored successfully' });
+    } catch (error) {
+        console.error('Error restoring product:', error);
+        res.status(500).json({ success: false, message: 'Failed to restore product' });
+    }
+};
+
+const permanentlyDeleteProduct = async (req, res) => {
+    try {
+        const productId = req.query.id;
+        const product = await Product.findById(productId);
+        if (!product) {
+            return res.status(404).json({ success: false, message: 'Product not found' });
+        }
+
+        if (!product.isDeleted) {
+            return res.status(400).json({ success: false, message: 'Product must be soft-deleted before permanent deletion' });
+        }
+
+        await Product.findByIdAndDelete(productId);
+
+        res.status(200).json({ success: true, message: 'Product permanently deleted' });
+    } catch (error) {
+        console.error('Error permanently deleting product:', error);
+        res.status(500).json({ success: false, message: 'Failed to permanently delete product' });
+    }
+};
+
+const loadEditProduct = async (req, res) => {
+    try {
+        const productId = req.params.id;
+        const product = await Product.findById(productId).populate('category').populate('brand');
+        const categories = await Category.find({ isListed: true });
+        const brands = await Brand.find({ isListed: true });
+
+        if (!product || product.isDeleted) {
+            return res.redirect('/admin/error404');
+        }
+
+        res.render('Admin/editProduct', {
+            product,
+            cat: categories,
+            brand: brands,
+            error: null
+        });
+    } catch (error) {
+        console.error('Error loading edit product page:', error);
+        res.redirect('/admin/error404');
+    }
+};
+
+const editProduct = async (req, res) => {
+    try {
+        const productId = req.params.id;
+        const {
+            productName,
+            description,
+            brand,
+            category,
+            regularPrice,
+            salePrice,
+            stock,
+            color,
+            material,
+            waterResistance,
+            warranty,
+            movementType,
+            cropData1,
+            cropData2,
+            cropData3,
+            cropData4
+        } = req.body;
+
+        const cropDataArray = [cropData1, cropData2, cropData3, cropData4].map(data => {
+            try {
+                return data ? JSON.parse(data) : null;
+            } catch (e) {
+                console.log('Invalid crop data:', data);
+                return null;
+            }
+        });
+
+        const product = await Product.findById(productId);
+        if (!product || product.isDeleted) {
+            const categories = await Category.find({ isListed: true });
+            const brands = await Brand.find({ isListed: true });
+            return res.render('Admin/editProduct', {
+                product,
+                cat: categories,
+                brand: brands,
+                error: 'Product not found or has been deleted'
+            });
+        }
+
+        const existingProduct = await Product.findOne({ name: productName, _id: { $ne: productId } });
+        if (existingProduct) {
+            const categories = await Category.find({ isListed: true });
+            const brands = await Brand.find({ isListed: true });
+            return res.render('Admin/editProduct', {
+                product,
+                cat: categories,
+                brand: brands,
+                error: 'Watch with this name already exists'
+            });
+        }
+
+        const categoryExists = await Category.findById(category);
+        const brandExists = await Brand.findById(brand);
+        if (!categoryExists || !brandExists) {
+            throw new Error('Invalid category or brand');
+        }
+
+        let imageUrls = product.images;
+        if (req.files && req.files.length > 0) {
+            imageUrls = [];
+            for (let i = 0; i < req.files.length; i++) {
+                const file = req.files[i];
+                imageUrls.push(file.path); // Cloudinary URL
+            }
+        }
+
+        product.name = productName;
+        product.description = description;
+        product.brand = brand;
+        product.category = category;
+        product.regularPrice = parseFloat(regularPrice);
+        product.salePrice = parseFloat(salePrice);
+        product.stock = parseInt(stock);
+        product.color = color;
+        product.material = material || '';
+        product.waterResistance = waterResistance;
+        product.warranty = warranty;
+        product.movementType = movementType;
+        product.images = imageUrls;
+
+        // Recalculate salePrice if there's a product offer
+        if (product.ProductOffer > 0) {
+            product.salePrice = Math.floor(product.regularPrice * (1 - (product.ProductOffer / 100)));
+        } else {
+            const categoryData = await Category.findById(category);
+            const categoryOffer = categoryData ? categoryData.categoryOffer : 0;
+            product.salePrice = Math.floor(product.regularPrice * (1 - (categoryOffer / 100)));
+        }
+
+        await product.save();
+        res.redirect('/admin/getProduct');
+    } catch (error) {
+        console.error('Error editing product:', error);
+        const productId = req.params.id;
+        const product = await Product.findById(productId).populate('category').populate('brand');
+        const categories = await Category.find({ isListed: true });
+        const brands = await Brand.find({ isListed: true });
+        res.render('Admin/editProduct', {
+            product,
+            cat: categories,
+            brand: brands,
+            error: error.message
+        });
+    }
+};
+
 module.exports = {
     loadProducts,
     addProducts,
-    getProduct
+    getProduct,
+    addProductOffer,
+    removeProductOffer,
+    blockProduct,
+    unblockProduct,
+    softDeleteProduct,
+    undoDeleteProduct,
+    permanentlyDeleteProduct,
+    loadEditProduct,
+    editProduct
 };
