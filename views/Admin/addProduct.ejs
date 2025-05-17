@@ -127,10 +127,17 @@
               <div id="color-error" class="error-message"></div>
             </div>
             <div class="mb-4">
-              <label class="form-label">Material</label>
-              <input name="material" type="text" placeholder="e.g., Stainless Steel" class="form-control" value="<%= formData.material || '' %>" />
-              <div id="material-error" class="error-message"></div>
-            </div>
+  <label class="form-label">Material</label>
+  <select name="material" class="form-control">
+    <option value="">Select material</option>
+    <% const materials = ['leather', 'metal', 'rubber', 'ceramic', 'plastic', 'nylon']; %>
+    <% materials.forEach(material => { %>
+      <option value="<%= material %>" <%= formData.material === material ? 'selected' : '' %>><%= material.charAt(0).toUpperCase() + material.slice(1) %></option>
+    <% }) %>
+  </select>
+  <div id="material-error" class="error-message"></div>
+</div>
+
             <div class="mb-4">
               <label class="form-label">Water Resistance</label>
               <select class="form-select" name="waterResistance">

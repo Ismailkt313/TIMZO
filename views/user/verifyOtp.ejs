@@ -2,158 +2,238 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Verify OTP - Timzo</title>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Verify OTP</title>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <style>
     body {
-      background: linear-gradient(to right, #1c92d2, #f2fcfe);
+      background: linear-gradient(to right, #2a9df4, #e0f7fa);
       display: flex;
       align-items: center;
       justify-content: center;
       height: 100vh;
       margin: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: 'Arial', sans-serif;
     }
 
     .otp-container {
       background: white;
-      padding: 40px;
-      border-radius: 16px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
       text-align: center;
-      animation: slideUp 1s ease;
+      animation: fadeIn 0.8s ease;
+      width: 300px;
     }
 
-    @keyframes slideUp {
-      from {
-        transform: translateY(50px);
-        opacity: 0;
-      }
-      to {
-        transform: translateY(0);
-        opacity: 1;
-      }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.9); }
+      to { opacity: 1; transform: scale(1); }
     }
 
     h2 {
-      margin-bottom: 20px;
-      color: #333;
+      margin-bottom: 15px;
+      color: #222;
+      font-size: 24px;
     }
 
     input[type="text"] {
-      padding: 10px;
-      width: 200px;
-      font-size: 18px;
-      border: 2px solid #ccc;
-      border-radius: 8px;
-      margin-bottom: 20px;
+      padding: 12px;
+      width: 100%;
+      box-sizing: border-box;
+      font-size: 16px;
+      border: 2px solid #ddd;
+      border-radius: 6px;
+      margin-bottom: 15px;
+      outline: none;
+      transition: border-color 0.3s;
+    }
+
+    input[type="text"]:focus {
+      border-color: #2a9df4;
     }
 
     button {
-      padding: 10px 20px;
-      background-color: #1c92d2;
+      padding: 12px 20px;
+      background-color: #2a9df4;
       color: white;
       border: none;
-      border-radius: 8px;
+      border-radius: 6px;
       cursor: pointer;
       font-size: 16px;
-      margin-top: 10px;
+      width: 100%;
+      transition: background-color 0.3s;
+    }
+
+    button:disabled {
+      background-color: #a0a0a0;
+      cursor: not-allowed;
+    }
+
+    button:hover:not(:disabled) {
+      background-color: #1a73e8;
     }
 
     .timer {
-      margin: 10px 0;
+      margin: 15px 0;
       font-weight: bold;
-      color: #ff4500;
+      color: #e91e63;
+      font-size: 16px;
     }
 
     .error {
-      color: red;
-      margin-top: 10px;
+      color: #d32f2f;
+      margin-bottom: 15px;
+      font-size: 14px;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background-color: #4caf50;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 6px;
+      font-size: 14px;
+      opacity: 0;
+      transition: transform 0.5s, opacity 0.5s;
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
     }
   </style>
 </head>
 <body>
-
   <div class="otp-container">
     <h2>Verify OTP</h2>
 
-    <% if (error) { %>
-      <p class="error"><%= error %></p>
+    <!-- Display server-side error if passed from backend -->
+    <% if (typeof error !== 'undefined' && error) { %>
+      <div class="error"><%= error %></div>
     <% } %>
 
-    <form action="/user/verify-otp" method="POST">
-      <input type="text" id="otp" name="otp" placeholder="Enter OTP" required />
-      <br />
+    <!-- Client-side error display area -->
+    <div id="client-error" class="error" style="display: none;"></div>
+
+    <form id="otp-form" action="/user/verify-otp" method="POST">
+      <input type="text" id="otp" name="otp" placeholder="Enter OTP" />
       <button type="submit">Verify OTP</button>
     </form>
 
-    <div class="timer" id="timer">01:00</div>
-
-      <button type="submit" onclick="resendOTP()">Resend OTP</button>
-    
+    <div class="timer" id="timer">00:30</div>
+    <button id="resend-btn" disabled>Resend OTP</button>
   </div>
 
+  <div id="toast" class="toast">OTP Resent Successfully!</div>
+
   <script>
-    let timer = 60;
+    let timer = 30;
     let countdown;
     const timerDisplay = document.getElementById("timer");
-  
+    const resendBtn = document.getElementById("resend-btn");
+    const clientErrorDisplay = document.getElementById("client-error");
+    const otpForm = document.getElementById("otp-form");
+    const toast = document.getElementById("toast");
+
     function startTimer() {
-      clearInterval(countdown); 
-      timer = 60;
-      timerDisplay.textContent = "01:00";
-  
+      clearInterval(countdown);
+      timerDisplay.textContent = `00:${timer.toString().padStart(2, '0')}`;
+      resendBtn.disabled = true;
+
       countdown = setInterval(() => {
+        timer--;
         if (timer <= 0) {
           clearInterval(countdown);
-          timerDisplay.textContent = "OTP expired? Try resending.";
+          timerDisplay.textContent = "OTP expired";
+          resendBtn.disabled = false;
           return;
         }
-  
-        timer--;
-        let minutes = Math.floor(timer / 60);
-        let seconds = timer % 60;
-        timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        timerDisplay.textContent = `00:${timer.toString().padStart(2, '0')}`;
       }, 1000);
     }
-  
-    startTimer(); 
-  
-    function resendOTP() {
-      fetch("/user/resend-otp", {
-        method: "POST"
+
+    function showToast(message) {
+      toast.textContent = message;
+      toast.classList.add("show");
+      setTimeout(() => {
+        toast.classList.remove("show");
+      }, 3000);
+    }
+
+    startTimer();
+
+    otpForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const otp = document.getElementById("otp").value;
+
+      clientErrorDisplay.style.display = "none";
+      clientErrorDisplay.textContent = "";
+
+      fetch("/user/verify-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ otp })
       })
-      .then(res => res.json())
+      .then(res => {
+        const contentType = res.headers.get("content-type");
+        if (!contentType || !contentType.includes("application/json")) {
+          throw new Error("Expected JSON response");
+        }
+        return res.json();
+      })
       .then(response => {
         if (response.success) {
           Swal.fire({
             icon: "success",
-            title: "OTP resent successfully!",
+            title: "OTP Verified!",
             timer: 1500,
             showConfirmButton: false
+          }).then(() => {
+            window.location.href = response.redirect || "/user/";
           });
-          startTimer(); 
+        } else {
+          clientErrorDisplay.textContent = response.error || "Invalid OTP.";
+          clientErrorDisplay.style.display = "block";
+        }
+      })
+      .catch(error => {
+        console.error("Fetch error:", error);
+        clientErrorDisplay.textContent = "An error occurred. Please try again.";
+        clientErrorDisplay.style.display = "block";
+      });
+    });
+
+    resendBtn.addEventListener("click", () => {
+      fetch("/user/resend-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" }
+      })
+      .then(res => res.json())
+      .then(response => {
+        if (response.success) {
+          timer = 30;
+          startTimer();
+          showToast("OTP Resent Successfully!");
         } else {
           Swal.fire({
             icon: "error",
             title: "Error",
-            text: response.error || "Something went wrong."
+            text: response.error || "Failed to resend OTP."
           });
         }
       })
-      .catch(error => {
+      .catch(() => {
         Swal.fire({
           icon: "error",
           title: "Network Error",
           text: "Please try again later."
         });
       });
-    }
+    });
   </script>
-  
-  
-
 </body>
 </html>

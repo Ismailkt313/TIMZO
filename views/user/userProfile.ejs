@@ -7,11 +7,14 @@
     <title>User Profile - TIMZO</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="/images/TIMZO.jpg">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
-        /* Main Layout */
         body {
             background-color: #f4f4f4;
             font-family: 'Arial', sans-serif;
+            margin: 0;
         }
 
         .container-fluid {
@@ -63,9 +66,22 @@
             color: #666;
         }
 
+        .profile-card .info-item input {
+            width: 60%;
+            padding: 5px;
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .profile-card .info-item input:focus {
+            outline: none;
+            border-color: #1a1a1a;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+        }
+
         .profile-card .btn-edit {
-            display: block;
-            width: 100%;
             background-color: #1a1a1a;
             color: #ffffff;
             border: none;
@@ -81,6 +97,45 @@
             color: #1a1a1a;
         }
 
+        .profile-card .btn-update {
+            background-color: #28a745;
+            color: #ffffff;
+            border: none;
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 500;
+            transition: background-color 0.3s ease;
+        }
+
+        .profile-card .btn-update:hover {
+            background-color: #218838;
+        }
+
+        .profile-card .btn-cancel {
+            background-color: #dc3545;
+            color: #ffffff;
+            border: none;
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 500;
+            transition: background-color 0.3s ease;
+        }
+
+        .profile-card .btn-cancel:hover {
+            background-color: #c82333;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .row{
+            padding-left: 520px;
+        }
+
         /* Responsive Adjustments */
         @media (max-width: 767px) {
             .main-content {
@@ -94,45 +149,241 @@
             .profile-card h1 {
                 font-size: 20px;
             }
+
+            .profile-card .info-item input {
+                width: 50%;
+                font-size: 12px;
+            }
         }
     </style>
 </head>
 
 <body>
-
+    <%- include('.././Partials/user/userSidebar', { user: user, currentPage: 'profile' }) %>
     <!-- Main Content with Sidebar -->
-    <div class="container-fluid vh-100">
+    <div class="container-fluid vh-100 ">
         <div class="row h-100">
-            <!-- Include User Sidebar -->
-            <%- include('.././Partials/user/userSidebar', { user: user, currentPage: 'profile' }) %>
+            <!-- Include User Sidebar --> 
+            
 
-                <!-- Main Content -->
-                <div class="col-md-9 d-flex align-items-center justify-content-center">
-                    <div class="profile-card text-center">
-                        <h1>Welcome <%= user && user.fullname ? user.fullname : 'Guest' %>!</h1>
-                        <div class="info-item">
-                            <strong>Full name</strong>
-                            <span>
-                                <%= user && user.fullname ? user.fullname : 'Not provided' %>
-                            </span>
-                        </div>
-                        <div class="info-item">
-                            <strong>Email</strong>
-                            <span>
-                                <%= user && user.email ? user.email : 'Not provided' %>
-                            </span>
-                        </div>
-                        <div class="info-item">
-                            <strong>Phone</strong>
-                            <span>
-                                <%= user && user.mobile ? user.mobile : 'Not provided' %>
-                            </span>
-                        </div>
-                        <a href="/user/edit-profile" class="btn-edit">Edit</a>
+            <!-- Main Content -->
+            <div class="col-md-9 d-flex align-items-center justify-content-center"> 
+                <div class="profile-card text-center">
+                    <h1>Welcome <%= user && user.fullname ? user.fullname : 'Guest' %>!</h1>
+                    <div class="info-item">
+                        <strong>Full Name</strong>
+                        <span class="view-field" id="fullname-view">
+                            <%= user && user.fullname ? user.fullname : 'Not provided' %>
+                        </span>
+                        <input type="text" class="edit-field d-none" id="fullname-edit" name="fullname" value="<%= user && user.fullname ? user.fullname : '' %>">
+                    </div>
+                    <div class="info-item">
+                        <strong>Email</strong>
+                        <span class="view-field" id="email-view">
+                            <%= user && user.email ? user.email : 'Not provided' %>
+                        </span>
+                        <input type="email" class="edit-field d-none" id="email-edit" name="email" value="<%= user && user.email ? user.email : '' %>">
+                    </div>
+                    <div class="info-item">
+                        <strong>Phone</strong>
+                        <span class="view-field" id="mobile-view">
+                            <%= user && user.mobile ? user.mobile : 'Not provided' %>
+                        </span>
+                        <input type="tel" class="edit-field d-none" id="mobile-edit" name="mobile" value="<%= user && user.mobile ? user.mobile : '' %>">
+                    </div>
+                    <div class="button-group" id="button-group">
+                        <button class="btn-edit w-100" id="edit-btn">Edit</button>
                     </div>
                 </div>
+            </div>
         </div>
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const editBtn = document.getElementById('edit-btn');
+        const buttonGroup = document.getElementById('button-group');
+        let isEditing = false;
+
+        const originalValues = {
+            fullname: document.getElementById('fullname-edit').value,
+            email: document.getElementById('email-edit').value,
+            mobile: document.getElementById('mobile-edit').value
+        };
+
+        editBtn.addEventListener('click', () => {
+            if (isEditing) {
+                updateProfile();
+            } else {
+                toggleEditMode(true);
+            }
+        });
+
+        function toggleEditMode(edit) {
+            isEditing = edit;
+            const viewFields = document.querySelectorAll('.view-field');
+            const editFields = document.querySelectorAll('.edit-field');
+
+            if (edit) {
+                viewFields.forEach(field => field.classList.add('d-none'));
+                editFields.forEach(field => field.classList.remove('d-none'));
+
+                editBtn.textContent = 'Update';
+                editBtn.classList.remove('btn-edit');
+                editBtn.classList.add('btn-update');
+
+                const cancelBtn = document.createElement('button');
+                cancelBtn.className = 'btn-cancel w-100';
+                cancelBtn.textContent = 'Cancel';
+                cancelBtn.addEventListener('click', () => {
+                    document.getElementById('fullname-edit').value = originalValues.fullname;
+                    document.getElementById('email-edit').value = originalValues.email;
+                    document.getElementById('mobile-edit').value = originalValues.mobile;
+                    toggleEditMode(false);
+                });
+                buttonGroup.appendChild(cancelBtn);
+            } else {
+                viewFields.forEach(field => field.classList.remove('d-none'));
+                editFields.forEach(field => field.classList.add('d-none'));
+
+                document.getElementById('fullname-view').textContent = document.getElementById('fullname-edit').value || 'Not provided';
+                document.getElementById('email-view').textContent = document.getElementById('email-edit').value || 'Not provided';
+                document.getElementById('mobile-view').textContent = document.getElementById('mobile-edit').value || 'Not provided';
+
+                editBtn.textContent = 'Edit';
+                editBtn.classList.remove('btn-update');
+                editBtn.classList.add('btn-edit');
+
+                const cancelBtn = buttonGroup.querySelector('.btn-cancel');
+                if (cancelBtn) cancelBtn.remove();
+            }
+        }
+
+        async function updateProfile() {
+            const data = {
+                fullname: document.getElementById('fullname-edit').value,
+                email: document.getElementById('email-edit').value,
+                mobile: document.getElementById('mobile-edit').value
+            };
+
+            console.log('Updating profile with:', data);
+
+            if (!data.fullname || !data.email) {
+                Swal.fire({
+                    title: 'Error',
+                    text: 'Full name and email are required',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+                return;
+            }
+
+            try {
+                const response = await fetch('/user/edit-profile', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data),
+                    credentials: 'include'
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+
+                const result = await response.json();
+
+                if (result.success) {
+                    Swal.fire({
+                        title: 'Success',
+                        text: 'Profile updated successfully',
+                        icon: 'success',
+                        timer: 1500,
+                        showConfirmButton: false
+                    });
+                    originalValues.fullname = data.fullname;
+                    originalValues.email = data.email;
+                    originalValues.mobile = data.mobile;
+                    toggleEditMode(false);
+                } else if (result.requiresOtp) {
+                    const { value: otp } = await Swal.fire({
+                        title: 'Enter OTP',
+                        text: 'An OTP has been sent to your new email address.',
+                        input: 'text',
+                        inputPlaceholder: 'Enter OTP',
+                        showCancelButton: true,
+                        confirmButtonText: 'Verify',
+                        cancelButtonText: 'Cancel',
+                        inputValidator: (value) => {
+                            if (!value) {
+                                return 'Please enter the OTP';
+                            }
+                        }
+                    });
+
+                    if (otp) {
+                        try {
+                            const otpResponse = await fetch('/user/verify-email-otp', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ otp }),
+                                credentials: 'include'
+                            });
+
+                            if (!otpResponse.ok) {
+                                throw new Error(`HTTP error! Status: ${otpResponse.status}`);
+                            }
+
+                            const otpResult = await otpResponse.json();
+
+                            if (otpResult.success) {
+                                Swal.fire({
+                                    title: 'Success',
+                                    text: 'Email and profile updated successfully',
+                                    icon: 'success',
+                                    timer: 1500,
+                                    showConfirmButton: false
+                                });
+                                originalValues.fullname = data.fullname;
+                                originalValues.email = data.email;
+                                originalValues.mobile = data.mobile;
+                                toggleEditMode(false);
+                            } else {
+                                Swal.fire({
+                                    title: 'Error',
+                                    text: otpResult.message || 'Invalid OTP',
+                                    icon: 'error',
+                                    confirmButtonText: 'OK'
+                                });
+                            }
+                        } catch (otpError) {
+                            console.error('Error verifying OTP:', otpError);
+                            Swal.fire({
+                                title: 'Error',
+                                text: 'An error occurred while verifying OTP. Please try again.',
+                                icon: 'error',
+                                confirmButtonText: 'OK'
+                            });
+                        }
+                    }
+                } else {
+                    Swal.fire({
+                        title: 'Error',
+                        text: result.message || 'Failed to update profile',
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+                }
+            } catch (error) {
+                console.error('Error updating profile:', error);
+                Swal.fire({
+                    title: 'Error',
+                    text: 'An error occurred while updating profile. Please try again.',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+            }
+        }
+    </script>
 </body>
 
 </html>

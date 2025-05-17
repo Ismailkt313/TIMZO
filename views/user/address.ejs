@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Addresses - Timzo</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" type="image/x-icon" href="/images/TIMZO.jpg">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        .address-card {
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+        .btn-custom {
+            background-color: #1a1a1a;
+            color: #ffffff;
+            transition: all 0.2s;
+        }
+        .btn-custom:hover {
+            background-color: #ffd700;
+            color: #1a1a1a;
+        }
+        .modal-content {
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        }
+        .bg-gray-100{
+            padding-left: 230px;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div class="container-fluid min-h-screen flex">
+        <!-- Include User Sidebar -->
+        <%- include('../Partials/user/userSidebar', { user: user, currentPage: 'address' }) %>
+
+        <div class="flex-1 p-6 mt-16">
+            <div class="max-w-2xl mx-auto">
+                <h1 class="text-2xl font-bold text-gray-800 mb-6 text-center">My Addresses</h1>
+                <div class="text-center mb-4">
+                    <button class="btn-custom px-4 py-2 rounded font-semibold" data-bs-toggle="modal" data-bs-target="#addAddressModal">
+                        <i class="fas fa-plus"></i> Add New Address
+                    </button>
+                </div>
+
+                <% if (addresses.length === 0) { %>
+                    <div class="text-center">
+                        <p class="text-gray-600">No addresses found. Add a new address to get started.</p>
+                    </div>
+                <% } else { %>
+                    <% addresses.forEach(address => { %>
+                        <div class="address-card">
+                            <% if (address.isDefault) { %>
+                                <span class="absolute top-2 right-2 bg-green-500 text-white text-xs px-2 py-1 rounded">Default</span>
+                            <% } %>
+                            <p class="font-semibold text-gray-800"><%= address.fullName %></p>
+                            <p class="text-gray-600">
+                                <%= address.addressLine1 %><br>
+                                <% if (address.addressLine2) { %>
+                                    <%= address.addressLine2 %><br>
+                                <% } %>
+                                <%= address.city %>, <%= address.state %> <%= address.postalCode %><br>
+                                <%= address.country %>
+                            </p>
+                            <p class="text-gray-600">Phone: <%= address.phone %></p>
+                            <div class="flex justify-between mt-4">
+                                <button class="btn-custom px-3 py-1 rounded text-sm edit-address" data-bs-toggle="modal" data-bs-target="#editAddressModal" data-address-id="<%= address._id %>">
+                                    <i class="fas fa-edit"></i> Edit
+                                </button>
+                                <button class="bg-red-500 text-white px-3 py-1 rounded text-sm delete-address" data-address-id="<%= address._id %>">
+                                    <i class="fas fa-trash"></i> Delete
+                                </button>
+                            </div>
+                        </div>
+                    <% }) %>
+                <% } %>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Address Modal -->
+    <div class="modal fade" id="addAddressModal" tabindex="-1" aria-labelledby="addAddressModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addAddressModalLabel">Add New Address</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addAddressForm">
+                        <div class="mb-3">
+                            <label for="fullName" class="form-label">Full Name</label>
+                            <input type="text" class="form-control" id="fullName" name="fullName">
+                        </div>
+                        <div class="mb-3">
+                            <label for="addressLine1" class="form-label">Address Line 1</label>
+                            <input type="text" class="form-control" id="addressLine1" name="addressLine1">
+                        </div>
+                        <div class="mb-3">
+                            <label for="addressLine2" class="form-label">Address Line 2 (Optional)</label>
+                            <input type="text" class="form-control" id="addressLine2" name="addressLine2">
+                        </div>
+                        <div class="mb-3">
+                            <label for="city" class="form-label">City</label>
+                            <input type="text" class="form-control" id="city" name="city">
+                        </div>
+                        <div class="mb-3">
+                            <label for="state" class="form-label">State</label>
+                            <input type="text" class="form-control" id="state" name="state">
+                        </div>
+                        <div class="mb-3">
+                            <label for="postalCode" class="form-label">Postal Code</label>
+                            <input type="text" class="form-control" id="postalCode" name="postalCode" pattern="\d{6}">
+                        </div>
+                        <div class="mb-3">
+                            <label for="country" class="form-label">Country</label>
+                            <input type="text" class="form-control" id="country" name="country">
+                        </div>
+                        <div class="mb-3">
+                            <label for="phone" class="form-label">Phone</label>
+                            <input type="tel" class="form-control" id="phone" name="phone" pattern="\d{10}">
+                        </div>
+                        <div class="mb-3">
+                            <label for="addressType" class="form-label">Address Type</label>
+                            <select class="form-control" id="addressType" name="addressType">
+                                <option value="Home">Home</option>
+                                <option value="Work">Work</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="landmark" class="form-label">Landmark (Optional)</label>
+                            <input type="text" class="form-control" id="landmark" name="landmark">
+                        </div>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="isDefault" name="isDefault" value="true">
+                            <label class="form-check-label" for="isDefault">Set as Default Address</label>
+                        </div>
+                        <button type="submit" class="btn-custom w-full py-2 rounded">Save Address</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Address Modal -->
+    <div class="modal fade" id="editAddressModal" tabindex="-1" aria-labelledby="editAddressModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editAddressModalLabel">Edit Address</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editAddressForm">
+                        <input type="hidden" id="editAddressId" name="addressId">
+                        <div class="mb-3">
+                            <label for="editFullName" class="form-label">Full Name</label>
+                            <input type="text" class="form-control" id="editFullName" name="fullName">
+                        </div>
+                        <div class="mb-3">
+                            <label for="editAddressLine1" class="form-label">Address Line 1</label>
+                            <input type="text" class="form-control" id="editAddressLine1" name="addressLine1">
+                        </div>
+                        <div class="mb-3">
+                            <label for="editAddressLine2" class="form-label">Address Line 2 (Optional)</label>
+                            <input type="text" class="form-control" id="editAddressLine2" name="addressLine2">
+                        </div>
+                        <div class="mb-3">
+                            <label for="editCity" class="form-label">City</label>
+                            <input type="text" class="form-control" id="editCity" name="city">
+                        </div>
+                        <div class="mb-3">
+                            <label for="editState" class="form-label">State</label>
+                            <input type="text" class="form-control" id="editState" name="state">
+                        </div>
+                        <div class="mb-3">
+                            <label for="editPostalCode" class="form-label">Postal Code</label>
+                            <input type="text" class="form-control" id="editPostalCode" name="postalCode" pattern="\d{6}">
+                        </div>
+                        <div class="mb-3">
+                            <label for="editCountry" class="form-label">Country</label>
+                            <input type="text" class="form-control" id="editCountry" name="country">
+                        </div>
+                        <div class="mb-3">
+                            <label for="editPhone" class="form-label">Phone</label>
+                            <input type="tel" class="form-control" id="editPhone" name="phone" pattern="\d{10}">
+                        </div>
+                        <div class="mb-3">
+                            <label for="editAddressType" class="form-label">Address Type</label>
+                            <select class="form-control" id="editAddressType" name="addressType">
+                                <option value="Home">Home</option>
+                                <option value="Work">Work</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editLandmark" class="form-label">Landmark (Optional)</label>
+                            <input type="text" class="form-control" id="editLandmark" name="landmark">
+                        </div>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="editIsDefault" name="isDefault" value="true">
+                            <label class="form-check-label" for="editIsDefault">Set as Default Address</label>
+                        </div>
+                        <button type="submit" class="btn-custom w-full py-2 rounded">Save Changes</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Toast setup (using SweetAlert2 instead)
+        function showToast(message, type = 'success') {
+            Swal.fire({
+                toast: true,
+                position: 'bottom-end',
+                icon: type,
+                title: message,
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true
+            });
+        }
+
+        // Validate form fields
+        function validateForm(data, isEdit = false) {
+            const errors = [];
+
+            // Full Name: Required, 2-50 characters, letters and spaces
+            if (!data.fullName || !/^[A-Za-z\s]{2,50}$/.test(data.fullName)) {
+                errors.push('Full Name must be 2-50 characters long and contain only letters and spaces');
+            }
+
+            // Address Line 1: Required, 5-100 characters, alphanumeric with ,.- and spaces
+            if (!data.addressLine1 || !/^[\w\s,.-]{5,100}$/.test(data.addressLine1)) {
+                errors.push('Address Line 1 must be 5-100 characters long and contain valid address characters');
+            }
+
+            // Address Line 2: Optional, 0-100 characters, same format as addressLine1 if provided
+            if (data.addressLine2 && !/^[\w\s,.-]{0,100}$/.test(data.addressLine2)) {
+                errors.push('Address Line 2 must be up to 100 characters and contain valid address characters');
+            }
+
+            // City: Required, 2-50 characters, letters and spaces
+            if (!data.city || !/^[A-Za-z\s]{2,50}$/.test(data.city)) {
+                errors.push('City must be 2-50 characters long and contain only letters and spaces');
+            }
+
+            // State: Required, 2-50 characters, letters and spaces
+            if (!data.state || !/^[A-Za-z\s]{2,50}$/.test(data.state)) {
+                errors.push('State must be 2-50 characters long and contain only letters and spaces');
+            }
+
+            // Postal Code: Required, exactly 6 digits
+            if (!data.postalCode || !/^\d{6}$/.test(data.postalCode)) {
+                errors.push('Postal Code must be exactly 6 digits');
+            }
+
+            // Country: Required, 2-50 characters, letters and spaces
+            if (!data.country || !/^[A-Za-z\s]{2,50}$/.test(data.country)) {
+                errors.push('Country must be 2-50 characters long and contain only letters and spaces');
+            }
+
+            // Phone: Required, exactly 10 digits
+            if (!data.phone || !/^\d{10}$/.test(data.phone)) {
+                errors.push('Phone number must be exactly 10 digits');
+            }
+
+            // Address Type: Required, must be Home, Work, or Other
+            if (!data.addressType || !['Home', 'Work', 'Other'].includes(data.addressType)) {
+                errors.push('Address Type must be Home, Work, or Other');
+            }
+
+            // Landmark: Optional, 0-100 characters, same format as addressLine1 if provided
+            if (data.landmark && !/^[\w\s,.-]{0,100}$/.test(data.landmark)) {
+                errors.push('Landmark must be up to 100 characters and contain valid address characters');
+            }
+
+            // isDefault: Optional, no validation needed (defaults to false if not present)
+            // addressId: Only for edit form, required but handled by form structure
+            if (isEdit && !data.addressId) {
+                errors.push('Address ID is required for editing');
+            }
+
+            return errors;
+        }
+
+        // Add Address
+        document.getElementById('addAddressForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData);
+            console.log('Add address data:', data);
+
+            // Validate form
+            const errors = validateForm(data);
+            if (errors.length > 0) {
+                showToast(errors.join('\n'), 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch('/user/address', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data),
+                    credentials: 'include'
+                });
+
+                const result = await response.json();
+                showToast(result.message, result.success ? 'success' : 'error');
+
+                if (result.success) {
+                    setTimeout(() => window.location.reload(), 1500);
+                }
+            } catch (error) {
+                console.error('Error adding address:', error);
+                showToast('An error occurred while adding address', 'error');
+            }
+        });
+
+        // Populate Edit Address Modal
+        document.querySelectorAll('.edit-address').forEach(button => {
+            button.addEventListener('click', async () => {
+                const addressId = button.getAttribute('data-address-id');
+                console.log('Fetching address:', addressId);
+                try {
+                    const response = await fetch(`/user/address/${addressId}`, {
+                        method: 'GET',
+                        headers: { 'Content-Type': 'application/json' },
+                        credentials: 'include'
+                    });
+
+                    const address = await response.json();
+                    console.log('Address data:', address);
+
+                    if (address) {
+                        document.getElementById('editAddressId').value = addressId;
+                        document.getElementById('editFullName').value = address.fullName;
+                        document.getElementById('editAddressLine1').value = address.addressLine1;
+                        document.getElementById('editAddressLine2').value = address.addressLine2 || '';
+                        document.getElementById('editCity').value = address.city;
+                        document.getElementById('editState').value = address.state;
+                        document.getElementById('editPostalCode').value = address.postalCode;
+                        document.getElementById('editCountry').value = address.country;
+                        document.getElementById('editPhone').value = address.phone;
+                        document.getElementById('editAddressType').value = address.addressType || 'Home';
+                        document.getElementById('editLandmark').value = address.landmark || '';
+                        document.getElementById('editIsDefault').checked = address.isDefault;
+                    } else {
+                        showToast('Address not found', 'error');
+                    }
+                } catch (error) {
+                    console.error('Error fetching address:', error);
+                    showToast('An error occurred while fetching address', 'error');
+                }
+            });
+        });
+
+        // Edit Address
+        document.getElementById('editAddressForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData);
+            const addressId = data.addressId;
+            console.log('Edit address data:', data);
+
+            // Validate form
+            const errors = validateForm(data, true);
+            if (errors.length > 0) {
+                showToast(errors.join('\n'), 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch(`/user/address/edit/${addressId}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data),
+                    credentials: 'include'
+                });
+
+                const result = await response.json();
+                showToast(result.message, result.success ? 'success' : 'error');
+
+                if (result.success) {
+                    setTimeout(() => window.location.reload(), 1500);
+                }
+            } catch (error) {
+                console.error('Error editing address:', error);
+                showToast('An error occurred while editing address', 'error');
+            }
+        });
+
+        // Delete Address
+        document.querySelectorAll('.delete-address').forEach(button => {
+            button.addEventListener('click', async () => {
+                const addressId = button.getAttribute('data-address-id');
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: 'This address will be deleted permanently.',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Delete',
+                    cancelButtonText: 'Cancel'
+                }).then(async (result) => {
+                    if (result.isConfirmed) {
+                        try {
+                            const response = await fetch(`/user/address/delete/${addressId}`, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                credentials: 'include'
+                            });
+
+                            const data = await response.json();
+                            showToast(data.message, data.success ? 'success' : 'error');
+
+                            if (data.success) {
+                                setTimeout(() => window.location.reload(), 1500);
+                            }
+                        } catch (error) {
+                            console.error('Error deleting address:', error);
+                            showToast('An error occurred while deleting address', 'error');
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

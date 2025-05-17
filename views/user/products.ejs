@@ -376,7 +376,7 @@
     <section class="container my-5" data-aos="fade-up">
         <h2 class="section-title">Explore Our Collection</h2>
         <div class="row g-4">
-            <% if (newArrivals.length === 0) { %>
+            <% if (products.length === 0) { %>
                 <div class="col-12">
                     <div class="empty-products" data-aos="fade-up">
                         <i class="fas fa-box-open"></i>
@@ -386,7 +386,8 @@
                     </div>
                 </div>
             <% } else { %>
-                <% newArrivals.forEach(product => { %>
+                <% products.forEach(product => { %>
+                    <% console.log(`Rendering product ${product._id}: ${wishlist.includes(product._id.toString()) ? 'in wishlist' : 'not in wishlist'}`); %>
                     <div class="col-6 col-md-3" data-aos="fade-up">
                         <div class="product-card">
                             <% if (product.createdAt && product.createdAt > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)) { %>
@@ -394,8 +395,8 @@
                             <% } else if (product.regularPrice && product.salePrice < product.regularPrice) { %>
                                 <span class="badge bg-danger">Sale</span>
                             <% } %>
-                            <button class="wishlist-btn" data-product-id="<%= product._id %>" data-in-wishlist="false" aria-label="Add to Wishlist">
-                                <i class="far fa-heart"></i>
+                            <button class="wishlist-btn <%= wishlist.includes(product._id.toString()) ? 'active' : '' %>" data-product-id="<%= product._id %>" aria-label="Add to Wishlist">
+                                <i class="<%= wishlist.includes(product._id.toString()) ? 'fas fa-heart' : 'far fa-heart' %>"></i>
                             </button>
                             <a href="/products/<%= product._id %>">
                                 <img src="<%= product.images[0] || '/images/placeholder.jpg' %>" class="card-img-top" alt="<%= product.name %>">
@@ -451,7 +452,7 @@
                                             </div>
                                             <p class="product-price">$<%= product.salePrice.toFixed(2) %></p>
                                             <p class="product-description">
-                                                This is a premium watch designed for elegance and durability. Featuring a sleek design, it’s perfect for both casual and formal occasions. (Placeholder description)
+                                                <%= product.description || 'This is a premium watch designed for elegance and durability. Featuring a sleek design, it’s perfect for both casual and formal occasions.' %>
                                             </p>
                                             <input type="number" id="quickViewQuantityInput-<%= product._id %>" class="form-control d-inline-block w-25 mb-2" min="1" value="1">
                                             <button class="btn btn-gold add-to-cart-modal" onclick="addToCart('<%= product._id %>')">Add to Cart</button>
@@ -464,8 +465,8 @@
                 <% }); %>
             <% } %>
         </div>
-        <% if (trendingProducts && trendingProducts.length > 0) { %>
-            <button class="view-more-btn" data-aos="fade-up">View More</button>
+        <% if (hasMore) { %>
+            <button class="view-more-btn" data-aos="fade-up" data-next-page="<%= currentPage + 1 %>">View More</button>
         <% } %>
     </section>
 
@@ -474,14 +475,17 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script>
-        // Initialize AOS
         AOS.init({ duration: 800, once: true });
 
-        // Toast setup
         const toastEl = document.getElementById('liveToast');
         const toast = new bootstrap.Toast(toastEl);
 
-        // Smooth scrolling for anchor links
+        const initialWishlist = <%- JSON.stringify(wishlist) %>;
+        console.log('Initial wishlist from server:', initialWishlist);
+
+        const productIds = Array.from(document.querySelectorAll('.wishlist-btn')).map(btn => btn.getAttribute('data-product-id'));
+        console.log('Product IDs on page:', productIds);
+
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', e => {
                 e.preventDefault();
@@ -492,10 +496,8 @@
             });
         });
 
-        // Enhanced modal handling
         let activeModal = null;
 
-        // Close any open modal before opening a new one
         document.querySelectorAll('.quick-view-btn').forEach(button => {
             button.addEventListener('click', () => {
                 if (activeModal) {
@@ -505,7 +507,6 @@
             });
         });
 
-        // Handle modal lifecycle
         document.querySelectorAll('.quick-view-modal').forEach(modal => {
             const bootstrapModal = new bootstrap.Modal(modal);
 
@@ -520,7 +521,6 @@
             });
         });
 
-        // Cleanup function for modals
         function cleanupModal() {
             document.querySelectorAll('.modal-backdrop').forEach(backdrop => {
                 backdrop.remove();
@@ -535,7 +535,6 @@
             });
         }
 
-        // Add to cart (both from card and modal)
         function addToCart(productId) {
             const quantityInput = document.getElementById(`quantityInput-${productId}`) || document.getElementById(`quickViewQuantityInput-${productId}`);
             const isLoggedIn = <%= user ? 'true' : 'false' %>;
@@ -565,11 +564,11 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    toastEl.querySelector('.toast-body').textContent = 'Product added to cart';
+                    toastEl.querySelector('.toast-body').textContent = data.message || 'Product added to cart';
                     toast.show();
                     const cartCountElement = document.querySelector('.cart-count');
                     if (cartCountElement) {
-                        cartCountElement.textContent = parseInt(cartCountElement.textContent) + parseInt(quantityInput.value);
+                        cartCountElement.textContent = data.cartCount || (parseInt(cartCountElement.textContent) + parseInt(quantityInput.value));
                     }
                     if (activeModal) {
                         activeModal.hide();
@@ -586,30 +585,48 @@
             });
         }
 
-        // Wishlist functionality
-        document.querySelectorAll('.wishlist-btn').forEach(button => {
-            // Check initial wishlist state
-            const productId = button.getAttribute('data-product-id');
-            fetch(`/user/wishlist/check/${productId}`, {
-                method: 'GET',
-                headers: { 'Content-Type': 'application/json' }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.isInWishlist) {
-                    button.classList.add('active');
-                    button.querySelector('i').classList.remove('far');
-                    button.querySelector('i').classList.add('fas');
-                    button.setAttribute('data-in-wishlist', 'true');
-                }
-            })
-            .catch(error => console.error('Error checking wishlist:', error));
+        async function syncWishlist() {
+            const isLoggedIn = <%= user ? 'true' : 'false' %>;
+            if (!isLoggedIn) {
+                console.log('User not logged in, skipping wishlist sync');
+                return;
+            }
 
-            // Handle click to add/remove from wishlist
+            try {
+                const response = await fetch('/user/wishlist', {
+                    method: 'GET',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                const data = await response.json();
+                console.log('Wishlist from server:', data.wishlist);
+                if (data.success && data.wishlist) {
+                    const wishlist = data.wishlist.map(item => item.productId._id.toString());
+                    console.log('Applying wishlist to UI:', wishlist);
+                    document.querySelectorAll('.wishlist-btn').forEach(button => {
+                        const productId = button.getAttribute('data-product-id');
+                        const isInWishlist = wishlist.includes(productId);
+                        button.classList.toggle('active', isInWishlist);
+                        const icon = button.querySelector('i');
+                        icon.classList.toggle('far', !isInWishlist);
+                        icon.classList.toggle('fas', isInWishlist);
+                        console.log(`Updated button for product ${productId}: ${isInWishlist ? 'in wishlist' : 'not in wishlist'}`);
+                    });
+                } else {
+                    console.log('Failed to sync wishlist:', data.message);
+                }
+            } catch (error) {
+                console.error('Error syncing wishlist:', error);
+            }
+        }
+
+        window.addEventListener('load', syncWishlist);
+
+        document.querySelectorAll('.wishlist-btn').forEach(button => {
             button.addEventListener('click', async (e) => {
                 e.stopPropagation();
                 const productId = button.getAttribute('data-product-id');
                 const isLoggedIn = <%= user ? 'true' : 'false' %>;
+
                 if (!isLoggedIn) {
                     Swal.fire({
                         icon: 'warning',
@@ -622,45 +639,43 @@
                     return;
                 }
 
-                const isInWishlist = button.getAttribute('data-in-wishlist') === 'true';
-                const action = isInWishlist ? 'remove' : 'add';
-                const endpoint = `/user/wishlist/${action}`;
-
                 try {
+                    const isInWishlist = button.classList.contains('active');
+                    const endpoint = isInWishlist ? '/user/remove-from-wishlist' : '/user/wishlist/add';
                     const response = await fetch(endpoint, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ productId })
                     });
+
                     const data = await response.json();
                     if (data.success) {
                         button.classList.toggle('active');
                         button.querySelector('i').classList.toggle('far');
                         button.querySelector('i').classList.toggle('fas');
-                        button.setAttribute('data-in-wishlist', isInWishlist ? 'false' : 'true');
-                        toastEl.querySelector('.toast-body').textContent = isInWishlist ? 'Removed from Wishlist' : 'Added to Wishlist';
+                        toastEl.querySelector('.toast-body').textContent = data.message || (isInWishlist ? 'Removed from Wishlist' : 'Added to Wishlist');
                         toast.show();
+                        console.log(`Product ${productId} ${isInWishlist ? 'removed from' : 'added to'} wishlist`);
                     } else {
-                        toastEl.querySelector('.toast-body').textContent = data.message || `Failed to ${action} from wishlist`;
+                        toastEl.querySelector('.toast-body').textContent = data.message || 'Failed to update wishlist';
                         toast.show();
+                        console.log(`Failed to update wishlist for product ${productId}: ${data.message}`);
                     }
                 } catch (error) {
+                    console.error('Error updating wishlist:', error);
                     toastEl.querySelector('.toast-body').textContent = 'An error occurred while updating wishlist';
                     toast.show();
                 }
             });
         });
 
-        // View More functionality (basic placeholder)
         const viewMoreBtn = document.querySelector('.view-more-btn');
         if (viewMoreBtn) {
             viewMoreBtn.addEventListener('click', () => {
-                Swal.fire({
-                    icon: 'info',
-                    title: 'Feature Coming Soon',
-                    text: 'Loading more products will be implemented soon!',
-                    timer: 2000
-                });
+                const nextPage = viewMoreBtn.getAttribute('data-next-page');
+                const url = new URL(window.location.href);
+                url.searchParams.set('page', nextPage);
+                window.location.href = url.toString();
             });
         }
     </script>

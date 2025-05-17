@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Wallet - Timzo</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" type="image/x-icon" href="/images/TIMZO.jpg">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f9fafb;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        h1, h2, h3 {
+            font-family: 'Poppins', sans-serif;
+        }
+        .container {
+            display: flex;
+            flex: 1;
+        }
+        .sidebar {
+            width: 256px;
+            background: linear-gradient(180deg, #1f2937 0%, #111827 100%);
+            color: #ffffff;
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100%;
+            overflow-y: auto;
+            z-index: 1000;
+            transition: transform 0.3s ease;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+        }
+        .sidebar-hidden {
+            transform: translateX(-100%);
+        }
+        .main-content {
+            flex-grow: 1;
+            padding: 2rem;
+            margin-left: 400px;
+            display: flex;
+            justify-content: center;
+        }
+        .wallet-card {
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+            padding: 2.5rem;
+            width: 100%;
+            max-width: 800px;
+            min-width: 300px;
+        }
+        .wallet-card h1 {
+            font-size: 1.75rem;
+            color: #1f2937;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            font-weight: 600;
+        }
+        .balance-section {
+            background: linear-gradient(45deg, #facc15, #ffd700);
+            border-radius: 8px;
+            padding: 1.5rem;
+            text-align: center;
+            margin-bottom: 2rem;
+            color: #1f2937;
+        }
+        .balance-section h2 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+        .balance-section .balance {
+            font-size: 2rem;
+            font-weight: 600;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        .btn-action {
+            background-color: #1f2937;
+            color: #ffffff;
+            padding: 0.5rem 1.5rem;
+            border-radius: 6px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        .btn-action:hover {
+            background-color: #facc15;
+            color: #1f2937;
+        }
+        .btn-action:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(250, 204, 21, 0.3);
+        }
+        .transaction-section h3 {
+            font-size: 1.25rem;
+            color: #1f2937;
+            margin-bottom: 1rem;
+        }
+        .transaction-controls {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+        .transaction-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .transaction-table th,
+        .transaction-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .transaction-table th {
+            background-color: #f9fafb;
+            color: #1f2937;
+            font-weight: 500;
+        }
+        .transaction-table .credit {
+            color: #10b981;
+        }
+        .transaction-table .debit {
+            color: #ef4444;
+        }
+        .pagination {
+            justify-content: center;
+            margin-top: 1.5rem;
+            display: flex;
+            gap: 0.5rem;
+        }
+        .page-link {
+            color: #1f2937;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+        .page-link:hover {
+            background-color: #facc15;
+            color: #1f2937;
+        }
+        .page-link:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(250, 204, 21, 0.3);
+        }
+        .page-item.active .page-link {
+            background-color: #1f2937;
+            color: #fff;
+        }
+        .page-item.disabled .page-link {
+            color: #6b7280;
+            cursor: not-allowed;
+        }
+        .form-control {
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            padding: 0.5rem;
+            width: 100%;
+        }
+        .form-control:focus {
+            outline: none;
+            border-color: #facc15;
+            box-shadow: 0 0 0 3px rgba(250, 204, 21, 0.3);
+        }
+        .btn-submit {
+            background-color: #1f2937;
+            color: #ffffff;
+            padding: 0.5rem 1.5rem;
+            border-radius: 6px;
+            font-weight: 500;
+            transition: all 0.3s;
+            width: 100%;
+        }
+        .btn-submit:hover {
+            background-color: #facc15;
+            color: #1f2937;
+        }
+        .tooltip {
+            position: relative;
+        }
+        .tooltip:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            top: -2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #374151;
+            color: #fff;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            white-space: nowrap;
+            z-index: 10;
+        }
+        .sidebar-toggle {
+            display: none;
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            z-index: 1100;
+            background-color: #1f2937;
+            color: #ffffff;
+            padding: 0.5rem;
+            border-radius: 6px;
+            transition: all 0.3s;
+        }
+        .sidebar-toggle:hover {
+            background-color: #facc15;
+            color: #1f2937;
+        }
+        .sidebar-toggle:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(250, 204, 21, 0.3);
+        }
+        footer {
+            flex-shrink: 0;
+        }
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .sidebar-active {
+                transform: translateX(0);
+            }
+            .main-content {
+                margin-left: 0;
+                padding: 1rem;
+            }
+            .sidebar-toggle {
+                display: block;
+            }
+            .wallet-card {
+                padding: 1.5rem;
+            }
+            .wallet-card h1 {
+                font-size: 1.5rem;
+            }
+            .balance-section .balance {
+                font-size: 1.75rem;
+            }
+            .action-buttons {
+                flex-direction: column;
+                gap: 0.75rem;
+            }
+            .transaction-table th,
+            .transaction-table td {
+                font-size: 0.875rem;
+                padding: 0.5rem;
+            }
+            .transaction-controls {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <%- include('../Partials/user/userSidebar', { user: user, currentPage: 'wallet' }) %>
+        <button class="sidebar-toggle" onclick="toggleSidebar()" aria-label="Toggle Sidebar">
+            <i class="fas fa-bars"></i>
+        </button>
+        <div class="main-content">
+            <div class="w-full max-w-6xl">
+                <div class="wallet-card" data-aos="fade-up">
+                    <h1>My Wallet</h1>
+                    <div class="balance-section" data-aos="fade-up" data-aos-delay="100">
+                        <h2>Current Balance</h2>
+                        <div class="balance flex items-center justify-center gap-2">
+                            ₹<%= wallet && wallet.balance !== undefined ? wallet.balance.toFixed(2) : '0.00' %>
+                            <button class="btn-action btn-sm tooltip" onclick="copyBalance()" data-tooltip="Copy Balance" aria-label="Copy Balance">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="action-buttons" data-aos="fade-up" data-aos-delay="200">
+                        <button class="btn-action tooltip" onclick="showAddFundsModal()" data-tooltip="Add Funds" aria-label="Add Funds">
+                            <i class="fas fa-plus"></i> Add Funds
+                        </button>
+                        <button class="btn-action tooltip" onclick="showWithdrawFundsModal()" data-tooltip="Withdraw Funds" aria-label="Withdraw Funds">
+                            <i class="fas fa-minus"></i> Withdraw Funds
+                        </button>
+                        <button class="btn-action tooltip" onclick="downloadWalletHistory()" data-tooltip="Download History" aria-label="Download Transaction History">
+                            <i class="fas fa-download"></i> Download History
+                        </button>
+                    </div>
+                    <div class="transaction-section" data-aos="fade-up" data-aos-delay="300">
+                        <h3>Transaction History</h3>
+                        <% if (wallet && wallet.transactions && wallet.transactions.length > 0) { %>
+                            <div class="transaction-controls">
+                                <input type="text" id="searchInput" class="form-control" placeholder="Search transactions..." aria-label="Search transactions">
+                                <select id="filterType" class="form-control" aria-label="Filter transaction type">
+                                    <option value="all">All Types</option>
+                                    <option value="credit">Credit</option>
+                                    <option value="debit">Debit</option>
+                                </select>
+                            </div>
+                            <table class="transaction-table" id="transactionTable">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Type</th>
+                                        <th>Amount</th>
+                                        <th>Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% wallet.transactions.forEach(transaction => { %>
+                                        <tr data-type="<%= transaction.type %>">
+                                            <td><%= transaction.date ? new Date(transaction.date).toLocaleString('en-IN', { dateStyle: 'short', timeStyle: 'short' }) : 'N/A' %></td>
+                                            <td class="<%= transaction.type === 'credit' ? 'credit' : 'debit' %>">
+                                                <%= transaction.type.charAt(0).toUpperCase() + transaction.type.slice(1) %>
+                                            </td>
+                                            <td class="<%= transaction.type === 'credit' ? 'credit' : 'debit' %>">
+                                                ₹<%= transaction.amount.toFixed(2) %>
+                                            </td>
+                                            <td><%= transaction.description %></td>
+                                        </tr>
+                                    <% }); %>
+                                </tbody>
+                            </table>
+                            <nav aria-label="Transaction pagination">
+                                <ul class="pagination">
+                                    <li class="page-item <%= currentPage === 1 ? 'disabled' : '' %>">
+                                        <a class="page-link" href="/user/wallet?page=<%= currentPage - 1 %>&limit=<%= limit %>" aria-label="Previous">
+                                            <span aria-hidden="true">« Previous</span>
+                                        </a>
+                                    </li>
+                                    <% for (let i = 1; i <= totalPages; i++) { %>
+                                        <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+                                            <a class="page-link" href="/user/wallet?page=<%= i %>&limit=<%= limit %>"><%= i %></a>
+                                        </li>
+                                    <% } %>
+                                    <li class="page-item <%= currentPage === totalPages ? 'disabled' : '' %>">
+                                        <a class="page-link" href="/user/wallet?page=<%= currentPage + 1 %>&limit=<%= limit %>" aria-label="Next">
+                                            <span aria-hidden="true">Next »</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        <% } else { %>
+                            <p class="text-gray-600 text-center" data-aos="fade-up">No transactions found.</p>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-white p-6 text-center text-gray-600 text-sm shadow-inner">
+        © <%= new Date().getFullYear() %> Timzo. All rights reserved.
+    </footer>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        AOS.init({ duration: 800, once: true });
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('sidebar-active');
+        }
+
+        function copyBalance() {
+            const balance = `<%= wallet && wallet.balance !== undefined ? wallet.balance.toFixed(2) : '0.00' %>`;
+            navigator.clipboard.writeText(balance).then(() => {
+                Swal.fire({
+                    title: 'Copied!',
+                    text: 'Balance copied to clipboard.',
+                    icon: 'success',
+                    timer: 1000,
+                    showConfirmButton: false
+                });
+            }).catch(() => {
+                Swal.fire({
+                    title: 'Error',
+                    text: 'Failed to copy balance.',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+            });
+        }
+
+        function showAddFundsModal() {
+            Swal.fire({
+                title: 'Add Funds',
+                html: `
+                    <input type="number" id="amount" class="swal2-input" min="1" step="0.01" placeholder="Amount (₹)" required>
+                `,
+                showCancelButton: true,
+                confirmButtonText: 'Add Funds',
+                cancelButtonText: 'Cancel',
+                focusConfirm: false,
+                preConfirm: () => {
+                    const amount = document.getElementById('amount').value;
+                    if (!amount || amount <= 0) {
+                        Swal.showValidationMessage('Please enter a valid amount');
+                        return false;
+                    }
+                    return { amount: parseFloat(amount) };
+                }
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    try {
+                        const response = await fetch('/user/wallet/add', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(result.value),
+                            credentials: 'include'
+                        });
+                        const data = await response.json();
+                        if (data.success) {
+                            Swal.fire({
+                                title: 'Success',
+                                text: data.message,
+                                icon: 'success',
+                                timer: 1500,
+                                showConfirmButton: false
+                            });
+                            setTimeout(() => window.location.reload(), 1500);
+                        } else {
+                            Swal.fire({
+                                title: 'Error',
+                                text: data.message || 'Failed to add funds',
+                                icon: 'error',
+                                confirmButtonText: 'OK'
+                            });
+                        }
+                    } catch (error) {
+                        Swal.fire({
+                            title: 'Error',
+                            text: 'An error occurred while adding funds.',
+                            icon: 'error',
+                            confirmButtonText: 'OK'
+                        });
+                    }
+                }
+            });
+        }
+
+        function showWithdrawFundsModal() {
+            Swal.fire({
+                title: 'Withdraw Funds',
+                html: `
+                    <input type="number" id="withdrawAmount" class="swal2-input" min="1" step="0.01" placeholder="Amount (₹)" required>
+                `,
+                showCancelButton: true,
+                confirmButtonText: 'Withdraw Funds',
+                cancelButtonText: 'Cancel',
+                focusConfirm: false,
+                preConfirm: () => {
+                    const amount = document.getElementById('withdrawAmount').value;
+                    if (!amount || amount <= 0) {
+                        Swal.showValidationMessage('Please enter a valid amount');
+                        return false;
+                    }
+                    return { amount: parseFloat(amount) };
+                }
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    try {
+                        const response = await fetch('/user/wallet/withdraw', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(result.value),
+                            credentials: 'include'
+                        });
+                        const data = await response.json();
+                        if (data.success) {
+                            Swal.fire({
+                                title: 'Success',
+                                text: data.message,
+                                icon: 'success',
+                                timer: 1500,
+                                showConfirmButton: false
+                            });
+                            setTimeout(() => window.location.reload(), 1500);
+                        } else {
+                            Swal.fire({
+                                title: 'Error',
+                                text: data.message || 'Failed to withdraw funds',
+                                icon: 'error',
+                                confirmButtonText: 'OK'
+                            });
+                        }
+                    } catch (error) {
+                        Swal.fire({
+                            title: 'Error',
+                            text: 'An error occurred while withdrawing funds.',
+                            icon: 'error',
+                            confirmButtonText: 'OK'
+                        });
+                    }
+                }
+            });
+        }
+
+        function downloadWalletHistory() {
+            const transactions = Array.from(document.querySelectorAll('#transactionTable tbody tr')).map(row => {
+                const cells = row.querySelectorAll('td');
+                return {
+                    date: cells[0].textContent,
+                    type: cells[1].textContent,
+                    amount: cells[2].textContent,
+                    description: cells[3].textContent
+                };
+            });
+
+            if (transactions.length === 0) {
+                Swal.fire({
+                    title: 'No Transactions',
+                    text: 'There are no transactions to download.',
+                    icon: 'info',
+                    confirmButtonText: 'OK'
+                });
+                return;
+            }
+
+            const csvContent = [
+                'Date,Type,Amount,Description',
+                ...transactions.map(t => `"${t.date}","${t.type}","${t.amount}","${t.description}"`)
+            ].join('\n');
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.setAttribute('href', url);
+            link.setAttribute('download', 'wallet_history.csv');
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }
+
+        const searchInput = document.getElementById('searchInput');
+        const filterType = document.getElementById('filterType');
+        const transactionRows = document.querySelectorAll('#transactionTable tbody tr');
+
+        function filterTransactions() {
+            const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
+            const typeFilter = filterType ? filterType.value : 'all';
+
+            transactionRows.forEach(row => {
+                const description = row.querySelector('td:nth-child(4)').textContent.toLowerCase();
+                const amount = row.querySelector('td:nth-child(3)').textContent.toLowerCase();
+                const type = row.getAttribute('data-type');
+
+                const matchesSearch = description.includes(searchTerm) || amount.includes(searchTerm);
+                const matchesType = typeFilter === 'all' || type === typeFilter;
+
+                row.style.display = matchesSearch && matchesType ? '' : 'none';
+            });
+        }
+
+        if (searchInput) {
+            searchInput.addEventListener('input', filterTransactions);
+        }
+        if (filterType) {
+            filterType.addEventListener('change', filterTransactions);
+        }
+    </script>
+</body>
+</html>

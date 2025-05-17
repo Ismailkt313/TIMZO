@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Confirmation - Timzo</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" type="image/x-icon" href="/images/TIMZO.jpg">
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f4f4f4, #e0e0e0);
+            overflow-x: hidden;
+        }
+        .container-fluid {
+            padding: 0;
+        }
+        .main-content {
+            padding: 40px 20px;
+            background: #ffffff;
+            min-height: 100vh;
+            overflow-y: auto;
+        }
+        .confirmation-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+        }
+        .confirmation-container h1 {
+            font-size: 32px;
+            font-weight: 700;
+            color: #1a1a1a;
+            text-align: center;
+            margin-bottom: 20px;
+            letter-spacing: 1px;
+        }
+        .confirmation-container .success-message {
+            text-align: center;
+            color: #28a745;
+            font-size: 18px;
+            margin-bottom: 30px;
+        }
+        .section {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 25px;
+            transition: transform 0.2s ease;
+        }
+        .section:hover {
+            transform: translateY(-5px);
+        }
+        .section h2 {
+            font-size: 22px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .section p {
+            color: #666;
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+        .order-items table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .order-items th, .order-items td {
+            padding: 12px;
+            text-align: left;
+            font-size: 15px;
+        }
+        .order-items th {
+            color: #1a1a1a;
+            font-weight: 600;
+        }
+        .order-items td {
+            color: #666;
+        }
+        .order-items .total-row {
+            border-top: 2px solid #dee2e6;
+            font-weight: 700;
+            color: #1a1a1a;
+        }
+        .btn-custom {
+            background: #1a1a1a;
+            color: #ffffff;
+            padding: 12px 30px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 500;
+            border: none;
+            transition: all 0.3s ease;
+        }
+        .btn-custom:hover {
+            background: #ffd700;
+            color: #1a1a1a;
+            transform: scale(1.05);
+        }
+        @media (max-width: 767.98px) {
+            .confirmation-container {
+                padding: 15px;
+            }
+            .confirmation-container h1 {
+                font-size: 24px;
+            }
+            .section h2 {
+                font-size: 20px;
+            }
+            .section p {
+                font-size: 14px;
+            }
+            .order-items th, .order-items td {
+                font-size: 14px;
+                padding: 8px;
+            }
+            .btn-custom {
+                padding: 10px 20px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="main-content">
+            <div class="confirmation-container">
+                <h1>Order Confirmation</h1>
+                <div class="success-message">
+                    <i class="fas fa-check-circle fa-2x"></i>
+                    <p>Thank you for your order! Your order has been successfully placed.</p>
+                </div>
+
+                <div class="section order-items">
+                    <h2>Order Details</h2>
+                    <p><strong>Order ID:</strong> <%= order._id %></p>
+                    <p><strong>Payment Method:</strong> <%= order.paymentMethod %></p>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Quantity</th>
+                                <th>Price</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% order.items.forEach(item => { %>
+                                <tr>
+                                    <td><%= item.productName || 'Unknown Product' %></td>
+                                    <td><%= item.quantity %></td>
+                                    <td>$<%= item.price ? item.price.toFixed(2) : '0.00' %></td>
+                                    <td>$<%= item.price ? (item.quantity * item.price).toFixed(2) : '0.00' %></td>
+                                </tr>
+                            <% }); %>
+                            <tr>
+                                <td colspan="3" class="total-row">Subtotal</td>
+                                <td class="total-row">$<%= order.subtotal.toFixed(2) %></td>
+                            </tr>
+                            <tr>
+                                <td colspan="3">Shipping Fee</td>
+                                <td>$<%= order.shippingFee.toFixed(2) %></td>
+                            </tr>
+                            <tr>
+                                <td colspan="3">Tax</td>
+                                <td>$<%= order.tax.toFixed(2) %></td>
+                            </tr>
+                            <tr>
+                                <td colspan="3" class="total-row">Grand Total</td>
+                                <td class="total-row">$<%= order.totalAmount.toFixed(2) %></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="section">
+                    <h2>Shipping Address</h2>
+                    <p><strong><%= order.address.name %></strong></p>
+                    <p><%= order.address.address %>, <%= order.address.city %></p>
+                    <p><%= order.address.state %>, <%= order.address.country %> <%= order.address.zipCode %></p>
+                    <p>Phone: <%= order.address.phone %></p>
+                </div>
+
+                <% if (order.paymentMethod === 'COD') { %>
+                    <div class="section">
+                        <h2>Next Steps</h2>
+                        <p>Your order will be shipped soon. Please prepare cash for delivery. You’ll receive a confirmation email with tracking details once your order is dispatched.</p>
+                    </div>
+                <% } %>
+
+                <div class="text-center">
+                    <a href="/" class="btn btn-custom me-2">Back to Homepage</a>
+                    <a href="/orders" class="btn btn-custom">View Order History</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

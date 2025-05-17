@@ -120,7 +120,7 @@ const addProducts = async (req, res) => {
             images: imageUrls,
             status: 'available',
             isDeleted: false,
-            isBlocked: false,
+            isListed: true,
             ProductOffer: 0
         });
 
@@ -250,7 +250,7 @@ const blockProduct = async (req, res) => {
             return res.status(404).json({ success: false, message: 'Product not found or has been deleted' });
         }
 
-        product.isBlocked = true;
+        product.isListed = false;
         await product.save();
 
         res.status(200).json({ success: true, message: 'Product blocked successfully' });
@@ -268,7 +268,7 @@ const unblockProduct = async (req, res) => {
             return res.status(404).json({ success: false, message: 'Product not found or has been deleted' });
         }
 
-        product.isBlocked = false;
+        product.isListed = true;
         await product.save();
 
         res.status(200).json({ success: true, message: 'Product unblocked successfully' });

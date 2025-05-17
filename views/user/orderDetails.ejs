@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Details - Timzo</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="icon" type="image/x-icon" href="/images/TIMZO.jpg">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        body {
+            background-color: #f4f4f4;
+            font-family: 'Arial', sans-serif;
+        }
+        .order-details-section {
+            max-width: 800px;
+            margin: auto;
+        }
+        .order-details-card {
+            background-color: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+        .order-details-card p {
+            margin: 5px 0;
+            color: #666;
+        }
+        .order-details-card p strong {
+            color: #333;
+            font-weight: 500;
+        }
+        .badge {
+            font-size: 0.75rem;
+            padding: 4px 8px;
+            border-radius: 12px;
+        }
+        .order-items table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        .order-items th,
+        .order-items td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .order-items th {
+            background-color: #f9fafb;
+            color: #1a1a1a;
+            font-weight: 600;
+        }
+        .order-items .total-row {
+            border-top: 2px solid #e5e7eb;
+            font-weight: 700;
+            color: #1a1a1a;
+        }
+        .btn-custom {
+            background-color: #1a1a1a;
+            color: #ffffff;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        .btn-custom:hover {
+            background-color: #ffd700;
+            color: #1a1a1a;
+        }
+        .btn-cancel {
+            background-color: #ef4444;
+            color: #ffffff;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        .btn-cancel:hover {
+            background-color: #dc2626;
+        }
+        .btn-return {
+            background-color: #ffd700;
+            color: #1a1a1a;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        .btn-return:hover {
+            background-color: #eab308;
+        }
+        .tracking-timeline {
+            position: relative;
+            padding: 20px 0;
+        }
+        .tracking-timeline::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 4px;
+            height: 100%;
+            background-color: #e5e7eb;
+        }
+        .tracking-step {
+            position: relative;
+            width: 50%;
+            padding: 20px;
+            text-align: center;
+        }
+        .tracking-step:nth-child(odd) {
+            left: 0;
+        }
+        .tracking-step:nth-child(even) {
+            left: 50%;
+        }
+        .tracking-step .step-circle {
+            position: absolute;
+            top: 20px;
+            width: 24px;
+            height: 24px;
+            background-color: #e5e7eb;
+            border: 4px solid #e5e7eb;
+            border-radius: 50%;
+            z-index: 1;
+        }
+        .tracking-step:nth-child(odd) .step-circle {
+            right: -12px;
+        }
+        .tracking-step:nth-child(even) .step-circle {
+            left: -12px;
+        }
+        .tracking-step.active .step-circle {
+            background-color: #1a1a1a;
+            border-color: #ffd700;
+        }
+        .tracking-step.completed .step-circle {
+            background-color: #10b981;
+            border-color: #10b981;
+        }
+        .tracking-step .step-content {
+            background-color: #ffffff;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        .request-info {
+            font-size: 0.9rem;
+            color: #666;
+        }
+        .search-bar {
+            max-width: 300px;
+            margin: 0 auto 20px;
+        }
+        @media (max-width: 767px) {
+            .main-content {
+                padding: 15px;
+            }
+            .order-details-section {
+                min-width: 100%;
+            }
+            .order-details-section h1 {
+                font-size: 1.25rem;
+            }
+            .order-details-card {
+                padding: 15px;
+            }
+            .order-items th,
+            .order-items td {
+                font-size: 0.875rem;
+                padding: 8px;
+            }
+            .tracking-timeline::before {
+                left: 20px;
+            }
+            .tracking-step {
+                width: 100%;
+                left: 0 !important;
+                padding-left: 50px;
+                text-align: left;
+            }
+            .tracking-step .step-circle {
+                left: 8px !important;
+                right: auto !important;
+            }
+            .request-info {
+                font-size: 0.8rem;
+            }
+            .search-bar {
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid min-h-screen flex">
+        <%- include('../Partials/user/userSidebar', { user: user, currentPage: 'orders' }) %>
+        <div class="flex-1 p-6 mt-16">
+            <div class="order-details-section">
+                <h1 class="text-2xl font-bold text-gray-800 mb-6 text-center">Order Details</h1>
+                <div class="order-details-card">
+                    <div class="flex justify-between items-center mb-4">
+                        <p>
+                            <strong>Order ID:</strong> <%= order.orderId %>
+                            <span class="badge <%= order.orderStatus === 'Delivered' ? 'bg-green-500' : order.orderStatus === 'Cancelled' ? 'bg-red-500' : order.orderStatus === 'Shipped' ? 'bg-blue-500' : 'bg-yellow-500' %> text-white">
+                                <%= order.orderStatus %>
+                            </span>
+                        </p>
+                        <button class="btn-custom text-sm" onclick="downloadInvoice('<%= order._id %>')">
+                            <i class="fas fa-download"></i> Download Invoice
+                        </button>
+                    </div>
+                    <p><strong>Date:</strong> <%= new Date(order.orderDate).toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' }) %></p>
+                    <p><strong>Estimated Delivery:</strong> <%= order.estimatedDelivery ? new Date(order.estimatedDelivery).toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' }) : 'N/A' %></p>
+                    <p><strong>Payment Method:</strong> <%= order.paymentMethod %></p>
+                    <p><strong>Payment Status:</strong> <%= order.paymentStatus %></p>
+                    <p><strong>Order Status:</strong> <%= order.orderStatus %></p>
+                    <p><strong>Shipping Address:</strong></p>
+                    <p><%= order.shippingAddress.fullName %></p>
+                    <p><%= order.shippingAddress.addressLine1 %> <%= order.shippingAddress.addressLine2 ? ', ' + order.shippingAddress.addressLine2 : '' %></p>
+                    <p><%= order.shippingAddress.city %>, <%= order.shippingAddress.state %> <%= order.shippingAddress.postalCode %>, <%= order.shippingAddress.country %></p>
+                    <p>Phone: <%= order.shippingAddress.phone %></p>
+                    <% if (order.shippingAddress.landmark) { %>
+                        <p>Landmark: <%= order.shippingAddress.landmark %></p>
+                    <% } %>
+
+                    <div class="tracking-timeline mt-4">
+                        <div class="tracking-step <%= order.orderStatus === 'Processing' || order.orderStatus === 'Shipped' || order.orderStatus === 'Delivered' ? 'completed' : '' %>">
+                            <div class="step-circle"></div>
+                            <div class="step-content">
+                                <h4 class="text-base font-semibold text-gray-800">Order Placed</h4>
+                                <p class="text-sm text-gray-600">We have received your order on <%= new Date(order.orderDate).toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric' }) %>.</p>
+                            </div>
+                        </div>
+                        <div class="tracking-step <%= order.orderStatus === 'Shipped' || order.orderStatus === 'Delivered' ? 'completed' : order.orderStatus === 'Processing' ? 'active' : '' %>">
+                            <div class="step-circle"></div>
+                            <div class="step-content">
+                                <h4 class="text-base font-semibold text-gray-800">Order Shipped</h4>
+                                <p class="text-sm text-gray-600">Your order has been shipped. It’s on its way!</p>
+                            </div>
+                        </div>
+                        <div class="tracking-step <%= order.orderStatus === 'Delivered' ? 'completed' : order.orderStatus === 'Shipped' ? 'active' : '' %>">
+                            <div class="step-circle"></div>
+                            <div class="step-content">
+                                <h4 class="text-base font-semibold text-gray-800">Order Delivered</h4>
+                                <p class="text-sm text-gray-600">Your order has been delivered on <%= order.orderStatus === 'Delivered' && order.updatedAt ? new Date(order.updatedAt).toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric' }) : 'TBD' %>.</p>
+                            </div>
+                        </div>
+                        <% if (order.orderStatus === 'Cancelled') { %>
+                            <div class="tracking-step completed">
+                                <div class="step-circle"></div>
+                                <div class="step-content">
+                                    <h4 class="text-base font-semibold text-gray-800">Order Cancelled</h4>
+                                    <p class="text-sm text-gray-600">Your order was cancelled on <%= new Date(order.updatedAt).toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric' }) %>.</p>
+                                </div>
+                            </div>
+                        <% } %>
+                    </div>
+
+                    <div class="order-items mt-4">
+                        <h3 class="text-lg font-semibold text-gray-700 mb-2">Items</h3>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Quantity</th>
+                                    <th>Price</th>
+                                    <th>Total</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% order.items.forEach(item => { %>
+                                    <tr>
+                                        <td><%= item.productName %></td>
+                                        <td><%= item.quantity %></td>
+                                        <td>₹<%= item.price.toFixed(2) %></td>
+                                        <td>₹<%= (item.quantity * item.price).toFixed(2) %></td>
+                                        <td>
+                                            <span class="badge <%= item.status === 'Delivered' ? 'bg-green-500' : (item.status === 'Returned' || item.status === 'Cancelled') ? 'bg-red-500' : (item.status === 'CancelRequested' || item.status === 'ReturnRequested') ? 'bg-yellow-500' : 'bg-blue-500' %> text-white">
+                                                <%= item.status %>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <% if (order.orderStatus === 'Processing' && item.status === 'Ordered') { %>
+                                                <button class="btn-cancel text-sm" onclick="promptItemAction('<%= order._id %>', '<%= item.productId._id %>', '<%= item.productName %>', 'cancel')">Request Cancel</button>
+                                            <% } else if (order.orderStatus === 'Delivered' && item.status === 'Delivered') { %>
+                                                <button class="btn-return text-sm" onclick="promptItemAction('<%= order._id %>', '<%= item.productId._id %>', '<%= item.productName %>', 'return')">Request Return</button>
+                                            <% } else if (item.status === 'CancelRequested') { %>
+                                                <div class="request-info">
+                                                    <p>Cancel request pending</p>
+                                                    <p>Requested: <%= new Date(item.cancelRequestDate).toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric' }) %></p>
+                                                </div>
+                                            <% } else if (item.status === 'ReturnRequested') { %>
+                                                <div class="request-info">
+                                                    <p>Return request pending</p>
+                                                    <p>Reason: <%= item.returnReason %></p>
+                                                    <p>Requested: <%= new Date(item.returnRequestDate).toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric' }) %></p>
+                                                </div>
+                                            <% } else if (item.status === 'Returned' && item.returnReason) { %>
+                                                <div class="request-info">
+                                                    <p>Returned</p>
+                                                    <p>Reason: <%= item.returnReason %></p>
+                                                    <p>Date: <%= new Date(item.returnDate).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' }) %></p>
+                                                </div>
+                                            <% } else if (item.status === 'Cancelled') { %>
+                                                <div class="request-info">
+                                                    <p>Cancelled on <%= new Date(item.cancelDate || order.updatedAt).toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric' }) %></p>
+                                                </div>
+                                            <% } else { %>
+                                                <span>—</span>
+                                            <% } %>
+                                        </td>
+                                    </tr>
+                                <% }) %>
+                                <tr>
+                                    <td colspan="5">Subtotal</td>
+                                    <td>₹<%= order.subtotal.toFixed(2) %></td>
+                                </tr>
+                                <% if (order.discount > 0) { %>
+                                    <tr>
+                                        <td colspan="5">Discount</td>
+                                        <td>-₹<%= order.discount.toFixed(2) %></td>
+                                    </tr>
+                                <% } %>
+                                <tr>
+                                    <td colspan="5">Shipping Fee</td>
+                                    <td>₹<%= order.shippingFee.toFixed(2) %></td>
+                                </tr>
+                                <tr>
+                                    <td colspan="5">Tax</td>
+                                    <td>₹<%= order.tax.toFixed(2) %></td>
+                                </tr>
+                                <tr class="total-row">
+                                    <td colspan="5">Total Amount</td>
+                                    <td>₹<%= order.totalAmount.toFixed(2) %></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <% if (order.orderStatus === 'Processing') { %>
+                        <div class="text-center mt-4">
+                            <button class="btn-cancel" onclick="cancelOrder('<%= order._id %>')">Cancel Entire Order</button>
+                        </div>
+                    <% } else if (order.orderStatus === 'Delivered') { %>
+                        <div class="text-center mt-4">
+                            <button class="btn-return" onclick="returnOrder('<%= order._id %>')">Request Return Entire Order</button>
+                        </div>
+                    <% } %>
+
+                    <div class="text-center mt-4">
+                        <a href="/orders" class="btn-custom">
+                            <i class="fas fa-arrow-left"></i> Back to Orders
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-gray-100 p-4 text-center text-gray-600 text-sm shadow-inner mt-6">
+        © <%= new Date().getFullYear() %> Timzo. All rights reserved.
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        async function cancelOrder(orderId) {
+            const result = await Swal.fire({
+                title: 'Cancel Entire Order',
+                text: 'Are you sure you want to cancel your entire order? This action cannot be undone.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, Cancel',
+                cancelButtonText: 'No, Keep Order',
+                buttonsStyling: false,
+                customClass: {
+                    confirmButton: 'btn-cancel mx-2',
+                    cancelButton: 'btn-custom mx-2'
+                }
+            });
+
+            if (result.isConfirmed) {
+                try {
+                    Swal.fire({
+                        title: 'Cancelling...',
+                        allowOutsideClick: false,
+                        didOpen: () => Swal.showLoading()
+                    });
+
+                    const response = await fetch(`/user/orders/cancel/${orderId}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        credentials: 'include'
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        Swal.fire({
+                            title: 'Cancelled',
+                            text: 'Your order has been cancelled.',
+                            icon: 'success',
+                            timer: 1500,
+                            showConfirmButton: false
+                        });
+                        setTimeout(() => window.location.reload(), 1500);
+                    } else {
+                        Swal.fire('Error', data.message || 'Failed to cancel order', 'error');
+                    }
+                } catch (error) {
+                    console.error('Error cancelling order:', error);
+                    Swal.fire('Error', 'Failed to cancel order. Please check your connection or contact support.', 'error');
+                }
+            }
+        }
+
+        async function promptItemAction(orderId, productId, productName, action) {
+            const isReturn = action.toLowerCase() === 'return';
+            const actionText = isReturn ? 'Return' : 'Cancel';
+            let reason = '';
+            console.log('Submitting request with:', { orderId, productId, action, reason });
+            if (isReturn) {
+                const reasonResult = await Swal.fire({
+                    title: `${actionText} ${productName}`,
+                    text: 'Please provide a reason for returning this item:',
+                    input: 'textarea',
+                    inputPlaceholder: 'Enter reason (5-200 characters)',
+                    inputAttributes: {
+                        minlength: 5,
+                        maxlength: 200,
+                        required: true
+                    },
+                    showCancelButton: true,
+                    confirmButtonText: 'Submit Request',
+                    cancelButtonText: 'Cancel',
+                    buttonsStyling: false,
+                    customClass: {
+                        confirmButton: 'btn-return mx-2',
+                        cancelButton: 'btn-custom mx-2'
+                    },
+                    inputValidator: (value) => {
+                        if (!value || value.length < 5) {
+                            return 'Reason must be at least 5 characters long';
+                        }
+                        if (value.length > 200) {
+                            return 'Reason cannot exceed 200 characters';
+                        }
+                    }
+                });
+
+                if (!reasonResult.isConfirmed || !reasonResult.value) {
+                    return;
+                }
+                reason = reasonResult.value;
+            }
+
+            const confirmResult = await Swal.fire({
+                title: `Confirm ${actionText} Request`,
+                text: `Are you sure you want to request to ${actionText.toLowerCase()} ${productName}? This will be sent to the admin for approval.`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: `Yes, Request ${actionText}`,
+                cancelButtonText: 'Cancel',
+                buttonsStyling: false,
+                customClass: {
+                    confirmButton: `btn ${isReturn ? 'btn-return' : 'btn-cancel'} mx-2`,
+                    cancelButton: 'btn-custom mx-2'
+                }
+            });
+
+            if (confirmResult.isConfirmed) {
+                try {
+                    Swal.fire({
+                        title: 'Submitting Request...',
+                        allowOutsideClick: false,
+                        didOpen: () => Swal.showLoading()
+                    });
+
+                    const response = await fetch(`/user/request-item-action/${orderId}/${productId}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ action, reason }),
+                        credentials: 'include'
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        Swal.fire({
+                            title: 'Request Submitted',
+                            text: data.message,
+                            icon: 'success',
+                            timer: 1500,
+                            showConfirmButton: false
+                        });
+                        setTimeout(() => window.location.reload(), 1500);
+                    } else {
+                        Swal.fire('Error', data.message || `Failed to submit ${actionText.toLowerCase()} request`, 'error');
+                    }
+                } catch (error) {
+                    console.error(`Error submitting ${actionText.toLowerCase()} request:`, error);
+                    Swal.fire('Error', `Failed to submit ${actionText.toLowerCase()} request. Please check your connection or contact support.`, 'error');
+                }
+            }
+        }
+
+        async function returnOrder(orderId) {
+            const { value: reason } = await Swal.fire({
+                title: 'Return Entire Order',
+                input: 'textarea',
+                inputLabel: 'Reason for Return',
+                inputPlaceholder: 'Write your reason here...',
+                inputAttributes: {
+                    'aria-label': 'Reason for return'
+                },
+                showCancelButton: true,
+                confirmButtonText: 'Submit Request',
+                cancelButtonText: 'Cancel',
+                inputValidator: (value) => {
+                    if (!value.trim()) {
+                        return 'Please provide a reason!';
+                    }
+                },
+                buttonsStyling: false,
+                customClass: {
+                    confirmButton: 'btn-return mx-2',
+                    cancelButton: 'btn-custom mx-2'
+                }
+            });
+
+            if (reason) {
+                try {
+                    Swal.fire({
+                        title: 'Submitting...',
+                        allowOutsideClick: false,
+                        didOpen: () => Swal.showLoading()
+                    });
+
+                    const response = await fetch(`/user/orders/return/${orderId}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        credentials: 'include',
+                        body: JSON.stringify({ reason })
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        Swal.fire({
+                            title: 'Return Requested',
+                            text: data.message || 'Your return request was submitted.',
+                            icon: 'success',
+                            timer: 1500,
+                            showConfirmButton: false
+                        });
+                        setTimeout(() => window.location.reload(), 1500);
+                    } else {
+                        Swal.fire('Error', data.message || 'Failed to request return.', 'error');
+                    }
+                } catch (error) {
+                    console.error('Error requesting return:', error);
+                    Swal.fire('Error', 'Something went wrong. Try again later.', 'error');
+                }
+            }
+        }
+
+        async function downloadInvoice(orderId) {
+            try {
+                Swal.fire({
+                    title: 'Generating Invoice...',
+                    allowOutsideClick: false,
+                    didOpen: () => Swal.showLoading()
+                });
+
+                const response = await fetch(`/user/orders/invoice/${orderId}`, {
+                    method: 'GET',
+                    credentials: 'include'
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `Invoice_${orderId}.pdf`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+
+                Swal.close();
+            } catch (error) {
+                console.error('Error downloading invoice:', error);
+                Swal.fire('Error', 'Failed to download invoice. Please try again.', 'error');
+            }
+        }
+
+        async function searchOrder() {
+            const query = document.getElementById('orderSearch').value.trim();
+            if (!query) {
+                Swal.fire('Error', 'Please enter an Order ID to search', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch(`/user/orders/search?query=${encodeURIComponent(query)}`, {
+                    method: 'GET',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include'
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                if (data.success && data.order) {
+                    window.location.href = `/user/orders/${data.order._id}`;
+                } else {
+                    Swal.fire('Error', data.message || 'No order found with that ID', 'error');
+                }
+            } catch (error) {
+                console.error('Error searching order:', error);
+                Swal.fire('Error', 'Failed to search order. Please try again.', 'error');
+            }
+        }
+
+        document.getElementById('orderSearch').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                searchOrder();
+            }
+        });
+    </script>
+</body>
+</html>

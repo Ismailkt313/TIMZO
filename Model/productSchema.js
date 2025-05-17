@@ -9,17 +9,23 @@ const productSchema = new mongoose.Schema({
   salePrice: { type: Number, required: true },
   stock: { type: Number, required: true },
   color: { type: String, required: true }, 
-  material: { type: String },
+  material: { 
+  type: String, 
+  enum: ['leather', 'metal', 'rubber', 'ceramic', 'plastic', 'nylon'],
+  lowercase: true,
+  trim: true
+},
   waterResistance: { type: String },
   warranty: { type: String },
   movementType: { type: String, required: true },
   images: [{ type: String }],
   status: { type: String, default: 'available' },
-  ProductOffer: { type: Number, default: 0 },
   isDeleted: { type: Boolean, default: false }, 
   deletedAt: { type: Date } ,
-  isBlocked: { type: Boolean, default: false },
-  ProductOffer: { type: Number, default: 0 }  
+  isListed: { type: Boolean, default: true },
+  ProductOffer: { type: Number, default: 0 }
+},{
+  timestamps:true
 });
 
 module.exports = mongoose.model('Product', productSchema);

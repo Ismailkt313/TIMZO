@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <style>
     body {
       font-family: 'Poppins', sans-serif;
@@ -75,35 +76,43 @@
       object-fit: cover;
       cursor: crosshair;
     }
-    .zoom-lens {
-      position: absolute;
-      width: 100px;
-      height: 100px;
-      border: 2px solid #6f42c1;
-      background: rgba(255, 255, 255, 0.4);
-      border-radius: 50%;
-      pointer-events: none;
-      display: none;
-    }
-    .zoom-result {
-      position: absolute;
-      top: 0;
-      left: 420px;
-      width: 300px;
-      height: 300px;
-      border: 1px solid #e5e7eb;
-      border-radius: 8px;
-      background: #fff;
-      overflow: hidden;
-      display: none;
-      z-index: 10;
-    }
-    .zoom-result img {
-      position: absolute;
-      width: 800px; /* 2x main image for zoom */
-      height: 800px;
-      object-fit: cover;
-    }
+#zoomLens {
+  position: absolute;
+  width: 120px;
+  height: 120px;
+  border: 2px solid #6f42c1;
+  background: rgba(111, 66, 193, 0.2);
+  border-radius: 8px;
+  pointer-events: none;
+  display: none;
+  z-index: 5;
+}
+
+#zoomResult {
+  position: absolute;
+  top: 0;
+  left: 80%; /* move to the right of image */
+  margin-left: 20px;
+  width: 400px;
+  height: 400px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  background: #fff;
+  display: none;
+  z-index: 10;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  pointer-events: none; /* important */
+}
+
+#zoomImage {
+  position: absolute;
+  width: 1200px; /* 3x zoom */
+  height: 1200px;
+  object-fit: cover;
+  pointer-events: none; /* important */
+}
+
+
     .product-info h1 {
       font-size: 2rem;
       font-weight: 700;
@@ -154,6 +163,30 @@
     }
     .add-to-cart-btn:hover {
       background-color: #5a32a3;
+    }
+    .wishlist-btn {
+      background: rgba(255, 255, 255, 0.9);
+      border: none;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      color: #6b7280;
+      transition: color 0.3s ease, background 0.3s ease, transform 0.3s ease;
+      margin-left: 1rem;
+    }
+    .wishlist-btn:hover {
+      background: #ffd700;
+      color: #1f2937;
+      transform: scale(1.1);
+    }
+
+    .wishlist-btn.active {
+      color: #ef4444;
+      background: #ffe4e1;
     }
     .details-tabs .nav-link {
       color: #6b7280;
@@ -272,7 +305,12 @@
 
       <!-- Product Info -->
       <div class="col-lg-6 product-info">
-        <h1><%= product.name %></h1>
+        <div class="d-flex align-items-center">
+          <h1><%= product.name %></h1>
+          <button class="wishlist-btn <%= wishlist.includes(product._id.toString()) ? 'active' : '' %>" data-product-id="<%= product._id %>" aria-label="Add to Wishlist">
+                                <i class="<%= wishlist.includes(product._id.toString()) ? 'fas fa-heart' : 'far fa-heart' %>"></i>
+                            </button>
+        </div>
         <% if (product.brand && product.brand.name) { %>
           <p class="text-gray-600">Brand: <%= product.brand.name %></p>
         <% } %>
@@ -308,8 +346,6 @@
           <i class="fas fa-shopping-cart mr-2"></i> Add to Cart
         </button>
 
-
-        
         <!-- Cart Summary (Optional) -->
         <% if (cart && cart.items.length > 0) { %>
           <div class="mt-4">
@@ -426,7 +462,7 @@
   <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
     <div id="cartToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
       <div class="toast-header">
-        <strong class="me-auto">Cart Update</strong>
+        <strong class="me-auto">Notification</strong>
         <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
       </div>
       <div class="toast-body"></div>
@@ -441,7 +477,9 @@
     const toast = new bootstrap.Toast(toastEl);
     let quantity = 1;
 
-    // Change main image and update zoom
+    const initialWishlist = <%- JSON.stringify(wishlist) %>;
+    console.log('Initial wishlist from server:', initialWishlist);
+
     function changeMainImage(element) {
       const mainImage = document.getElementById('mainImage');
       const zoomImage = document.getElementById('zoomImage');
@@ -451,7 +489,6 @@
       element.classList.add('active');
     }
 
-    // Update quantity
     function updateQuantity(change) {
       const input = document.getElementById('quantityInput');
       const minusBtn = document.getElementById('minusBtn');
@@ -464,8 +501,21 @@
       plusBtn.disabled = quantity === parseInt(input.max);
     }
 
-    // Add to cart
     function addToCart(productId) {
+      const isLoggedIn = <%= user ? 'true' : 'false' %>;
+      if (!isLoggedIn) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Please Log In',
+          text: 'You need to be logged in to add items to your cart.',
+          showConfirmButton: true,
+          confirmButtonText: 'Log In'
+        }).then(result => {
+          if (result.isConfirmed) window.location.href = '/login';
+        });
+        return;
+      }
+
       fetch('/user/add-to-cart', {
         method: 'POST',
         headers: {
@@ -479,11 +529,11 @@
       .then(response => response.json())
       .then(data => {
         if (data.success) {
-          toastEl.querySelector('.toast-body').textContent = 'Product added to cart';
+          toastEl.querySelector('.toast-body').textContent = data.message || 'Product added to cart';
           toast.show();
           const cartCountElement = document.querySelector('.cart-count');
           if (cartCountElement) {
-            cartCountElement.textContent = parseInt(cartCountElement.textContent) + parseInt(document.getElementById('quantityInput').value);
+            cartCountElement.textContent = data.cartCount || (parseInt(cartCountElement.textContent) + parseInt(document.getElementById('quantityInput').value));
           }
         } else {
           toastEl.querySelector('.toast-body').textContent = data.message || 'Failed to add item to cart';
@@ -497,13 +547,98 @@
       });
     }
 
-    // Custom zoom effect
+    async function syncWishlist() {
+      const isLoggedIn = <%= user ? 'true' : 'false' %>;
+      if (!isLoggedIn) {
+        console.log('User not logged in, skipping wishlist sync');
+        return;
+      }
+
+      try {
+        const response = await fetch('/user/wishlist', {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' }
+        });
+        const data = await response.json();
+        console.log('Wishlist from server:', data.wishlist);
+        if (data.success && data.wishlist) {
+          const wishlist = data.wishlist.map(item => item.productId._id.toString());
+          console.log('Applying wishlist to UI:', wishlist);
+          document.querySelectorAll('.wishlist-btn').forEach(button => {
+            const productId = button.getAttribute('data-product-id');
+            const isInWishlist = wishlist.includes(productId);
+            button.classList.toggle('active', isInWishlist);
+            const icon = button.querySelector('i');
+            icon.classList.toggle('far', !isInWishlist);
+            icon.classList.toggle('fas', isInWishlist);
+            console.log(`Updated button for product ${productId}: ${isInWishlist ? 'in wishlist' : 'not in wishlist'}`);
+          });
+        } else {
+          console.log('Failed to sync wishlist:', data.message);
+        }
+      } catch (error) {
+        console.error('Error syncing wishlist:', error);
+      }
+    }
+
+    document.querySelectorAll('.wishlist-btn').forEach(button => {
+            button.addEventListener('click', async (e) => {
+                e.stopPropagation();
+                const productId = button.getAttribute('data-product-id');
+                const isLoggedIn = <%= user ? 'true' : 'false' %>;
+
+                if (!isLoggedIn) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Please Log In',
+                        text: 'You need to be logged in to add items to your wishlist.',
+                        confirmButtonText: 'Log In'
+                    }).then(result => {
+                        if (result.isConfirmed) window.location.href = '/login';
+                    });
+                    return;
+                }
+
+                try {
+                    const isInWishlist = button.classList.contains('active');
+                    const endpoint = isInWishlist ? '/user/remove-from-wishlist' : '/user/wishlist/add';
+                    const response = await fetch(endpoint, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ productId })
+                    });
+
+                    const data = await response.json();
+                    if (data.success) {
+                        button.classList.toggle('active');
+                        button.querySelector('i').classList.toggle('far');
+                        button.querySelector('i').classList.toggle('fas');
+                        toastEl.querySelector('.toast-body').textContent = data.message || (isInWishlist ? 'Removed from Wishlist' : 'Added to Wishlist');
+                        toast.show();
+                        console.log(`Product ${productId} ${isInWishlist ? 'removed from' : 'added to'} wishlist`);
+                    } else {
+                        toastEl.querySelector('.toast-body').textContent = data.message || 'Failed to update wishlist';
+                        toast.show();
+                        console.log(`Failed to update wishlist for product ${productId}: ${data.message}`);
+                    }
+                } catch (error) {
+                    console.error('Error updating wishlist:', error);
+                    toastEl.querySelector('.toast-body').textContent = 'An error occurred while updating wishlist';
+                    toast.show();
+                }
+            });
+        });
+
+    window.addEventListener('load', syncWishlist);
+
     const mainImage = document.getElementById('mainImage');
     const zoomLens = document.getElementById('zoomLens');
     const zoomResult = document.getElementById('zoomResult');
     const zoomImage = document.getElementById('zoomImage');
 
     function initializeZoom() {
+      if (window.innerWidth <= 767) return;
+
       mainImage.addEventListener('mouseenter', () => {
         zoomLens.style.display = 'block';
         zoomResult.style.display = 'block';
@@ -519,18 +654,15 @@
         const lensWidth = zoomLens.offsetWidth;
         const lensHeight = zoomLens.offsetHeight;
 
-        // Calculate lens position
         let x = e.clientX - rect.left - lensWidth / 2;
         let y = e.clientY - rect.top - lensHeight / 2;
 
-        // Restrict lens within image bounds
         x = Math.max(0, Math.min(x, rect.width - lensWidth));
         y = Math.max(0, Math.min(y, rect.height - lensHeight));
 
         zoomLens.style.left = x + 'px';
         zoomLens.style.top = y + 'px';
 
-        // Calculate zoom image position (2x magnification)
         const ratioX = zoomImage.offsetWidth / rect.width;
         const ratioY = zoomImage.offsetHeight / rect.height;
         zoomImage.style.left = -(x * ratioX) + 'px';
@@ -538,8 +670,16 @@
       });
     }
 
-    // Initialize zoom on page load
     initializeZoom();
+
+    window.addEventListener('resize', () => {
+      if (window.innerWidth <= 767) {
+        zoomLens.style.display = 'none';
+        zoomResult.style.display = 'none';
+      } else {
+        initializeZoom();
+      }
+    });
   </script>
 </body>
 </html>

@@ -1,188 +1,103 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        /* Sidebar Container */
-        .user-sidebar {
-            height: 100%;
-            width: 0;
-            position: fixed;
-            z-index: 1000;
-            top: 0;
-            left: 0;
-            background: linear-gradient(135deg, #1a1a1a 0%, #2c2c2c 100%);
-            overflow-x: hidden;
-            transition: 0.5s;
-            padding-top: 60px;
-            box-shadow: 2px 0 15px rgba(0, 0, 0, 0.5);
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>User Sidebar</title>
 
-        /* User Info Section */
-        .user-info {
-            text-align: center;
-            margin-bottom: 30px;
-            padding: 0 20px;
-        }
-        .user-info .avatar {
-            width: 80px;
-            height: 80px;
-            background-color: #adb5bd;
-            border-radius: 50%;
-            margin: 0 auto 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 32px;
-            color: #ffffff;
-            font-weight: bold;
-            text-transform: uppercase;
-        }
-        .user-info .user-name {
-            color: #ffffff;
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 5px;
-        }
-
-        /* Sidebar Links */
-        .user-sidebar a {
-            padding: 12px 20px;
-            text-decoration: none;
-            font-size: 16px;
-            color: #adb5bd;
-            display: flex;
-            align-items: center;
-            transition: 0.3s;
-            text-transform: uppercase;
-            border-left: 4px solid transparent;
-        }
-        .user-sidebar a i {
-            margin-right: 15px;
-            font-size: 18px;
-            width: 20px;
-            text-align: center;
-        }
-        .user-sidebar a:hover {
-            color: #ffd700;
-            background-color: #333333;
-            border-left: 4px solid #ffd700;
-        }
-        .user-sidebar a.active {
-            color: #ffffff;
-            background-color: #6f42c1;
-            border-left: 4px solid #ffffff;
-        }
-
-        /* Close Button */
-        .user-sidebar .closebtn {
-            position: absolute;
-            top: 10px;
-            right: 25px;
-            font-size: 36px;
-            color: #adb5bd;
-            text-decoration: none;
-        }
-        .user-sidebar .closebtn:hover {
-            color: #ffffff;
-        }
-
-        /* Open Button (for mobile) */
-        .open-user-sidebar {
-            font-size: 24px;
-            cursor: pointer;
-            background-color: transparent;
-            color: #ffffff;
-            border: none;
-            padding: 10px;
-            transition: color 0.3s ease;
-        }
-        .open-user-sidebar:hover {
-            color: #ffd700;
-        }
-
-        /* Responsive Design */
-        @media (min-width: 768px) {
-            .user-sidebar {
-                width: 250px;
-                position: static;
-                height: auto;
-                min-height: 100vh;
-            }
-            .open-user-sidebar {
-                display: none;
-            }
-            .user-sidebar .closebtn {
-                display: none;
-            }
-        }
-    </style>
+  <!-- Bootstrap and Tailwind -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
-<body>
-    <button class="open-user-sidebar d-md-none" onclick="openUserSidebar()">☰</button>
+<body class="bg-gray-100 font-sans">
 
-    <div id="userSidebar" class="user-sidebar">
-        <a href="javascript:void(0)" class="closebtn d-md-none" onclick="closeUserSidebar()">×</a>
-
-        <!-- User Info -->
-        <div class="user-info">
-            <div class="avatar">
-                <% if (user && user.fullname) { %>
-                    <%= user.fullname.charAt(0) %>
-                <% } else { %>
-                    ?
-                <% } %>
-            </div>
-            <div class="user-name">
-                <% if (user && user.fullname) { %>
-                    <%= user.fullname %>
-                <% } else { %>
-                    Guest
-                <% } %>
-            </div>
-        </div>
-
-        <!-- Navigation Links -->
-        <a href="/user/account" class="<%= currentPage === 'profile' ? 'active' : '' %>">
-            <i class="fas fa-user"></i> My Profile
-        </a>
-        <a href="/user/address" class="<%= currentPage === 'address' ? 'active' : '' %>">
-            <i class="fas fa-map-marker-alt"></i> My Address
-        </a>
-        <a href="/user/orders" class="<%= currentPage === 'orders' ? 'active' : '' %>">
-            <i class="fas fa-shopping-bag"></i> My Order
-        </a>
-        <a href="/user/wishlist" class="<%= currentPage === 'wishlist' ? 'active' : '' %>">
-            <i class="fas fa-heart"></i> My Wishlist
-        </a>
-        <a href="/user/wallet" class="<%= currentPage === 'wallet' ? 'active' : '' %>">
-            <i class="fas fa-wallet"></i> My Wallet
-        </a>
-        <a href="/user/coupons" class="<%= currentPage === 'coupons' ? 'active' : '' %>">
-            <i class="fas fa-ticket-alt"></i> My Coupon
-        </a>
-        <a href="/user/changepassword" class="<%= currentPage === 'changepassword' ? 'active' : '' %>">
-            <i class="fas fa-lock"></i> Change Password
-        </a>
-        <a href="/logout">
-            <i class="fas fa-sign-out-alt"></i> Log out
-        </a>
-        <a href="/user/referral" class="<%= currentPage === 'referral' ? 'active' : '' %>">
-            <i class="fas fa-users"></i> Referral Code
-        </a>
+  <!-- Sidebar -->
+  <div class="h-screen w-64 bg-gray-900 text-white fixed top-0 left-0 shadow-xl flex flex-col">
+    
+    <!-- Header -->
+    <div class="p-6 text-xl font-semibold border-b border-gray-700 text-center">
+      <% if (user && user.fullname) { %>
+        <%= user.fullname %>
+      <% } else { %>
+        Guest
+      <% } %>
     </div>
 
-    <script>
-        function openUserSidebar() {
-            document.getElementById("userSidebar").style.width = "250px";
-        }
+    <!-- Avatar -->
+    <div class="flex justify-center items-center py-5 border-b border-gray-700">
+      <div class="w-16 h-16 bg-gray-600 rounded-full flex items-center justify-center text-2xl font-bold uppercase">
+        <% if (user && user.fullname) { %>
+          <%= user.fullname.charAt(0) %>
+        <% } else { %>
+          ?
+        <% } %>
+      </div>
+    </div>
 
-        function closeUserSidebar() {
-            document.getElementById("userSidebar").style.width = "0";
-        }
-    </script>
+    <!-- Navigation -->
+    <nav class="flex-1 px-4 py-6 space-y-3 text-sm font-medium">
+      <a href="/user/account"
+         class="flex items-center gap-3 px-4 py-2 rounded-md transition-all duration-200 
+                <%= currentPage === 'profile' ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white' %>">
+        <i class="fas fa-user w-4 text-sm"></i> My Profile
+      </a>
+
+      <a href="/user/address"
+         class="flex items-center gap-3 px-4 py-2 rounded-md transition-all duration-200 
+                <%= currentPage === 'address' ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white' %>">
+        <i class="fas fa-map-marker-alt w-4 text-sm"></i> My Address
+      </a>
+
+      <a href="/user/orders"
+         class="flex items-center gap-3 px-4 py-2 rounded-md transition-all duration-200 
+                <%= currentPage === 'orders' ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white' %>">
+        <i class="fas fa-shopping-bag w-4 text-sm"></i> My Orders
+      </a>
+
+      <a href="/user/wallet"
+         class="flex items-center gap-3 px-4 py-2 rounded-md transition-all duration-200 
+                <%= currentPage === 'wallet' ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white' %>">
+        <i class="fas fa-wallet w-4 text-sm"></i> My Wallet
+      </a>
+
+ <a href="/user/newPassword"
+         class="flex items-center gap-3 px-4 py-2 rounded-md transition-all duration-200 
+                <%= currentPage === 'changepassword' ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white' %>">
+        <i class="fas fa-lock w-4 text-sm"></i> Change Password
+      </a>
+
+      <a href="/user/sidewishlist"
+         class="flex items-center gap-3 px-4 py-2 rounded-md transition-all duration-200 
+                <%= currentPage === 'Wishlist' ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white' %>">
+        <i class="fas fa-lock w-4 text-sm"></i> Wishlist
+      </a>
+      
+      <a href="/user/coupons"
+         class="flex items-center gap-3 px-4 py-2 rounded-md transition-all duration-200 
+                <%= currentPage === 'coupons' ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white' %>">
+        <i class="fas fa-ticket-alt w-4 text-sm"></i> My Coupon
+      </a>
+
+     
+
+      <a href="/user/referral"
+         class="flex items-center gap-3 px-4 py-2 rounded-md transition-all duration-200 
+                <%= currentPage === 'referral' ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white' %>">
+        <i class="fas fa-users w-4 text-sm"></i> Referral Code
+      </a>
+      <a href="/user/"
+         class="flex items-center gap-3 px-4 py-2 rounded-md transition-all duration-200 ">
+        <i class="fas fa-user w-4 text-sm"></i> Home
+      </a>
+
+      <a href="/logout"
+         class="flex items-center gap-3 px-4 py-2 rounded-md transition-all duration-200 
+                text-red-400 hover:bg-red-500 hover:text-white">
+        <i class="fas fa-sign-out-alt w-4 text-sm"></i> Log Out
+      </a>
+    </nav>
+  </div>
+
 </body>
 </html>

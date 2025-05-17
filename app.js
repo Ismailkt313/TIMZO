@@ -17,13 +17,13 @@ app.set('view engine','ejs')
 app.set('views', path.join(__dirname, 'views'))
  
    
-app.use(nocache()) 
-app.use(express.json())
+app.use(nocache())    
+app.use(express.json()) 
 app.use(express.urlencoded({extended:true}))
 app.use(session({
     secret:process.env.SESSION_SECRET,
     resave:false,
-    saveUninitialized:true,
+    saveUninitialized:true, 
     cookie:{
         secure:false,
         httpOnly:true,  
@@ -48,4 +48,4 @@ app.listen(PORT, ()=>{
 })
  
  
-module.exports = app    
+module.exports = app  

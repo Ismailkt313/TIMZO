@@ -322,7 +322,7 @@
     </style>
 </head>
 <body>
-    <%- include('.././Partials/user/navbar', { user: user, cartCount: cartCount, search: search }) %>
+    <%- include('../Partials/user/navbar', { user: user, cartCount: cartCount, search: search }) %>
 
     <!-- Toast Notification -->
     <div class="toast-container position-fixed bottom-0 end-0 p-3">
@@ -337,7 +337,6 @@
         </div>
     </div>
 
-    <!-- Hero Carousel -->
     <div id="heroCarousel" class="carousel slide hero-carousel carousel-slide" data-bs-ride="carousel">
         <div class="carousel-indicators">
             <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
@@ -369,7 +368,6 @@
         </button>
     </div>
 
-    <!-- Featured Watches Gallery -->
     <section class="container my-5 watch-gallery" data-aos="fade-up">
         <h2 class="section-title">Featured Watches</h2>
         <div class="row g-4">
@@ -418,8 +416,8 @@
                         <% } else if (product.regularPrice && product.salePrice < product.regularPrice) { %>
                             <span class="badge bg-danger">Sale</span>
                         <% } %>
-                        <button class="wishlist-btn" data-product-id="<%= product._id %>" aria-label="Add to Wishlist">
-                            <i class="far fa-heart"></i>
+                        <button class="wishlist-btn <%= wishlist.includes(product._id.toString()) ? 'active' : '' %>" data-product-id="<%= product._id %>" aria-label="Toggle Wishlist">
+                            <i class="<%= wishlist.includes(product._id.toString()) ? 'fas fa-heart' : 'far fa-heart' %>"></i>
                         </button>
                         <a href="/products/<%= product._id %>" aria-label="View <%= product.name %>">
                             <img src="<%= product.images && product.images[0] || '/images/placeholder.jpg' %>" class="card-img-top" alt="<%= product.name %>">
@@ -478,8 +476,8 @@
                         <% } else if (product.regularPrice && product.salePrice < product.regularPrice) { %>
                             <span class="badge bg-danger">Sale</span>
                         <% } %>
-                        <button class="wishlist-btn" data-product-id="<%= product._id %>" aria-label="Add to Wishlist">
-                            <i class="far fa-heart"></i>
+                        <button class="wishlist-btn <%= wishlist.includes(product._id.toString()) ? 'active' : '' %>" data-product-id="<%= product._id %>" aria-label="Toggle Wishlist">
+                            <i class="<%= wishlist.includes(product._id.toString()) ? 'fas fa-heart' : 'far fa-heart' %>"></i>
                         </button>
                         <a href="/products/<%= product._id %>" aria-label="View <%= product.name %>">
                             <img src="<%= product.images && product.images[0] || '/images/placeholder.jpg' %>" class="card-img-top" alt="<%= product.name %>">
@@ -514,30 +512,6 @@
     <!-- Explore More -->
     <section class="container my-5" data-aos="fade-up">
         <h2 class="section-title">Explore More</h2>
-        <div class="filter-bar">
-            <div class="row align-items-center">
-                <div class="col-md-6">
-                    <select class="form-select" id="sortExplore" aria-label="Sort Explore Products">
-                        <option value="price-asc">Price: Low to High</option>
-                        <option value="price-desc">Price: High to Low</option>
-                        <option value="rating-desc">Rating: High to Low</option>
-                    </select>
-                </div>
-                <div class="col-md-6 text-end">
-                    <button class="btn btn-outline-secondary btn-sm d-md-none" type="button" data-bs-toggle="collapse" data-bs-target="#filterCollapseExplore" aria-expanded="false" aria-controls="filterCollapseExplore">
-                        Filters
-                    </button>
-                </div>
-            </div>
-            <div class="collapse mt-3 d-md-block" id="filterCollapseExplore">
-                <div class="d-flex gap-2 flex-wrap">
-                    <button class="btn btn-outline-secondary btn-sm filter-brand active" data-brand="all">All Brands</button>
-                    <% brands && brands.forEach(brand => { %>
-                        <button class="btn btn-outline-secondary btn-sm filter-brand" data-brand="<%= brand.name %>"><%= brand.name %></button>
-                    <% }); %>
-                </div>
-            </div>
-        </div>
         <div class="row g-4" id="exploreProducts">
             <% exploreProducts && exploreProducts.forEach(product => { %>
                 <div class="col-6 col-md-3" data-brand="<%= product.brand?.name || 'Unknown' %>" data-price="<%= product.salePrice || 0 %>" data-rating="<%= product.rating || 0 %>" data-product-id="<%= product._id %>" data-aos="fade-up">
@@ -547,8 +521,8 @@
                         <% } else if (product.regularPrice && product.salePrice < product.regularPrice) { %>
                             <span class="badge bg-danger">Sale</span>
                         <% } %>
-                        <button class="wishlist-btn" data-product-id="<%= product._id %>" aria-label="Add to Wishlist">
-                            <i class="far fa-heart"></i>
+                        <button class="wishlist-btn <%= wishlist.includes(product._id.toString()) ? 'active' : '' %>" data-product-id="<%= product._id %>" aria-label="Toggle Wishlist">
+                            <i class="<%= wishlist.includes(product._id.toString()) ? 'fas fa-heart' : 'far fa-heart' %>"></i>
                         </button>
                         <a href="/products/<%= product._id %>" aria-label="View <%= product.name %>">
                             <img src="<%= product.images && product.images[0] || '/images/placeholder.jpg' %>" class="card-img-top" alt="<%= product.name %>">
@@ -619,259 +593,286 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script>
-        // Initialize AOS
-        AOS.init({ duration: 800, once: true });
+    AOS.init({ duration: 800, once: true });
 
-        // Toast setup
-        const toastEl = document.getElementById('liveToast');
-        const toast = new bootstrap.Toast(toastEl);
+    const toastEl = document.getElementById('liveToast');
+    const toast = new bootstrap.Toast(toastEl);
 
-        // Smooth scrolling for anchor links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', e => {
-                e.preventDefault();
-                const target = document.querySelector(anchor.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({ behavior: 'smooth' });
-                }
-            });
+    const initialWishlist = <%- JSON.stringify(wishlist) %>;
+    console.log('Initial wishlist from server:', initialWishlist);
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', e => {
+            e.preventDefault();
+            const target = document.querySelector(anchor.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({ behavior: 'smooth' });
+            }
         });
+    });
 
-        // Countdown timer
-        function startCountdown() {
-            const endDate = new Date('2025-12-31T23:59:59').getTime();
-            const timer = setInterval(() => {
-                const now = new Date().getTime();
-                const distance = endDate - now;
-                if (distance < 0) {
-                    clearInterval(timer);
-                    document.getElementById('countdown').innerHTML = '<p>Sale Ended!</p>';
-                    return;
-                }
-                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-                document.getElementById('days').textContent = days.toString().padStart(2, '0');
-                document.getElementById('hours').textContent = hours.toString().padStart(2, '0');
-                document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
-                document.getElementById('seconds').textContent = seconds.toString().padStart(2, '0');
-            }, 1000);
+    function startCountdown() {
+        const endDate = new Date('2025-12-31T23:59:59').getTime();
+        const timer = setInterval(() => {
+            const now = new Date().getTime();
+            const distance = endDate - now;
+            if (distance < 0) {
+                clearInterval(timer);
+                document.getElementById('countdown').innerHTML = '<p>Sale Ended!</p>';
+                return;
+            }
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+            document.getElementById('days').textContent = days.toString().padStart(2, '0');
+            document.getElementById('hours').textContent = hours.toString().padStart(2, '0');
+            document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
+            document.getElementById('seconds').textContent = seconds.toString().padStart(2, '0');
+        }, 1000);
+    }
+    startCountdown();
+
+    async function syncWishlist() {
+        const isLoggedIn = <%= user ? 'true' : 'false' %>;
+        if (!isLoggedIn) return;
+
+        try {
+            const response = await fetch('/user/wishlist', {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            const data = await response.json();
+            console.log('Wishlist from server:', data.wishlist);
+            if (data.success && data.wishlist) {
+                const wishlist = data.wishlist.map(item => item.productId._id.toString());
+                document.querySelectorAll('.wishlist-btn').forEach(button => {
+                    const productId = button.getAttribute('data-product-id');
+                    const isInWishlist = wishlist.includes(productId);
+                    button.classList.toggle('active', isInWishlist);
+                    const icon = button.querySelector('i');
+                    icon.classList.toggle('far', !isInWishlist);
+                    icon.classList.toggle('fas', isInWishlist);
+                });
+            }
+        } catch (error) {
+            console.error('Error syncing wishlist:', error);
         }
-        startCountdown();
+    }
 
-        // Add to cart
-        function addToCart(productId) {
-            const quantityInput = document.getElementById(`quantityInput-${productId}`) || document.getElementById('quickViewQuantityInput');
+    window.addEventListener('load', syncWishlist);
+
+    function addToCart(productId) {
+        const quantityInput = document.getElementById(`quantityInput-${productId}`) || document.getElementById('quickViewQuantityInput');
+        const quantity = parseInt(quantityInput ? quantityInput.value : 1);
+        const isLoggedIn = <%= user ? 'true' : 'false' %>;
+        if (!isLoggedIn) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Please Log In',
+                text: 'You need to be logged in to add items to your cart.',
+                confirmButtonText: 'Log In'
+            }).then(result => {
+                if (result.isConfirmed) window.location.href = '/login';
+            });
+            return;
+        }
+        fetch('/user/add-to-cart', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                productId: productId,
+                quantity: quantity
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                toastEl.querySelector('.toast-body').textContent = data.message || 'Product added to cart';
+                toast.show();
+                const cartCountElement = document.querySelector('.cart-count');
+                if (cartCountElement) {
+                    cartCountElement.textContent = data.cartCount || (parseInt(cartCountElement.textContent) + quantity);
+                }
+            } else {
+                toastEl.querySelector('.toast-body').textContent = data.message || 'Failed to add item to cart';
+                toast.show();
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            toastEl.querySelector('.toast-body').textContent = 'An error occurred while adding item to cart';
+            toast.show();
+        });
+    }
+
+    document.querySelectorAll('.wishlist-btn').forEach(button => {
+        button.addEventListener('click', async (e) => {
+            e.stopPropagation();
+            const productId = button.getAttribute('data-product-id');
             const isLoggedIn = <%= user ? 'true' : 'false' %>;
+
             if (!isLoggedIn) {
                 Swal.fire({
                     icon: 'warning',
                     title: 'Please Log In',
-                    text: 'You need to be logged in to add items to your cart.',
+                    text: 'You need to be logged in to add items to your wishlist.',
                     confirmButtonText: 'Log In'
                 }).then(result => {
                     if (result.isConfirmed) window.location.href = '/login';
                 });
                 return;
             }
-            fetch('/user/add-to-cart', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    productId: productId,
-                    quantity: parseInt(quantityInput.value)
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    toastEl.querySelector('.toast-body').textContent = 'Product added to cart';
-                    toast.show();
-                    const cartCountElement = document.querySelector('.cart-count');
-                    if (cartCountElement) {
-                        cartCountElement.textContent = parseInt(cartCountElement.textContent) + parseInt(quantityInput.value);
-                    }
-                } else {
-                    toastEl.querySelector('.toast-body').textContent = data.message || 'Failed to add item to cart';
-                    toast.show();
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                toastEl.querySelector('.toast-body').textContent = 'An error occurred while adding item to cart';
-                toast.show();
-            });
-        }
 
-        // Wishlist functionality
-        document.querySelectorAll('.wishlist-btn').forEach(button => {
-            button.addEventListener('click', async (e) => {
-                e.stopPropagation();
-                const productId = button.getAttribute('data-product-id');
-                const isLoggedIn = <%= user ? 'true' : 'false' %>;
-                if (!isLoggedIn) {
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'Please Log In',
-                        text: 'You need to be logged in to add items to your wishlist.',
-                        confirmButtonText: 'Log In'
-                    }).then(result => {
-                        if (result.isConfirmed) window.location.href = '/login';
-                    });
-                    return;
+            try {
+                const isInWishlist = button.classList.contains('active');
+                const endpoint = isInWishlist ? '/user/remove-from-wishlist' : '/user/wishlist/add';
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ productId })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    button.classList.toggle('active');
+                    button.querySelector('i').classList.toggle('far');
+                    button.querySelector('i').classList.toggle('fas');
+                    toastEl.querySelector('.toast-body').textContent = data.message || (isInWishlist ? 'Removed from Wishlist' : 'Added to Wishlist');
+                    toast.show();
+                    console.log(`Product ${productId} ${isInWishlist ? 'removed from' : 'added to'} wishlist`); 
+                } else {
+                    toastEl.querySelector('.toast-body').textContent = data.message || 'Failed to update wishlist';
+                    toast.show();
                 }
-                try {
-                    const response = await fetch('/user/wishlist/add', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ productId })
+            } catch (error) {
+                console.error('Error updating wishlist:', error);
+                toastEl.querySelector('.toast-body').textContent = 'An error occurred while updating wishlist';
+                toast.show();
+            }
+        });
+    });
+
+    document.querySelectorAll('.quick-view-text').forEach(span => {
+        span.addEventListener('click', async (e) => {
+            e.stopPropagation();
+            const productId = span.getAttribute('data-product-id');
+            const productCard = document.querySelector(`[data-product-id="${productId}"]`);
+            if (!productCard) return;
+
+            const modalLoading = document.querySelector('#quickViewModal .modal-loading');
+            const modalBody = document.querySelector('#quickViewModal .modal-body');
+            modalLoading.style.display = 'block';
+            modalBody.style.display = 'none';
+
+            try {
+                let name = productCard.querySelector('.product-title')?.textContent || 'Unknown Product';
+                let brand = productCard.querySelector('.text-muted')?.textContent || 'No Brand';
+                let price = productCard.querySelector('.product-price')?.textContent || '$0.00';
+                let image = productCard.querySelector('img')?.src || '/images/placeholder.jpg';
+                let rating = parseFloat(productCard.getAttribute('data-rating') || 0);
+                let description = '';
+
+                const products = [
+                    ...(<%- JSON.stringify(newArrivals || []) %>),
+                    ...(<%- JSON.stringify(trendingProducts || []) %>),
+                    ...(<%- JSON.stringify(exploreProducts || []) %>)
+                ];
+                const product = products.find(p => p._id.toString() === productId);
+                if (product?.description) {
+                    description = product.description;
+                } else {
+                    // Fallback: Fetch product details from server if description is missing
+                    const response = await fetch(`/products/${productId}`, {
+                        method: 'GET',
+                        headers: { 'Content-Type': 'application/json' }
                     });
                     const data = await response.json();
-                    if (data.success) {
-                        button.classList.toggle('active');
-                        button.querySelector('i').classList.toggle('far');
-                        button.querySelector('i').classList.toggle('fas');
-                        toastEl.querySelector('.toast-body').textContent = data.message || 'Added to Wishlist';
-                        toast.show();
+                    if (data.success && data.product) {
+                        name = data.product.name || name;
+                        brand = data.product.brand?.name || brand;
+                        price = `$${data.product.salePrice?.toFixed(2) || '0.00'}`;
+                        image = data.product.images && data.product.images[0] || image;
+                        rating = data.product.rating || rating;
+                        description = data.product.description || 'No description available.';
                     } else {
-                        toastEl.querySelector('.toast-body').textContent = data.message || 'Failed to add to wishlist';
-                        toast.show();
+                        description = 'No description available.';
                     }
-                } catch (error) {
-                    toastEl.querySelector('.toast-body').textContent = 'An error occurred while adding to wishlist';
-                    toast.show();
                 }
-            });
+
+                document.getElementById('quickViewName').textContent = name;
+                document.getElementById('quickViewBrand').textContent = brand;
+                document.getElementById('quickViewPrice').textContent = price;
+                document.getElementById('quickViewImage').src = image;
+                document.getElementById('quickViewDescription').innerHTML = description;
+                document.getElementById('quickViewAddToCart').setAttribute('data-product-id', productId);
+
+                const ratingContainer = document.getElementById('quickViewRating');
+                ratingContainer.innerHTML = '';
+                for (let i = 0; i < Math.floor(rating); i++) {
+                    ratingContainer.innerHTML += '<i class="fas fa-star text-warning" aria-hidden="true"></i>';
+                }
+                for (let i = Math.floor(rating); i < 5; i++) {
+                    ratingContainer.innerHTML += '<i class="far fa-star text-muted" aria-hidden="true"></i>';
+                }
+
+                modalLoading.style.display = 'none';
+                modalBody.style.display = 'block';
+            } catch (error) {
+                console.error('Error loading Quick View:', error);
+                modalLoading.style.display = 'none';
+                modalBody.style.display = 'block';
+                document.getElementById('quickViewDescription').innerHTML = 'Error loading product details.';
+            }
+        });
+    });
+
+    function applyFilters(sectionId, sortSelectId) {
+        const section = document.getElementById(sectionId);
+        if (!section) return;
+        const sortSelect = document.getElementById(sortSelectId);
+        if (!sortSelect) return;
+        const sort = sortSelect.value;
+        const brand = section.querySelector('.filter-brand.active')?.getAttribute('data-brand') || 'all';
+
+        const products = Array.from(section.querySelectorAll('.col-6'));
+        products.sort((a, b) => {
+            const aPrice = parseFloat(a.getAttribute('data-price') || 0);
+            const bPrice = parseFloat(b.getAttribute('data-price') || 0);
+            const aRating = parseFloat(a.getAttribute('data-rating') || 0);
+            const bRating = parseFloat(a.getAttribute('data-rating') || 0);
+
+            if (sort === 'price-asc') return aPrice - bPrice;
+            if (sort === 'price-desc') return bPrice - aPrice;
+            if (sort === 'rating-desc') return bRating - aRating;
+            return 0;
         });
 
-        // Quick view modal
-        document.querySelectorAll('.quick-view-text').forEach(span => {
-            span.addEventListener('click', async (e) => {
-                e.stopPropagation();
-                const productId = span.getAttribute('data-product-id');
-                const productCard = document.querySelector(`[data-product-id="${productId}"]`);
-                if (!productCard) return;
-
-                // Show loading state
-                const modalLoading = document.querySelector('#quickViewModal .modal-loading');
-                const modalBody = document.querySelector('#quickViewModal .modal-body');
-                modalLoading.style.display = 'block';
-                modalBody.style.display = 'none';
-
-                try {
-                    // First, try to get data from client-side
-                    let name = productCard.querySelector('.product-title')?.textContent || 'Unknown Product';
-                    let brand = productCard.querySelector('.text-muted')?.textContent || 'No Brand';
-                    let price = productCard.querySelector('.product-price')?.textContent || '$0.00';
-                    let image = productCard.querySelector('img')?.src || '/images/placeholder.jpg';
-                    let rating = parseFloat(productCard.getAttribute('data-rating') || 0);
-                    let description = '';
-
-                    // Try to get description from client-side data
-                    const products = [
-                        ...(<%- JSON.stringify(newArrivals || []) %>),
-                        ...(<%- JSON.stringify(trendingProducts || []) %>),
-                        ...(<%- JSON.stringify(exploreProducts || []) %>)
-                    ];
-                    const product = products.find(p => p._id.toString() === productId);
-                    if (product?.description) {
-                        description = product.description;
-                    } else {
-                        // Fallback: Fetch product details from server if description is missing
-                        const response = await fetch(`/products/${productId}`, {
-                            method: 'GET',
-                            headers: { 'Content-Type': 'application/json' }
-                        });
-                        const data = await response.json();
-                        if (data.success && data.product) {
-                            name = data.product.name || name;
-                            brand = data.product.brand?.name || brand;
-                            price = `$${data.product.salePrice?.toFixed(2) || '0.00'}`;
-                            image = data.product.images && data.product.images[0] || image;
-                            rating = data.product.rating || rating;
-                            description = data.product.description || 'No description available.';
-                        } else {
-                            description = 'No description available.';
-                        }
-                    }
-
-                    // Populate modal
-                    document.getElementById('quickViewName').textContent = name;
-                    document.getElementById('quickViewBrand').textContent = brand;
-                    document.getElementById('quickViewPrice').textContent = price;
-                    document.getElementById('quickViewImage').src = image;
-                    document.getElementById('quickViewDescription').innerHTML = description;
-                    document.getElementById('quickViewAddToCart').setAttribute('data-product-id', productId);
-
-                    const ratingContainer = document.getElementById('quickViewRating');
-                    ratingContainer.innerHTML = '';
-                    for (let i = 0; i < Math.floor(rating); i++) {
-                        ratingContainer.innerHTML += '<i class="fas fa-star text-warning" aria-hidden="true"></i>';
-                    }
-                    for (let i = Math.floor(rating); i < 5; i++) {
-                        ratingContainer.innerHTML += '<i class="far fa-star text-muted" aria-hidden="true"></i>';
-                    }
-
-                    // Hide loading state and show modal content
-                    modalLoading.style.display = 'none';
-                    modalBody.style.display = 'block';
-                } catch (error) {
-                    console.error('Error loading Quick View:', error);
-                    modalLoading.style.display = 'none';
-                    modalBody.style.display = 'block';
-                    document.getElementById('quickViewDescription').innerHTML = 'Error loading product details.';
-                }
-            });
+        products.forEach(product => {
+            const productBrand = product.getAttribute('data-brand') || 'Unknown';
+            product.style.display = (brand === 'all' || brand === productBrand) ? 'block' : 'none';
         });
 
-        // Filter and sort functionality
-        function applyFilters(sectionId, sortSelectId) {
-            const section = document.getElementById(sectionId);
-            if (!section) return;
-            const sortSelect = document.getElementById(sortSelectId);
-            if (!sortSelect) return;
-            const sort = sortSelect.value;
-            const brand = section.querySelector('.filter-brand.active')?.getAttribute('data-brand') || 'all';
+        section.innerHTML = '';
+        products.forEach(product => section.appendChild(product));
+    }
 
-            const products = Array.from(section.querySelectorAll('.col-6'));
-            products.sort((a, b) => {
-                const aPrice = parseFloat(a.getAttribute('data-price') || 0);
-                const bPrice = parseFloat(b.getAttribute('data-price') || 0);
-                const aRating = parseFloat(a.getAttribute('data-rating') || 0);
-                const bRating = parseFloat(b.getAttribute('data-rating') || 0);
-
-                if (sort === 'price-asc') return aPrice - bPrice;
-                if (sort === 'price-desc') return bPrice - aPrice;
-                if (sort === 'rating-desc') return bRating - aRating;
-                return 0;
-            });
-
-            products.forEach(product => {
-                const productBrand = product.getAttribute('data-brand') || 'Unknown';
-                product.style.display = (brand === 'all' || brand === productBrand) ? 'block' : 'none';
-            });
-
-            section.innerHTML = '';
-            products.forEach(product => section.appendChild(product));
+    ['newArrivals', 'trendingProducts', 'exploreProducts'].forEach(sectionId => {
+        const sortSelect = document.getElementById(`sort${sectionId.charAt(0).toUpperCase() + sectionId.slice(1)}`);
+        if (sortSelect) {
+            sortSelect.addEventListener('change', () => applyFilters(sectionId, sortSelect.id));
         }
 
-        ['newArrivals', 'trendingProducts', 'exploreProducts'].forEach(sectionId => {
-            const sortSelect = document.getElementById(`sort${sectionId.charAt(0).toUpperCase() + sectionId.slice(1)}`);
-            if (sortSelect) {
-                sortSelect.addEventListener('change', () => applyFilters(sectionId, sortSelect.id));
-            }
-
-            document.querySelectorAll(`#${sectionId} .filter-brand`).forEach(button => {
-                button.addEventListener('click', () => {
-                    document.querySelectorAll(`#${sectionId} .filter-brand`).forEach(btn => btn.classList.remove('active'));
-                    button.classList.add('active');
-                    applyFilters(sectionId, sortSelect?.id);
-                });
+        document.querySelectorAll(`#${sectionId} .filter-brand`).forEach(button => {
+            button.addEventListener('click', () => {
+                document.querySelectorAll(`#${sectionId} .filter-brand`).forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                applyFilters(sectionId, sortSelect?.id);
             });
         });
-    </script>
+    });
+</script>
 </body>
 </html>
