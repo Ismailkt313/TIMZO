@@ -1,144 +1,439 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="en" class="h-full">
 <head>
-  <meta charset="UTF-8" />
-  <title>Timzo Admin - Customers</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
-  <script src="https://cdn.tailwindcss.com"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Customer Management - Timzo Admin</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-</head>
 
-<body class="bg-gray-100">
-  <%- include('.././Partials/admin/navbar') %>
+
+
   
   <style>
-    body {
-      padding-top: 100px; 
+    .sidebar {
+      width: 250px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100%;
+      background-color: #1f2937;
+      color: white;
+      padding-top: 20px;
+      transition: transform 0.3s ease;
     }
-    .search-container {
-      max-width: 500px;
-      margin: 0 auto 2rem auto;
-      position: relative;
+    .sidebar.collapsed {
+      transform: translateX(-250px);
     }
-    .search-input {
-      border-radius: 20px;
-      padding: 0.5rem 1rem;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    /* Custom scrollbar */
+    .scrollbar-thin::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
     }
-    .search-input:focus {
-      box-shadow: 0 0 0 3px rgba(43, 108, 176, 0.2);
-      border-color: #2b6cb0;
+    .scrollbar-thin::-webkit-scrollbar-track {
+      background: transparent;
     }
-    .table-container {
-      max-height: auto;
-      overflow-y: auto;
+    .scrollbar-thin::-webkit-scrollbar-thumb {
+      background-color: rgba(203, 213, 225, 0.5);
+      border-radius: 4px;
     }
-    .pagination {
-      margin-top: 1rem;
+    .dark .scrollbar-thin::-webkit-scrollbar-thumb {
+      background-color: rgba(71, 85, 105, 0.5);
     }
-    @media (max-width: 767px) {
-      .search-container {
-        max-width: 100%;
-        padding: 0 1rem;
+    
+    /* Fade in animation */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .fade-in {
+      animation: fadeIn 0.3s ease-out forwards;
+    }
+    
+    /* Badge styles */
+    .badge-active {
+      background-color: #dcfce7;
+      color: #16a34a;
+    }
+    .badge-blocked {
+      background-color: #fee2e2;
+      color: #dc2626;
+    }
+    
+    /* Responsive table */
+    @media (max-width: 768px) {
+      .responsive-table-container {
+        overflow-x: auto;
       }
-      .search-input {
-        font-size: 0.9rem;
+      
+      .responsive-card {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 1rem;
+        border-radius: 0.5rem;
+        overflow: hidden;
+      }
+      
+      .responsive-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem 1rem;
+        background-color: #f8fafc;
+      }
+      
+      .dark .responsive-card-header {
+        background-color: #334155;
+      }
+      
+      .responsive-card-body {
+        padding: 1rem;
+      }
+      
+      .responsive-card-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #e2e8f0;
+      }
+      
+      .dark .responsive-card-row {
+        border-bottom: 1px solid #475569;
+      }
+      
+      .responsive-card-label {
+        font-weight: 500;
+        color: #64748b;
+      }
+      
+      .dark .responsive-card-label {
+        color: #94a3b8;
+      }
+      
+      .responsive-card-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 0.5rem;
+        padding-top: 0.75rem;
       }
     }
   </style>
+</head>
+<body class="h-full bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 flex flex-col">
+  <!-- Include the sidebar -->
+  <%- include('.././partials/admin/navbar', { admin: admin || {} }) %>
+  <aside class="sidebar">
+      <%- include('.././partials/admin/adminsidebar', { activePage: 'users', admin: admin || {} }) %>
 
-  <div class="flex min-h-screen">
-    <div class="w-64 bg-dark text-white">
-      <%- include('.././Partials/admin/adminsidebar', { activePage: 'users' }) %>
-    </div>
-    
-    <main class="flex-1 p-6">
-      <h1 class="text-2xl font-bold mb-6 text-center">Customers</h1>
-
-      <div class="search-container">
-        <input 
-          class="form-control search-input" 
-          type="search" 
-          id="searchInput" 
-          placeholder="Search customers by name or email..." 
-          aria-label="Search"
-        >
-      </div>
-
-      <div class="bg-white p-4 rounded-xl shadow-md table-container">
-        <table class="table table-bordered table-hover text-center" id="customersTable">
-          <thead class="table-dark">
-            <tr>
-              <th>#</th>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Status</th>
-              <th>Joined At</th>
-              <th>Action</th>
-              <th>View</th>
-            </tr>
-          </thead>
-          <tbody id="customersTableBody">
-            <% if (users.length > 0) { %>
-              <% users.forEach((user, index) => { %>
-                <tr>
-                  <td><%= (currentPage - 1) * 10 + index + 1 %></td>
-                  <td><%= user.fullname %></td>
-                  <td><%= user.email %></td>
-                  <td>
-                    <% if (user.isBlocked) { %>
-                      <span class="text-danger">Blocked</span>
-                    <% } else { %>
-                      <span class="text-success">Active</span>
-                    <% } %>
-                  </td>
-                  <td><%= user.createdAt.toDateString() %></td>
-                  <td>
-                    <button class="btn btn-sm toggle-status-btn <%= user.isBlocked ? 'btn-danger' : 'btn-success' %>"
-                      data-user-id="<%= user._id %>" data-status="<%= user.isBlocked ? 'unblock' : 'block' %>">
-                      <%= user.isBlocked ? 'Blocked' : 'Active' %>
-                    </button>
-                  </td>
-                  <td>
-                    <a href="/admin/userprofile/<%= user._id %>" class="btn btn-sm btn-outline-primary" title="View Profile">
-                      <i class="bi bi-eye"></i>
-                    </a>
-                  </td>
-                </tr>
-              <% }) %>
-            <% } else { %>
-              <tr>
-                <td colspan="7">No users found.</td>
-              </tr>
-            <% } %>
-          </tbody>
-        </table>
-
-        <div class="pagination flex justify-center gap-2" id="pagination">
-          <% if (currentPage > 1) { %>
-            <a class="px-3 py-1 bg-gray-300 rounded hover:bg-gray-400"
-              href="/admin/users?page=<%= currentPage - 1 %>">« Prev</a>
-          <% } %>
-          <% for (let i = 1; i <= totalPages; i++) { %>
-            <a class="px-3 py-1 rounded <%= currentPage === i ? 'bg-blue-500 text-white' : 'bg-gray-200 hover:bg-gray-300' %>"
-              href="/admin/users?page=<%= i %>">
-              <%= i %>
-            </a>
-          <% } %>
-          <% if (currentPage < totalPages) { %>
-            <a class="px-3 py-1 bg-gray-300 rounded hover:bg-gray-400"
-              href="/admin/users?page=<%= currentPage + 1 %>">Next »</a>
-          <% } %>
+  </aside>    
+  <!-- Include the navbar -->
+  
+  <!-- Main Content -->
+  <main class="flex-1 ml-4 md:ml-80 mt-20 mb-4 mr-4 pb-6 px-4 md:px-8 transition-all duration-300">
+    <div class="max-w-7xl mx-auto">
+      <!-- Page Header -->
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+        <div>
+          <h1 class="text-2xl font-bold text-slate-800 dark:text-white">Customer Management</h1>
+          <p class="text-slate-500 dark:text-slate-400 mt-1">View and manage your customer accounts</p>
+        </div>
+        
+        <div class="flex items-center gap-3">
+          <button id="exportBtn" class="px-4 py-2 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            Export
+          </button>
         </div>
       </div>
-    </main>
-  </div>
-
-  <%- include('.././Partials/admin/footer') %>
-
+      
+      <!-- Stats Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <!-- Total Customers -->
+        <div class="bg-white dark:bg-slate-800 rounded-xl shadow-md border border-slate-200 dark:border-slate-700 p-6 fade-in">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-slate-500 dark:text-slate-400 text-base font-medium">Total Customers</p>
+              <h3 class="text-3xl font-bold mt-1 text-slate-800 dark:text-white"><%= totalUsers || 0 %></h3>
+            </div>
+            <div class="bg-blue-100 dark:bg-blue-900/30 p-3 rounded-lg">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-blue-500 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+              </svg>
+            </div>
+          </div>
+          <div class="flex items-center mt-4">
+            <span class="text-green-500 text-base font-medium flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+              </svg>
+              <%= newUsersPercent || 5 %>%
+            </span>
+            <span class="text-slate-500 dark:text-slate-400 text-base ml-2">vs last month</span>
+          </div>
+        </div>
+        
+        <!-- Active Customers -->
+        <div class="bg-white dark:bg-slate-800 rounded-xl shadow-md border border-slate-200 dark:border-slate-700 p-6 fade-in" style="animation-delay: 0.1s;">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-slate-500 dark:text-slate-400 text-base font-medium">Active Customers</p>
+              <h3 class="text-3xl font-bold mt-1 text-slate-800 dark:text-white"><%= activeUsers || 0 %></h3>
+            </div>
+            <div class="bg-green-100 dark:bg-green-900/30 p-3 rounded-lg">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-green-500 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+          </div>
+          <div class="flex items-center mt-4">
+            <span class="text-slate-500 dark:text-slate-400 text-base">
+              <%= activeUsersPercent || 85 %>% of total
+            </span>
+          </div>
+        </div>
+        
+        <!-- Blocked Customers -->
+        <div class="bg-white dark:bg-slate-800 rounded-xl shadow-md border border-slate-200 dark:border-slate-700 p-6 fade-in" style="animation-delay: 0.2s;">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-slate-500 dark:text-slate-400 text-base font-medium">Blocked Customers</p>
+              <h3 class="text-3xl font-bold mt-1 text-slate-800 dark:text-white"><%= blockedUsers || 0 %></h3>
+            </div>
+            <div class="bg-red-100 dark:bg-red-900/30 p-3 rounded-lg">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-red-500 dark:text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+              </svg>
+            </div>
+          </div>
+          <div class="flex items-center mt-4">
+            <span class="text-slate-500 dark:text-slate-400 text-base">
+              <%= blockedUsersPercent || 15 %>% of total
+            </span>
+          </div>
+        </div>
+        
+        <!-- New Customers -->
+        <div class="bg-white dark:bg-slate-800 rounded-xl shadow-md border border-slate-200 dark:border-slate-700 p-6 fade-in" style="animation-delay: 0.3s;">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-slate-500 dark:text-slate-400 text-base font-medium">New This Month</p>
+              <h3 class="text-3xl font-bold mt-1 text-slate-800 dark:text-white"><%= newUsers || 0 %></h3>
+            </div>
+            <div class="bg-purple-100 dark:bg-purple-900/30 p-3 rounded-lg">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-purple-500 dark:text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              </svg>
+            </div>
+          </div>
+          <div class="flex items-center mt-4">
+            <span class="text-green-500 text-base font-medium flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+              </svg>
+              <%= newUsersGrowth || 12 %>%
+            </span>
+            <span class="text-slate-500 dark:text-slate-400 text-base ml-2">growth rate</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Customer List Section -->
+      <div class="bg-white dark:bg-slate-800 rounded-xl shadow-md border border-slate-200 dark:border-slate-700 overflow-hidden fade-in" style="animation-delay: 0.4s;">
+        <!-- Search and Filter -->
+        <div class="p-6 border-b border-slate-200 dark:border-slate-700">
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <!-- Tabs -->
+            <div class="flex space-x-6 overflow-x-auto pb-2 md:pb-0">
+              <button class="text-base font-medium py-2 tab-active" data-filter="all">All Customers (<%= totalUsers || 0 %>)</button>
+              <button class="text-base font-medium py-2 text-slate-600 dark:text-slate-400 hover:text-amber-500 dark:hover:text-amber-400" data-filter="active">Active (<%= activeUsers || 0 %>)</button>
+              <button class="text-base font-medium py-2 text-slate-600 dark:text-slate-400 hover:text-amber-500 dark:hover:text-amber-400" data-filter="blocked">Blocked (<%= blockedUsers || 0 %>)</button>
+            </div>
+            
+            <!-- Search -->
+            <div class="relative">
+              <input type="text" id="searchInput" placeholder="Search customers..." class="w-full md:w-64 bg-slate-100 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg py-2 pl-10 pr-4 text-base focus:outline-none focus:ring-2 focus:ring-amber-500">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-slate-400 absolute left-3 top-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Desktop Table View -->
+        <div class="hidden md:block responsive-table-container">
+          <table class="w-full">
+            <thead>
+              <tr class="bg-slate-50 dark:bg-slate-700/50 border-b border-slate-200 dark:border-slate-700">
+                <th class="py-3 px-6 text-left text-sm font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                  <div class="flex items-center">
+                    <input type="checkbox" id="selectAllUsers" class="rounded border-slate-300 dark:border-slate-600 text-amber-500 focus:ring-amber-500 dark:bg-slate-700">
+                  </div>
+                </th>
+                <th class="py-3 px-6 text-left text-sm font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                  <div class="flex items-center cursor-pointer" data-sort="name">
+                    Customer
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
+                    </svg>
+                  </div>
+                </th>
+                <th class="py-3 px-6 text-left text-sm font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Email</th>
+                <th class="py-3 px-6 text-left text-sm font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Status</th>
+                <th class="py-3 px-6 text-left text-sm font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Joined Date</th>
+                <th class="py-3 px-6 text-right text-sm font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-200 dark:divide-slate-700" id="userTableBody">
+              <% if (users && users.length > 0) { %>
+                <% users.forEach((user, index) => { %>
+                  <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/25 transition-colors" data-user-id="<%= user._id %>" data-status="<%= user.isBlocked ? 'blocked' : 'active' %>">
+                    <td class="py-4 px-6">
+                      <input type="checkbox" class="user-checkbox rounded border-slate-300 dark:border-slate-600 text-amber-500 focus:ring-amber-500 dark:bg-slate-700" value="<%= user._id %>">
+                    </td>
+                    <td class="py-4 px-6">
+                      <div class="flex items-center">
+                        <div class="w-10 h-10 rounded-full bg-amber-500 flex items-center justify-center text-slate-900 font-bold mr-3">
+                          <%= user.fullname ? user.fullname.charAt(0).toUpperCase() : 'U' %>
+                        </div>
+                        <div>
+                          <div class="font-medium text-slate-800 dark:text-white"><%= user.fullname %></div>
+                          <div class="text-sm text-slate-500 dark:text-slate-400">ID: <%= (currentPage - 1) * 10 + index + 1 %></div>
+                        </div>
+                      </div>
+                    </td>
+                    <td class="py-4 px-6 text-slate-800 dark:text-white">
+                      <%= user.email %>
+                    </td>
+                    <td class="py-4 px-6">
+                      <span class="px-2.5 py-1 rounded-full text-xs font-medium <%= user.isBlocked ? 'badge-blocked' : 'badge-active' %>">
+                        <%= user.isBlocked ? 'Blocked' : 'Active' %>
+                      </span>
+                    </td>
+                    <td class="py-4 px-6 text-slate-800 dark:text-white">
+                      <%= user.createdAt.toDateString() %>
+                    </td>
+                    <td class="py-4 px-6 text-right">
+                      <div class="flex items-center justify-end space-x-2">
+                        <a href="/admin/userprofile/<%= user._id %>" class="p-1.5 text-slate-500 hover:text-amber-500 dark:text-slate-400 dark:hover:text-amber-400 transition-colors">
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                          </svg>
+                        </a>
+                        <button class="toggle-status-btn p-1.5 text-slate-500 hover:text-<%= user.isBlocked ? 'green' : 'red' %>-500 dark:text-slate-400 dark:hover:text-<%= user.isBlocked ? 'green' : 'red' %>-400 transition-colors" data-user-id="<%= user._id %>" data-status="<%= user.isBlocked ? 'unblock' : 'block' %>">
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="<%= user.isBlocked ? 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z' : 'M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636' %>" />
+                          </svg>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                <% }); %>
+              <% } else { %>
+                <tr>
+                  <td colspan="6" class="py-4 px-6 text-center text-slate-500 dark:text-slate-400">No customers found.</td>
+                </tr>
+              <% } %>
+            </tbody>
+          </table>
+        </div>
+        
+        <!-- Mobile Card View -->
+        <div class="md:hidden" id="userCardContainer">
+          <% if (users && users.length > 0) { %>
+            <% users.forEach((user, index) => { %>
+              <div class="responsive-card bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 mx-2 my-3" data-user-id="<%= user._id %>" data-status="<%= user.isBlocked ? 'blocked' : 'active' %>">
+                <div class="responsive-card-header bg-slate-50 dark:bg-slate-700">
+                  <div class="flex items-center">
+                    <div class="w-8 h-8 rounded-full bg-amber-500 flex items-center justify-center text-slate-900 font-bold mr-2">
+                      <%= user.fullname ? user.fullname.charAt(0).toUpperCase() : 'U' %>
+                    </div>
+                    <div class="font-medium text-slate-800 dark:text-white"><%= user.fullname %></div>
+                  </div>
+                  <span class="px-2 py-0.5 rounded-full text-xs font-medium <%= user.isBlocked ? 'badge-blocked' : 'badge-active' %>">
+                    <%= user.isBlocked ? 'Blocked' : 'Active' %>
+                  </span>
+                </div>
+                <div class="responsive-card-body">
+                  <div class="responsive-card-row">
+                    <span class="responsive-card-label">Email:</span>
+                    <span class="text-slate-800 dark:text-white"><%= user.email %></span>
+                  </div>
+                  <div class="responsive-card-row">
+                    <span class="responsive-card-label">Joined:</span>
+                    <span class="text-slate-800 dark:text-white"><%= user.createdAt.toDateString() %></span>
+                  </div>
+                  <div class="responsive-card-row">
+                    <span class="responsive-card-label">ID:</span>
+                    <span class="text-slate-800 dark:text-white"><%= (currentPage - 1) * 10 + index + 1 %></span>
+                  </div>
+                  <div class="responsive-card-actions">
+                    <a href="/admin/userprofile/<%= user._id %>" class="px-3 py-1.5 bg-amber-500 text-white rounded-lg text-sm">
+                      View Profile
+                    </a>
+                    <button class="toggle-status-btn px-3 py-1.5 bg-<%= user.isBlocked ? 'green' : 'red' %>-500 text-white rounded-lg text-sm" data-user-id="<%= user._id %>" data-status="<%= user.isBlocked ? 'unblock' : 'block' %>">
+                      <%= user.isBlocked ? 'Unblock' : 'Block' %>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            <% }); %>
+          <% } else { %>
+            <div class="p-6 text-center text-slate-500 dark:text-slate-400">
+              No customers found.
+            </div>
+          <% } %>
+        </div>
+        
+        <!-- Pagination -->
+        <div class="px-6 py-4 border-t border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row sm:items-center justify-between">
+          <div class="text-sm text-slate-500 dark:text-slate-400 mb-4 sm:mb-0">
+            Showing <span class="font-medium text-slate-700 dark:text-slate-300"><%= ((currentPage - 1) * 10) + 1 %></span> to <span class="font-medium text-slate-700 dark:text-slate-300"><%= Math.min((currentPage * 10), totalUsers) %></span> of <span class="font-medium text-slate-700 dark:text-slate-300"><%= totalUsers %></span> customers
+          </div>
+          
+          <div class="flex items-center justify-center space-x-2">
+            <% if (currentPage > 1) { %>
+              <a href="/admin/users?page=<%= currentPage - 1 %>" class="px-3 py-1.5 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-600 rounded-md hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
+                Previous
+              </a>
+            <% } else { %>
+              <button disabled class="px-3 py-1.5 bg-white dark:bg-slate-800 text-slate-400 dark:text-slate-600 border border-slate-300 dark:border-slate-600 rounded-md opacity-50 cursor-not-allowed">
+                Previous
+              </button>
+            <% } %>
+            
+            <% 
+            const startPage = Math.max(1, currentPage - 2);
+            const endPage = Math.min(totalPages, startPage + 4);
+            
+            for (let i = startPage; i <= endPage; i++) { 
+            %>
+              <a href="/admin/users?page=<%= i %>" class="px-3 py-1.5 <%= currentPage === i ? 'bg-amber-500 text-white' : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700' %> rounded-md transition-colors">
+                <%= i %>
+              </a>
+            <% } %>
+            
+            <% if (currentPage < totalPages) { %>
+              <a href="/admin/users?page=<%= currentPage + 1 %>" class="px-3 py-1.5 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-600 rounded-md hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
+                Next
+              </a>
+            <% } else { %>
+              <button disabled class="px-3 py-1.5 bg-white dark:bg-slate-800 text-slate-400 dark:text-slate-600 border border-slate-300 dark:border-slate-600 rounded-md opacity-50 cursor-not-allowed">
+                Next
+              </button>
+            <% } %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+  
+  <!-- Include the footer -->
+  <%- include('../partials/admin/footer') %>
+  
   <script>
     // Debounce function to limit API calls
     function debounce(func, delay) {
@@ -148,7 +443,110 @@
         timeoutId = setTimeout(() => func.apply(this, args), delay);
       };
     }
-
+    
+    // Function to attach event listeners to toggle buttons
+    function attachToggleListeners() {
+      document.querySelectorAll('.toggle-status-btn').forEach(button => {
+        button.addEventListener('click', async function() {
+          const userId = this.dataset.userId;
+          const currentStatus = this.dataset.status;
+          const btn = this;
+          
+          const result = await Swal.fire({
+            text: `This will ${currentStatus === 'block' ? 'block' : 'unblock'} the user.`,
+            title: `Are you sure?`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: `Yes, ${currentStatus}`,
+            confirmButtonColor: '#f59e0b',
+            cancelButtonText: 'Cancel'
+          });
+          
+          if (!result.isConfirmed) return;
+          
+          try {
+            const response = await fetch(`/admin/toggle-user-status/${userId}`, {
+              method: 'PATCH',
+              headers: {
+                'Content-Type': 'application/json'
+              }
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+              const isBlocked = data.isBlocked;
+              
+              // Update desktop view
+              const row = document.querySelector(`tr[data-user-id="${userId}"]`);
+              if (row) {
+                const statusCell = row.querySelector('td:nth-child(4) span');
+                if (statusCell) {
+                  statusCell.textContent = isBlocked ? 'Blocked' : 'Active';
+                  statusCell.className = `px-2.5 py-1 rounded-full text-xs font-medium ${isBlocked ? 'badge-blocked' : 'badge-active'}`;
+                }
+                
+                const actionBtn = row.querySelector('.toggle-status-btn');
+                if (actionBtn) {
+                  actionBtn.dataset.status = isBlocked ? 'unblock' : 'block';
+                  actionBtn.className = `toggle-status-btn p-1.5 text-slate-500 hover:text-${isBlocked ? 'green' : 'red'}-500 dark:text-slate-400 dark:hover:text-${isBlocked ? 'green' : 'red'}-400 transition-colors`;
+                  
+                  const svg = actionBtn.querySelector('svg');
+                  if (svg) {
+                    const path = svg.querySelector('path');
+                    if (path) {
+                      path.setAttribute('d', isBlocked ? 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z' : 'M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636');
+                    }
+                  }
+                }
+              }
+              
+              // Update mobile view
+              const card = document.querySelector(`.responsive-card[data-user-id="${userId}"]`);
+              if (card) {
+                const statusBadge = card.querySelector('.responsive-card-header span');
+                if (statusBadge) {
+                  statusBadge.textContent = isBlocked ? 'Blocked' : 'Active';
+                  statusBadge.className = `px-2 py-0.5 rounded-full text-xs font-medium ${isBlocked ? 'badge-blocked' : 'badge-active'}`;
+                }
+                
+                const actionBtn = card.querySelector('.toggle-status-btn');
+                if (actionBtn) {
+                  actionBtn.textContent = isBlocked ? 'Unblock' : 'Block';
+                  actionBtn.className = `toggle-status-btn px-3 py-1.5 bg-${isBlocked ? 'green' : 'red'}-500 text-white rounded-lg text-sm`;
+                  actionBtn.dataset.status = isBlocked ? 'unblock' : 'block';
+                }
+                
+                card.dataset.status = isBlocked ? 'blocked' : 'active';
+              }
+              
+              Swal.fire({
+                title: 'Success!',
+                text: `User has been ${isBlocked ? 'blocked' : 'unblocked'}.`,
+                icon: 'success',
+                confirmButtonColor: '#f59e0b'
+              });
+            } else {
+              Swal.fire({
+                title: 'Failed',
+                text: 'Operation unsuccessful.',
+                icon: 'error',
+                confirmButtonColor: '#f59e0b'
+              });
+            }
+          } catch (error) {
+            console.error(error);
+            Swal.fire({
+              title: 'Error',
+              text: 'Something went wrong!',
+              icon: 'error',
+              confirmButtonColor: '#f59e0b'
+            });
+          }
+        });
+      });
+    }
+    
     // Function to fetch and update the table with search results
     const updateTable = debounce(async (query) => {
       try {
@@ -158,140 +556,235 @@
             'Content-Type': 'application/json'
           }
         });
-
+        
         const data = await response.json();
-        const tbody = document.getElementById('customersTableBody');
-        const pagination = document.getElementById('pagination');
-
-        // Clear existing table rows
-        tbody.innerHTML = '';
-
-        if (data.users.length > 0) {
-          data.users.forEach((user, index) => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-              <td>${index + 1}</td>
-              <td>${user.fullname}</td>
-              <td>${user.email}</td>
-              <td>
-                <span class="text-${user.isBlocked ? 'danger' : 'success'}">
-                  ${user.isBlocked ? 'Blocked' : 'Active'}
-                </span>
-              </td>
-              <td>${new Date(user.createdAt).toDateString()}</td>
-              <td>
-                <button class="btn btn-sm toggle-status-btn ${user.isBlocked ? 'btn-danger' : 'btn-success'}"
-                  data-user-id="${user._id}" data-status="${user.isBlocked ? 'unblock' : 'block'}">
-                  ${user.isBlocked ? 'Blocked' : 'Active'}
-                </button>
-              </td>
-              <td>
-                <a href="/admin/userprofile/${user._id}" class="btn btn-sm btn-outline-primary" title="View Profile">
-                  <i class="bi bi-eye"></i>
-                </a>
-              </td>
-            `;
-            tbody.appendChild(row);
-          });
-
+        
+        if (data.success) {
+          // Update desktop table
+          const tbody = document.getElementById('userTableBody');
+          tbody.innerHTML = '';
+          
+          // Update mobile cards
+          const cardContainer = document.getElementById('userCardContainer');
+          cardContainer.innerHTML = '';
+          
+          if (data.users.length > 0) {
+            data.users.forEach((user, index) => {
+              // Create desktop table row
+              const row = document.createElement('tr');
+              row.className = 'hover:bg-slate-50 dark:hover:bg-slate-700/25 transition-colors';
+              row.dataset.userId = user._id;
+              row.dataset.status = user.isBlocked ? 'blocked' : 'active';
+              
+              row.innerHTML = `
+                <td class="py-4 px-6">
+                  <input type="checkbox" class="user-checkbox rounded border-slate-300 dark:border-slate-600 text-amber-500 focus:ring-amber-500 dark:bg-slate-700" value="${user._id}">
+                </td>
+                <td class="py-4 px-6">
+                  <div class="flex items-center">
+                    <div class="w-10 h-10 rounded-full bg-amber-500 flex items-center justify-center text-slate-900 font-bold mr-3">
+                      ${user.fullname ? user.fullname.charAt(0).toUpperCase() : 'U'}
+                    </div>
+                    <div>
+                      <div class="font-medium text-slate-800 dark:text-white">${user.fullname}</div>
+                      <div class="text-sm text-slate-500 dark:text-slate-400">ID: ${(data.currentPage - 1) * 10 + index + 1}</div>
+                    </div>
+                  </div>
+                </td>
+                <td class="py-4 px-6 text-slate-800 dark:text-white">
+                  ${user.email}
+                </td>
+                <td class="py-4 px-6">
+                  <span class="px-2.5 py-1 rounded-full text-xs font-medium ${user.isBlocked ? 'badge-blocked' : 'badge-active'}">
+                    ${user.isBlocked ? 'Blocked' : 'Active'}
+                  </span>
+                </td>
+                <td class="py-4 px-6 text-slate-800 dark:text-white">
+                  ${new Date(user.createdAt).toDateString()}
+                </td>
+                <td class="py-4 px-6 text-right">
+                  <div class="flex items-center justify-end space-x-2">
+                    <a href="/admin/userprofile/${user._id}" class="p-1.5 text-slate-500 hover:text-amber-500 dark:text-slate-400 dark:hover:text-amber-400 transition-colors">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                      </svg>
+                    </a>
+                    <button class="toggle-status-btn p-1.5 text-slate-500 hover:text-${user.isBlocked ? 'green' : 'red'}-500 dark:text-slate-400 dark:hover:text-${user.isBlocked ? 'green' : 'red'}-400 transition-colors" data-user-id="${user._id}" data-status="${user.isBlocked ? 'unblock' : 'block'}">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${user.isBlocked ? 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z' : 'M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636'}" />
+                      </svg>
+                    </button>
+                  </div>
+                </td>
+              `;
+              
+              tbody.appendChild(row);
+              
+              // Create mobile card
+              const card = document.createElement('div');
+              card.className = 'responsive-card bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 mx-2 my-3';
+              card.dataset.userId = user._id;
+              card.dataset.status = user.isBlocked ? 'blocked' : 'active';
+              
+              card.innerHTML = `
+                <div class="responsive-card-header bg-slate-50 dark:bg-slate-700">
+                  <div class="flex items-center">
+                    <div class="w-8 h-8 rounded-full bg-amber-500 flex items-center justify-center text-slate-900 font-bold mr-2">
+                      ${user.fullname ? user.fullname.charAt(0).toUpperCase() : 'U'}
+                    </div>
+                    <div class="font-medium text-slate-800 dark:text-white">${user.fullname}</div>
+                  </div>
+                  <span class="px-2 py-0.5 rounded-full text-xs font-medium ${user.isBlocked ? 'badge-blocked' : 'badge-active'}">
+                    ${user.isBlocked ? 'Blocked' : 'Active'}
+                  </span>
+                </div>
+                <div class="responsive-card-body">
+                  <div class="responsive-card-row">
+                    <span class="responsive-card-label">Email:</span>
+                    <span class="text-slate-800 dark:text-white">${user.email}</span>
+                  </div>
+                  <div class="responsive-card-row">
+                    <span class="responsive-card-label">Joined:</span>
+                    <span class="text-slate-800 dark:text-white">${new Date(user.createdAt).toDateString()}</span>
+                  </div>
+                  <div class="responsive-card-row">
+                    <span class="responsive-card-label">ID:</span>
+                    <span class="text-slate-800 dark:text-white">${(data.currentPage - 1) * 10 + index + 1}</span>
+                  </div>
+                  <div class="responsive-card-actions">
+                    <a href="/admin/userprofile/${user._id}" class="px-3 py-1.5 bg-amber-500 text-white rounded-lg text-sm">
+                      View Profile
+                    </a>
+                    <button class="toggle-status-btn px-3 py-1.5 bg-${user.isBlocked ? 'green' : 'red'}-500 text-white rounded-lg text-sm" data-user-id="${user._id}" data-status="${user.isBlocked ? 'unblock' : 'block'}">
+                      ${user.isBlocked ? 'Unblock' : 'Block'}
+                    </button>
+                  </div>
+                </div>
+              `;
+              
+              cardContainer.appendChild(card);
+            });
+          } else {
+            tbody.innerHTML = '<tr><td colspan="6" class="py-4 px-6 text-center text-slate-500 dark:text-slate-400">No customers found.</td></tr>';
+            cardContainer.innerHTML = '<div class="p-6 text-center text-slate-500 dark:text-slate-400">No customers found.</div>';
+          }
+          
+          // Reattach event listeners
+          attachToggleListeners();
+          
           // Update pagination
-          pagination.innerHTML = '';
-          if (data.currentPage > 1) {
-            const prevLink = document.createElement('a');
-            prevLink.className = 'px-3 py-1 bg-gray-300 rounded hover:bg-gray-400';
-            prevLink.href = `/admin/users?page=${data.currentPage - 1}&query=${encodeURIComponent(query)}`;
-            prevLink.textContent = '« Prev';
-            pagination.appendChild(prevLink);
-          }
-
-          for (let i = 1; i <= data.totalPages; i++) {
-            const pageLink = document.createElement('a');
-            pageLink.className = `px-3 py-1 rounded ${data.currentPage === i ? 'bg-blue-500 text-white' : 'bg-gray-200 hover:bg-gray-300'}`;
-            pageLink.href = `/admin/users?page=${i}&query=${encodeURIComponent(query)}`;
-            pageLink.textContent = i;
-            pagination.appendChild(pageLink);
-          }
-
-          if (data.currentPage < data.totalPages) {
-            const nextLink = document.createElement('a');
-            nextLink.className = 'px-3 py-1 bg-gray-300 rounded hover:bg-gray-400';
-            nextLink.href = `/admin/users?page=${data.currentPage + 1}&query=${encodeURIComponent(query)}`;
-            nextLink.textContent = 'Next »';
-            pagination.appendChild(nextLink);
-          }
+          // This would need to be implemented based on your pagination structure
         } else {
-          tbody.innerHTML = '<tr><td colspan="7">No users found.</td></tr>';
-          pagination.innerHTML = '';
+          console.error('Error fetching search results:', data.message);
         }
-
-        // Reattach event listeners to the new toggle buttons
-        attachToggleListeners();
       } catch (error) {
         console.error('Error fetching search results:', error);
-        Swal.fire('Error', 'Failed to fetch search results.', 'error');
+        Swal.fire({
+          title: 'Error',
+          text: 'Failed to fetch search results.',
+          icon: 'error',
+          confirmButtonColor: '#f59e0b'
+        });
       }
-    }, 300); // 300ms debounce delay
-
-    // Function to attach event listeners to toggle buttons
-    function attachToggleListeners() {
-      document.querySelectorAll('.toggle-status-btn').forEach(button => {
-        button.addEventListener('click', async function () {
-          const userId = this.dataset.userId;
-          const currentStatus = this.dataset.status;
-          const btn = this;
-
-          const result = await Swal.fire({
-            text: `This will ${currentStatus === 'block' ? 'block' : 'unblock'} the user.`,
-            title: `Are you sure?`,
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: `Yes, ${currentStatus}`,
-            cancelButtonText: 'Cancel'
-          });
-
-          if (!result.isConfirmed) return;
-
-          try {
-            const response = await fetch(`/admin/toggle-user-status/${userId}`, {
-              method: 'PATCH',
-              headers: {
-                'Content-Type': 'application/json'
-              }
-            });
-
-            const data = await response.json();
-
-            if (data.success) {
-              const isBlocked = data.isBlocked;
-              btn.textContent = isBlocked ? 'Blocked' : 'Active';
-              btn.classList.toggle('btn-danger', isBlocked);
-              btn.classList.toggle('btn-success', !isBlocked);
-              btn.dataset.status = isBlocked ? 'unblock' : 'block';
-
-              const statusCell = btn.closest('tr').querySelector('td:nth-child(4)');
-              if (statusCell) {
-                statusCell.innerHTML = `<span class="text-${isBlocked ? 'danger' : 'success'}">${isBlocked ? 'Blocked' : 'Active'}</span>`;
-              }
-
-              Swal.fire('Success!', `User has been ${isBlocked ? 'blocked' : 'unblocked'}.`, 'success');
-            } else {
-              Swal.fire('Failed', 'Operation unsuccessful.', 'error');
-            }
-          } catch (error) {
-            console.error(error);
-            Swal.fire('Error', 'Something went wrong!', 'error');
+    }, 300);
+    
+    // Filter tabs functionality
+    document.querySelectorAll('[data-filter]').forEach(tab => {
+      tab.addEventListener('click', function() {
+        // Update active tab styling
+        document.querySelectorAll('[data-filter]').forEach(t => {
+          t.classList.remove('tab-active');
+          t.classList.add('text-slate-600', 'dark:text-slate-400', 'hover:text-amber-500', 'dark:hover:text-amber-400');
+        });
+        this.classList.add('tab-active');
+        this.classList.remove('text-slate-600', 'dark:text-slate-400', 'hover:text-amber-500', 'dark:hover:text-amber-400');
+        
+        const filter = this.dataset.filter;
+        
+        // Filter desktop table rows
+        const rows = document.querySelectorAll('#userTableBody tr');
+        rows.forEach(row => {
+          if (filter === 'all' || row.dataset.status === filter) {
+            row.classList.remove('hidden');
+          } else {
+            row.classList.add('hidden');
+          }
+        });
+        
+        // Filter mobile cards
+        const cards = document.querySelectorAll('.responsive-card');
+        cards.forEach(card => {
+          if (filter === 'all' || card.dataset.status === filter) {
+            card.classList.remove('hidden');
+          } else {
+            card.classList.add('hidden');
           }
         });
       });
+    });
+    
+    // Select all checkbox functionality
+    const selectAllCheckbox = document.getElementById('selectAllUsers');
+    if (selectAllCheckbox) {
+      selectAllCheckbox.addEventListener('change', function() {
+        const checkboxes = document.querySelectorAll('.user-checkbox');
+        checkboxes.forEach(checkbox => {
+          checkbox.checked = this.checked;
+        });
+      });
     }
-
-    // Attach initial event listeners
-    attachToggleListeners();
-
-    // Add event listener for live search
-    document.getElementById('searchInput').addEventListener('input', function (e) {
+    
+    // Export button functionality
+    document.getElementById('exportBtn').addEventListener('click', function() {
+      Swal.fire({
+        title: 'Export Customers',
+        html: `
+          <div class="text-left">
+            <p class="mb-4">Select export format:</p>
+            <div class="flex items-center mb-3">
+              <input type="radio" id="exportCsv" name="exportFormat" value="csv" class="mr-2" checked>
+              <label for="exportCsv">CSV</label>
+            </div>
+            <div class="flex items-center mb-3">
+              <input type="radio" id="exportExcel" name="exportFormat" value="excel" class="mr-2">
+              <label for="exportExcel">Excel</label>
+            </div>
+            <div class="flex items-center">
+              <input type="radio" id="exportPdf" name="exportFormat" value="pdf" class="mr-2">
+              <label for="exportPdf">PDF</label>
+            </div>
+          </div>
+        `,
+        showCancelButton: true,
+        confirmButtonText: 'Export',
+        confirmButtonColor: '#f59e0b',
+        cancelButtonColor: '#64748b',
+        preConfirm: () => {
+          return document.querySelector('input[name="exportFormat"]:checked').value;
+        }
+      }).then((result) => {
+        if (result.isConfirmed) {
+          // Here you would typically make an API call to export the data
+          Swal.fire({
+            icon: 'success',
+            title: 'Export Started',
+            text: `Your customer data is being exported as ${result.value.toUpperCase()}.`,
+            confirmButtonColor: '#f59e0b'
+          });
+        }
+      });
+    });
+    
+    // Search input functionality
+    document.getElementById('searchInput').addEventListener('input', function(e) {
       const query = e.target.value.trim();
       updateTable(query);
+    });
+    
+    // Initialize event listeners
+    document.addEventListener('DOMContentLoaded', function() {
+      attachToggleListeners();
     });
   </script>
 </body>

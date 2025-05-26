@@ -315,10 +315,10 @@
           <p class="text-gray-600">Brand: <%= product.brand.name %></p>
         <% } %>
         <div class="price">
-          $<%= product.salePrice.toFixed(2) %>
+          ₹<%= product.salePrice.toFixed(2) %>
           <% if (product.regularPrice && product.regularPrice > product.salePrice) { %>
             <span class="text-muted text-decoration-line-through mx-2">
-              $<%= product.regularPrice.toFixed(2) %>
+              ₹<%= product.regularPrice.toFixed(2) %>
             </span>
             <span class="discount">
               <%= Math.round((1 - product.salePrice / product.regularPrice) * 100) %>% OFF
@@ -436,10 +436,10 @@
                   <h4><a href="/products/<%= product._id %>"><%= product.name %></a></h4>
                   <p class="text-gray-600"><%= product.brand && product.brand.name ? product.brand.name : 'No Brand' %></p>
                   <div class="d-flex align-items-center">
-                    <span class="price">$<%= product.salePrice.toFixed(2) %></span>
+                    <span class="price">₹<%= product.salePrice.toFixed(2) %></span>
                     <% if (product.regularPrice && product.regularPrice > product.salePrice) { %>
                       <span class="text-muted text-decoration-line-through mx-2">
-                        $<%= product.regularPrice.toFixed(2) %>
+                        ₹<%= product.regularPrice.toFixed(2) %>
                       </span>
                       <span class="discount">
                         <%= Math.round((1 - product.salePrice / product.regularPrice) * 100) %>% OFF

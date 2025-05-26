@@ -8,7 +8,9 @@ const addressController = require("../../Controller/user/addressController");
 const checkoutController = require("../../Controller/user/checkoutController");
 const OrderController = require("../../Controller/user/orderController");
 const walletController = require("../../Controller/user/walletController");
+const applyCouponController = require('../../Controller/user/applyCouponController')
 const passport = require('passport');
+const razorpayController = require('../../Controller/user/razorpayController')
 const { userAuth } = require("../../MiddleWares/auth");
 
 router.get('/', userController.loadlanding);
@@ -37,7 +39,7 @@ router.post('/clear-cart', userAuth, cartController.clearCart);
 router.get("/account", userAuth, UserProfileController.loadAccount);
 router.post("/edit-profile", userAuth, UserProfileController.updateAcount);
 router.post("/verify-email-otp", userAuth, UserProfileController.verificationotp); 
-router.get("/wishlist", userAuth, wishlistController.loadwishlist);
+router.get("/wishlist", userAuth, wishlistController.loadwishlist); 
 router.get("/sidewishlist", userAuth, wishlistController.loadsidewishlist);
 router.post("/wishlist/add", userAuth, wishlistController.addTOWishlist);
 router.post("/remove-from-wishlist", userAuth, wishlistController.removeWishlist);
@@ -50,11 +52,14 @@ router.get("/checkout", userAuth, checkoutController.loadCheckout);
 router.post("/order/place", userAuth, checkoutController.placeOrder);
 router.get("/order/success", userAuth, checkoutController.loadSuccess);
 router.get("/orders", userAuth, UserProfileController.loadOrders);
-router.get("/orders/:id", userAuth, OrderController.viewOrderDetail); // Simplified route
-router.get("/user/orders/:id", userAuth, OrderController.getOrder); // API for order fetch
+router.get("/orders/:id", userAuth, OrderController.viewOrderDetail); 
+router.get("/user/orders/:id", userAuth, OrderController.getOrder); 
 router.post("/orders/cancel/:orderId", userAuth, OrderController.cancelOrder);
 router.post('/orders/return/:orderId', userAuth, OrderController.returnEntireOrder);
 router.get('/orders/invoice/:orderId',userAuth,OrderController.downloadInvoice)
+router.post('/order/create-razorpay-order', userAuth,razorpayController.createRazorpayOrder);
+router.post('/order/verify-payment',userAuth, razorpayController.verifyPayment);
+router.post('/apply-coupon', userAuth, applyCouponController.applyCoupon);
 
 
 router.post('/request-item-action/:orderId/:productId', userAuth, OrderController.requestItemAction);

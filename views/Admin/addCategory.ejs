@@ -47,32 +47,16 @@
 
 <body>
 
-  <div>
-    <%- include('.././Partials/admin/adminsidebar', { activePage: 'categories' }) %>
-  </div>
+  <aside class="sidebar">
+      <%- include('.././partials/admin/adminsidebar', { activePage: 'categories', admin: admin || {} }) %>
+
+  </aside>
   
-  <!-- <div class="Breadmb"> -->
-    <%- include('.././Partials/admin/navbar') %>
-    <!-- Breadcrumb -->
-    <!-- <nav class="flex px-5 py-3 text-gray-700 border border-gray-200 rounded-lg bg-gray-50" aria-label="Breadcrumb">
-      <ol class="inline-flex items-center space-x-1 md:space-x-3">
-        <li class="inline-flex items-center">
-          <a href="/admin/dashboard" class="inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600">
-            Dashboard
-          </a>
-        </li>
-        <li>
-          <div class="flex items-center">
-            <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M6 9l6-6 6 6" />
-            </svg>
-            <span class="ml-1 text-sm font-medium text-gray-500">Categories</span>
-          </div>
-        </li>
-      </ol>
-    </nav> -->
-  <!-- </div> -->
-   
+
+    <!-- Include the sidebar -->
+  
+  <!-- Include the navbar -->
+  <%- include('.././partials/admin/navbar', { admin: admin || {} }) %>
 
   <div class="main-content">
 
@@ -118,9 +102,6 @@
                     <tr>
                       <th>Name</th>
                       <th>Description</th>
-                      <th>Offer</th>
-                      <th>Status</th>
-                      <th>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -128,43 +109,7 @@
                       <tr class="align-middle">
                         <td><%= category.name %></td>
                         <td><%= category.description || '-' %></td>
-                        <td>
-                          <% if (category.categoryOffer && category.categoryOffer > 0) { %>
-                            <span><%= category.categoryOffer %>%</span>
-                            <button class="btn btn-warning btn-sm ms-2" onclick="removeOffer('<%= category._id %>')">Remove Offer</button>
-                          <% } else { %>
-                            <span>0%</span>
-                            <button class="btn btn-info btn-sm ms-2" onclick="addOffer('<%= category._id %>')">Add Offer</button>
-                          <% } %>
-                        </td>
-                        <td>
-                          <% if (category.isListed) { %>
-                            <span class="badge bg-success">Listed</span>
-                          <% } else { %>
-                            <span class="badge bg-danger">Unlisted</span>
-                          <% } %>
-                        </td>
-                        <td>
-                          <div class="d-flex justify-content-center gap-2">
-                            <a href="/admin/editcategory/?id=<%= category._id %>" class="btn btn-sm btn-outline-warning" title="Edit">
-                              <i class="bi bi-pencil-square"></i>
-                            </a>
-                    
-                            <% if (category.isListed) { %>
-                              <a href="/admin/listcategory?id=<%= category._id %>" class="btn btn-danger btn-sm" title="Unlist">
-                                Unlist
-                              </a>
-                            <% } else { %>
-                              <a href="/admin/unlistcategory?id=<%= category._id %>" class="btn btn-success btn-sm" title="List">
-                                List
-                              </a>
-                            <% } %>
-                    
-                            <form action="/admin/categories/delete/<%= category._id %>" method="POST" style="display:inline;" onsubmit="return confirm('Are you sure to delete this category?')">
-                              <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete">
-                                <i class="bi bi-trash"></i>
-                              </button>
-                            </form>
+                       
                           </div>
                         </td>
                       </tr>
@@ -246,7 +191,7 @@
       if (name === '') {
         displayErrorMessage('name-error', 'Category name is required.');
         isValid = false;
-      } else if (!/^[A-Za-z\s]+$/.test(name)) {
+      } else if (!/^['A-Za-z\s]+$/.test(name)) {
         displayErrorMessage('name-error', 'Category name should contain only letters.');
         isValid = false;
       }

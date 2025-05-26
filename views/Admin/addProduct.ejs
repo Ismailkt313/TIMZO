@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -7,202 +8,319 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet" />
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    .error-message { color: #dc3545; font-size: 0.875rem; }
-    .thumbnails-container { display: flex; overflow-x: auto; gap: 10px; margin-top: 10px; }
-    .thumbnail { position: relative; }
-    .thumbnail img { width: 60px; height: auto; border: 1px solid #ddd; border-radius: 4px; }
-    .remove-icon { position: absolute; top: -5px; right: -5px; background: #dc3545; color: white; border-radius: 50%; width: 20px; height: 20px; text-align: center; cursor: pointer; font-size: 14px; }
-    .sidebar { width: 250px; min-height: 100vh; background-color: #1a202c; color: white; padding: 1rem; position: fixed; }
-    .main-content { margin-left: 250px; padding: 2rem; background-color: #f7fafc; }
-    .content-header { margin-bottom: 1rem; }
-    body { padding-top: 70px; }
-    .content-header h2 { font-size: 1.5rem; font-weight: 700; color: #2d3748; }
-    .card { border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-    .btn-primary { background-color: #2b6cb0; border-color: #2b6cb0; }
-    .btn-primary:hover { background-color: #2c5282; border-color: #2c5282; }
-    .form-control, .form-select { border-radius: 6px; }
-    .crop-container { position: relative; display: none; margin-top: 10px; }
-    .crop-box { position: absolute; border: 2px dashed #2b6cb0; cursor: move; }
-    .crop-box .resize-handle { position: absolute; width: 10px; height: 10px; background: #2b6cb0; cursor: nwse-resize; bottom: -5px; right: -5px; }
+    .error-message {
+      color: #dc3545;
+      font-size: 0.875rem;
+    }
+
+    .thumbnails-container {
+      display: flex;
+      overflow-x: auto;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .thumbnail {
+      position: relative;
+    }
+
+    .thumbnail img {
+      width: 60px;
+      height: auto;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+
+    .remove-icon {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background: #dc3545;
+      color: white;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      text-align: center;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .sidebar {
+      width: 250px;
+      min-height: 100vh;
+      background-color: #1a202c;
+      color: white;
+      padding: 1rem;
+      position: fixed;
+    }
+
+    .main-content {
+      margin-left: 250px;
+      padding: 2rem;
+      background-color: #f7fafc;
+    }
+
+    .content-header {
+      margin-bottom: 1rem;
+    }
+
+    body {
+      padding-top: 70px;
+    }
+
+    .content-header h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #2d3748;
+    }
+
+    .card {
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-primary {
+      background-color: #2b6cb0;
+      border-color: #2b6cb0;
+    }
+
+    .btn-primary:hover {
+      background-color: #2c5282;
+      border-color: #2c5282;
+    }
+
+    .form-control,
+    .form-select {
+      border-radius: 6px;
+    }
+
+    .crop-container {
+      position: relative;
+      display: none;
+      margin-top: 10px;
+    }
+
+    .crop-box {
+      position: absolute;
+      border: 2px dashed #2b6cb0;
+      cursor: move;
+    }
+
+    .crop-box .resize-handle {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      background: #2b6cb0;
+      cursor: nwse-resize;
+      bottom: -5px;
+      right: -5px;
+    }
 
     /* Responsive Adjustments */
     @media (max-width: 767px) {
       .sidebar {
         display: none;
       }
+
       .main-content {
         margin-left: 0;
         padding: 1rem;
       }
+
       body {
         padding-top: 56px;
       }
-      .form-control, .form-select {
+
+      .form-control,
+      .form-select {
         font-size: 0.9rem;
       }
+
       .content-header h2 {
         font-size: 1.25rem;
       }
+
       .btn-primary {
         width: 100%;
       }
+
       .thumbnail img {
         width: 50px;
       }
+
       .crop-container canvas {
         max-width: 100%;
       }
     }
   </style>
 </head>
+
 <body class="d-flex">
   <aside class="sidebar">
-    <%- include('../Partials/admin/adminsidebar', { activePage: 'product' }) %>
+      <%- include('.././partials/admin/adminsidebar', { activePage: 'product', admin: admin || {} }) %>
+
   </aside>
   <div class="flex-grow-1 main-content">
-    <%- include('../Partials/admin/navbar') %>
-    <section class="content-main">
-      <div class="content-header">
-        <h2 class="content-title">Add New Watch</h2>
-      </div>
-      <% if (error) { %>
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-          <%= error %>
-          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-      <% } %>
-      <div class="card mb-4">
-        <div class="card-body">
-          <form method="post" action="/admin/addproducts" enctype="multipart/form-data" onsubmit="return validateForm()">
-            <div class="mb-4">
-              <label for="product_name" class="form-label">Watch Name</label>
-              <input type="text" placeholder="e.g., TIMZO Chrono X" name="productName" class="form-control" id="product_name" value="<%= formData.productName || '' %>" />
-              <div id="productName-error" class="error-message"></div>
-            </div>
-            <div class="mb-4">
-              <label class="form-label">Brand</label>
-              <select class="form-select" name="brand">
-                <option value="">Select Brand</option>
-                <% brand.forEach(b => { %>
-                  <option value="<%= b._id %>" <%= formData.brand === b._id.toString() ? 'selected' : '' %>><%= b.name %></option>
-                <% }) %>
-              </select>
-              <div id="brand-error" class="error-message"></div>
-            </div>
-            <div class="mb-4">
-              <label class="form-label">Category</label>
-              <select class="form-select" name="category">
-                <option value="">Select Category</option>
-                <% cat.forEach(c => { %>
-                  <option value="<%= c._id %>" <%= formData.category === c._id.toString() ? 'selected' : '' %>><%= c.name %></option>
-                <% }) %>
-              </select>
-              <div id="category-error" class="error-message"></div>
-            </div>
-            <div class="mb-4">
-              <label for="descriptionid" class="form-label">Description</label>
-              <textarea placeholder="Describe the watch..." name="description" class="form-control" id="descriptionid" rows="4"><%= formData.description || '' %></textarea>
-              <div id="description-error" class="error-message"></div>
-            </div>
-            <div class="row">
-              <div class="col-lg-4 mb-4">
-                <label class="form-label">Regular Price</label>
-                <input placeholder="$" name="regularPrice" type="text" class="form-control" value="<%= formData.regularPrice || '' %>" />
-                <div id="regularPrice-error" class="error-message"></div>
-              </div>
-              <div class="col-lg-4 mb-4">
-                <label class="form-label">Sale Price</label>
-                <input placeholder="$" name="salePrice" type="text" class="form-control" value="<%= formData.salePrice || '' %>" />
-                <div id="salePrice-error" class="error-message"></div>
-              </div>
-              <div class="col-lg-4 mb-4">
-                <label class="form-label">Stock</label>
-                <input name="stock" type="text" class="form-control" value="<%= formData.stock || '' %>" />
-                <div id="stock-error" class="error-message"></div>
-              </div>
-            </div>
-            <div class="mb-4">
-              <label class="form-label">Color</label>
-              <input name="color" type="text" placeholder="e.g., Black" class="form-control" value="<%= formData.color || '' %>" />
-              <div id="color-error" class="error-message"></div>
-            </div>
-            <div class="mb-4">
-  <label class="form-label">Material</label>
-  <select name="material" class="form-control">
-    <option value="">Select material</option>
-    <% const materials = ['leather', 'metal', 'rubber', 'ceramic', 'plastic', 'nylon']; %>
-    <% materials.forEach(material => { %>
-      <option value="<%= material %>" <%= formData.material === material ? 'selected' : '' %>><%= material.charAt(0).toUpperCase() + material.slice(1) %></option>
-    <% }) %>
-  </select>
-  <div id="material-error" class="error-message"></div>
-</div>
 
-            <div class="mb-4">
-              <label class="form-label">Water Resistance</label>
-              <select class="form-select" name="waterResistance">
-                <option value="Not specified" <%= formData.waterResistance === 'Not specified' ? 'selected' : '' %>>Not specified</option>
-                <option value="30m" <%= formData.waterResistance === '30m' ? 'selected' : '' %>>30m</option>
-                <option value="50m" <%= formData.waterResistance === '50m' ? 'selected' : '' %>>50m</option>
-                <option value="100m" <%= formData.waterResistance === '100m' ? 'selected' : '' %>>100m</option>
-                <option value="200m" <%= formData.waterResistance === '200m' ? 'selected' : '' %>>200m</option>
-                <option value="300m" <%= formData.waterResistance === '300m' ? 'selected' : '' %>>300m</option>
-              </select>
-              <div id="waterResistance-error" class="error-message"></div>
-            </div>
-            <div class="mb-4">
-              <label class="form-label">Warranty</label>
-              <select class="form-select" name="warranty">
-                <option value="1 Year" <%= formData.warranty === '1 Year' ? 'selected' : '' %>>1 Year</option>
-                <option value="2 Years" <%= formData.warranty === '2 Years' ? 'selected' : '' %>>2 Years</option>
-                <option value="3 Years" <%= formData.warranty === '3 Years' ? 'selected' : '' %>>3 Years</option>
-                <option value="Limited Lifetime" <%= formData.warranty === 'Limited Lifetime' ? 'selected' : '' %>>Limited Lifetime</option>
-              </select>
-              <div id="warranty-error" class="error-message"></div>
-            </div>
-            <div class="mb-4">
-              <label class="form-label">Movement Type</label>
-              <select class="form-select" name="movementType">
-                <option value="" <%= !formData.movementType ? 'selected' : '' %>>Select Movement Type</option>
-                <option value="Quartz" <%= formData.movementType === 'Quartz' ? 'selected' : '' %>>Quartz</option>
-                <option value="Automatic" <%= formData.movementType === 'Automatic' ? 'selected' : '' %>>Automatic</option>
-                <option value="Manual" <%= formData.movementType === 'Manual' ? 'selected' : '' %>>Manual</option>
-                <option value="Solar" <%= formData.movementType === 'Solar' ? 'selected' : '' %>>Solar</option>
-              </select>
-              <div id="movementType-error" class="error-message"></div>
-            </div>
-            <div class="card mb-4">
-              <div class="card-header">
-                <h4>Watch Images (Up to 4)</h4>
-              </div>
-              <div class="card-body">
-                <div class="row">
-                  <% for (let i = 1; i <= 4; i++) { %>
-                    <div class="col-md-6 mb-3">
-                      <label for="input<%= i %>">Image <%= i %></label>
-                      <input class="form-control" type="file" name="images" id="input<%= i %>" accept="image/*" onchange="viewImage(event, <%= i %>)" />
-                      <img src="" alt="" id="imgView<%= i %>" class="mt-2" style="max-height: 150px; display: none;" />
-                      <div class="crop-container" id="cropContainer<%= i %>">
-                        <canvas id="cropCanvas<%= i %>"></canvas>
-                        <div class="crop-box" id="cropBox<%= i %>">
-                          <div class="resize-handle"></div>
-                        </div>
-                        <button type="button" class="btn btn-success btn-sm mt-2" onclick="saveCrop(<%= i %>)">Save Crop</button>
-                        <input type="hidden" name="cropData<%= i %>" id="cropData<%= i %>" value="">
-                      </div>
-                    </div>
-                  <% } %>
-                </div>
-                <div id="images-error" class="error-message"></div>
-                <div id="thumbnailsContainer" class="thumbnails-container"></div>
-              </div>
-            </div>
-            <button class="btn btn-md rounded btn-primary" type="submit">Add Watch</button>
-          </form>
+ <!-- Include the sidebar -->
+  
+  <!-- Include the navbar -->
+  <%- include('.././partials/admin/navbar', { admin: admin || {} }) %>
+
+      <section class="content-main">
+        <div class="content-header">
+          <h2 class="content-title">Add New Watch</h2>
         </div>
-      </div>
-    </section>
-    <%- include('../Partials/admin/footer') %>
+        <% if (error) { %>
+          <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <%= error %>
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+          <% } %>
+            <div class="card mb-4">
+              <div class="card-body">
+                <form method="post" action="/admin/addproducts" enctype="multipart/form-data"
+                  onsubmit="return validateForm()">
+                  <div class="mb-4">
+                    <label for="product_name" class="form-label">Watch Name</label>
+                    <input type="text" placeholder="e.g., TIMZO Chrono X" name="productName" class="form-control"
+                      id="product_name" value="<%= formData.productName || '' %>" />
+                    <div id="productName-error" class="error-message"></div>
+                  </div>
+                  <div class="mb-4">
+                    <label class="form-label">Brand</label>
+                    <select class="form-select" name="brand">
+                      <option value="">Select Brand</option>
+                      <% brand.forEach(b=> { %>
+                        <option value="<%= b._id %>" <%=formData.brand===b._id.toString() ? 'selected' : '' %>><%=
+                            b.name %>
+                        </option>
+                        <% }) %>
+                    </select>
+                    <div id="brand-error" class="error-message"></div>
+                  </div>
+                  <div class="mb-4">
+                    <label class="form-label">Category</label>
+                    <select class="form-select" name="category">
+                      <option value="">Select Category</option>
+                      <% cat.forEach(c=> { %>
+                        <option value="<%= c._id %>" <%=formData.category===c._id.toString() ? 'selected' : '' %>><%=
+                            c.name %>
+                        </option>
+                        <% }) %>
+                    </select>
+                    <div id="category-error" class="error-message"></div>
+                  </div>
+                  <div class="mb-4">
+                    <label for="descriptionid" class="form-label">Description</label>
+                    <textarea placeholder="Describe the watch..." name="description" class="form-control"
+                      id="descriptionid" rows="4"><%= formData.description || '' %></textarea>
+                    <div id="description-error" class="error-message"></div>
+                  </div>
+                  <div class="row">
+                    <div class="col-lg-4 mb-4">
+                      <label class="form-label">Regular Price</label>
+                      <input placeholder="$" name="regularPrice" type="text" class="form-control"
+                        value="<%= formData.regularPrice || '' %>" />
+                      <div id="regularPrice-error" class="error-message"></div>
+                    </div>
+                    <div class="col-lg-4 mb-4">
+                      <label class="form-label">Stock</label>
+                      <input name="stock" type="text" class="form-control" value="<%= formData.stock || '' %>" />
+                      <div id="stock-error" class="error-message"></div>
+                    </div>
+                  </div>
+                  <div class="mb-4">
+                    <label class="form-label">Color</label>
+                    <input name="color" type="text" placeholder="e.g., Black" class="form-control"
+                      value="<%= formData.color || '' %>" />
+                    <div id="color-error" class="error-message"></div>
+                  </div>
+                  <div class="mb-4">
+                    <label class="form-label">Material</label>
+                    <select name="material" class="form-control">
+                      <option value="">Select material</option>
+                      <% const materials=['leather', 'metal' , 'rubber' , 'ceramic' , 'plastic' , 'nylon' ]; %>
+                        <% materials.forEach(material=> { %>
+                          <option value="<%= material %>" <%=formData.material===material ? 'selected' : '' %>><%=
+                              material.charAt(0).toUpperCase() + material.slice(1) %>
+                          </option>
+                          <% }) %>
+                    </select>
+                    <div id="material-error" class="error-message"></div>
+                  </div>
+
+                  <div class="mb-4">
+                    <label class="form-label">Water Resistance</label>
+                    <select class="form-select" name="waterResistance">
+                      <option value="Not specified" <%=formData.waterResistance==='Not specified' ? 'selected' : '' %>
+                        >Not specified</option>
+                      <option value="30m" <%=formData.waterResistance==='30m' ? 'selected' : '' %>>30m</option>
+                      <option value="50m" <%=formData.waterResistance==='50m' ? 'selected' : '' %>>50m</option>
+                      <option value="100m" <%=formData.waterResistance==='100m' ? 'selected' : '' %>>100m</option>
+                      <option value="200m" <%=formData.waterResistance==='200m' ? 'selected' : '' %>>200m</option>
+                      <option value="300m" <%=formData.waterResistance==='300m' ? 'selected' : '' %>>300m</option>
+                    </select>
+                    <div id="waterResistance-error" class="error-message"></div>
+                  </div>
+                  <div class="mb-4">
+                    <label class="form-label">Warranty</label>
+                    <select class="form-select" name="warranty">
+                      <option value="1 Year" <%=formData.warranty==='1 Year' ? 'selected' : '' %>>1 Year</option>
+                      <option value="2 Years" <%=formData.warranty==='2 Years' ? 'selected' : '' %>>2 Years</option>
+                      <option value="3 Years" <%=formData.warranty==='3 Years' ? 'selected' : '' %>>3 Years</option>
+                      <option value="Limited Lifetime" <%=formData.warranty==='Limited Lifetime' ? 'selected' : '' %>
+                        >Limited Lifetime</option>
+                    </select>
+                    <div id="warranty-error" class="error-message"></div>
+                  </div>
+                  <div class="mb-4">
+                    <label class="form-label">Movement Type</label>
+                    <select class="form-select" name="movementType">
+                      <option value="" <%=!formData.movementType ? 'selected' : '' %>>Select Movement Type</option>
+                      <option value="Quartz" <%=formData.movementType==='Quartz' ? 'selected' : '' %>>Quartz</option>
+                      <option value="Automatic" <%=formData.movementType==='Automatic' ? 'selected' : '' %>>Automatic
+                      </option>
+                      <option value="Manual" <%=formData.movementType==='Manual' ? 'selected' : '' %>>Manual</option>
+                      <option value="Solar" <%=formData.movementType==='Solar' ? 'selected' : '' %>>Solar</option>
+                    </select>
+                    <div id="movementType-error" class="error-message"></div>
+                  </div>
+                  <div class="card mb-4">
+                    <div class="card-header">
+                      <h4>Watch Images (Up to 4)</h4>
+                    </div>
+                    <div class="card-body">
+                      <div class="row">
+                        <% for (let i=1; i <=4; i++) { %>
+                          <div class="col-md-6 mb-3">
+                            <label for="input<%= i %>">Image <%= i %></label>
+                            <input class="form-control" type="file" name="images" id="input<%= i %>" accept="image/*"
+                              onchange="viewImage(event, <%= i %>)" />
+                            <img src="" alt="" id="imgView<%= i %>" class="mt-2"
+                              style="max-height: 150px; display: none;" />
+                            <div class="crop-container" id="cropContainer<%= i %>">
+                              <canvas id="cropCanvas<%= i %>"></canvas>
+                              <div class="crop-box" id="cropBox<%= i %>">
+                                <div class="resize-handle"></div>
+                              </div>
+                              <button type="button" class="btn btn-success btn-sm mt-2"
+                                onclick="saveCrop(<%= i %>)">Save Crop</button>
+                              <input type="hidden" name="cropData<%= i %>" id="cropData<%= i %>" value="">
+                            </div>
+                          </div>
+                          <% } %>
+                      </div>
+                      <div id="images-error" class="error-message"></div>
+                      <div id="thumbnailsContainer" class="thumbnails-container"></div>
+                    </div>
+                  </div>
+                  <button class="btn btn-md rounded btn-primary" type="submit">Add Watch</button>
+                </form>
+              </div>
+            </div>
+      </section>
+      <%- include('../Partials/admin/footer') %>
   </div>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"></script>
   <script>
@@ -459,4 +577,5 @@
     }
   </script>
 </body>
+
 </html>

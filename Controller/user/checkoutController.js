@@ -5,6 +5,8 @@ const Cart = require("../../Model/cartSchema");
 const Order = require("../../Model/orderSchema");
 const Product = require("../../Model/productSchema");
 const Wishlist = require("../../Model/wishlistSchema");
+const Coupon = require('../../Model/coupenSchema')
+const dotenv = require("dotenv").config()
 const { v4: uuidv4 } = require('uuid');
 
 const totalSubtotal = (items) => {
@@ -38,7 +40,12 @@ const loadCheckout = async (req, res) => {
         }
 
         let cart = await Cart.findOne({ userId }).populate("items.product");
-        console.log('Cart:', cart);
+
+        const availableCoupons = await Coupon.find({
+      isActive: true,
+      validFrom: { $lte: new Date() },
+      validUntil: { $gte: new Date() }
+    });
 
         if (!cart) {
             console.log('No cart found, creating a new one');
@@ -62,14 +69,14 @@ const loadCheckout = async (req, res) => {
 
         const addresses = await Address.find({ userId });
         let selectedAddress = addresses.find(addr => addr.isDefault) || addresses[0] || null;
-
+        let couponDiscount = cart.coupon && cart.coupon.discount ? cart.coupon.discount : 0;
         const wallet = await Wallet.findOne({ userId }) || { balance: 0 };
 
 
         const subtotal = totalSubtotal(cart.items);
         const shippingFee = 10;
         const tax = calculateTax(subtotal);
-        const totalAmount = subtotal + shippingFee + tax;
+        const totalAmount = subtotal + shippingFee + tax - couponDiscount;
 
         res.render("user/checkOut", {
             user,
@@ -79,15 +86,19 @@ const loadCheckout = async (req, res) => {
             selectedAddressId: selectedAddress ? selectedAddress._id.toString() : '',
             walletBalance: wallet.balance,
             subtotal,
+            razorpayKey: process.env.RAZORPAY_KEY_ID, 
             shippingFee,
             tax,
             totalAmount,
+            availableCoupons
         });
     } catch (error) {
         console.error("Render checkout error:", error);
         res.status(500).render("error404", { message: "Internal Server Error" });
     }
 };
+
+
 
 const getAddress = async (req, res) => {
     try {
@@ -119,6 +130,8 @@ const placeOrder = async (req, res) => {
             console.log('User not logged in');
             return res.status(401).json({ success: false, message: 'Please log in to place an order' });
         }
+
+
 
         if (!addressId || !['COD', 'Online', 'Wallet'].includes(paymentMethod)) {
             console.log('Invalid address or payment method');
@@ -152,6 +165,20 @@ const placeOrder = async (req, res) => {
             return false;
         });
 
+        let total = 0 
+        cart.items.forEach(item =>{
+            if(item.product && item.product.salePrice){
+                total += item.product.salePrice * item.quantity
+            }
+        })
+
+        if (paymentMethod === 'COD' && total > 3000) {
+            return res.status(400).json({ 
+                success: false, 
+                message: "Cash on Delivery is not available for orders above ₹3000" 
+            });
+        }
+
         for (const item of cart.items) {
             if (item.product.stock < item.quantity) {
                 console.log(`Insufficient stock for ${item.product.name}`);
@@ -164,6 +191,51 @@ const placeOrder = async (req, res) => {
         const tax = calculateTax(subtotal);
         const totalAmount = subtotal + shippingFee + tax;
         const orderId = `ORD-${uuidv4().slice(0, 8)}`;
+
+
+        if (paymentMethod === 'Online') {
+            const order = new Order({
+                orderId,
+                user: userId,
+                items: cart.items.map(item => ({
+                    productId: item.product._id,
+                    productName: item.product.name,
+                    quantity: item.quantity,
+                    price: item.price || item.product.salePrice || 0,
+                    status: 'Ordered'
+                })),
+                subtotal,
+                discount: 0,
+                shippingFee,
+                tax,
+                totalAmount,
+                shippingAddress: {
+                    fullName: address.fullName,
+                    addressLine1: address.addressLine1,
+                    addressLine2: address.addressLine2 || '',
+                    city: address.city,
+                    state: address.state,
+                    postalCode: address.postalCode,
+                    country: address.country,
+                    phone: address.phone,
+                    addressType: address.addressType || "home",
+                    landmark: address.landmark || ''
+                },
+                orderDate: new Date(),
+                estimatedDelivery: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+                paymentMethod,
+                paymentStatus: 'Pending',
+                orderStatus: 'Pending',
+                statusHistory: [{
+                    status: 'Pending',
+                    date: new Date(),
+                    current: true
+                }]
+            });
+
+            await order.save();
+            return res.status(200).json({ success: true, orderId: order._id, totalAmount });
+        }
 
 
         if (paymentMethod === 'Wallet') {

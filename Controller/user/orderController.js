@@ -105,7 +105,12 @@ const cancelOrder = async (req, res) => {
         if (!wallet) {
             wallet = new Wallet({ userId, balance: 0, transactions: [] });
         }
+      
+
         for (const item of order.items) {
+              const baseAmount = item.quantity * item.price;
+        const taxAmount = baseAmount * 0.10; 
+        const totalRefund = baseAmount + taxAmount;
             if (item.status === 'Ordered' || item.status === 'Processing') {
                 item.status = 'Cancelled';
                 item.cancelDate = new Date();
@@ -113,10 +118,10 @@ const cancelOrder = async (req, res) => {
                     $inc: { stock: item.quantity }
                 }, { new: true });
                 if (order.paymentMethod === 'Wallet' || order.paymentMethod === 'Online') {
-                    wallet.balance += item.quantity * item.price;
+                    wallet.balance += totalRefund
                     wallet.transactions.push({
                         type: 'credit',
-                        amount: item.quantity * item.price,
+                        amount: totalRefund,
                         description: `Refund for cancelled item: ${item.productName} (${item.quantity} pcs)`,
                         date: new Date()
                     });
@@ -125,6 +130,7 @@ const cancelOrder = async (req, res) => {
         }
 
         order.subtotal = 0;
+        order.tax = 0;
         order.totalAmount = 0;
 
         await Promise.all([order.save(), wallet.save()]);
@@ -315,7 +321,7 @@ const downloadInvoice = async (req, res) => {
 
     res.download(filePath, `invoice-${orderId}.pdf`, (err) => {
       if (err) console.log("Download error:", err);
-      else fs.unlinkSync(filePath); // optional: delete after download
+      else fs.unlinkSync(filePath); 
     });
   } catch (err) {
     console.error("Invoice error:", err);

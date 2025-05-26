@@ -14,8 +14,11 @@
         body {
             font-family: 'Poppins', sans-serif;
             background-color: #f9fafb;
-            color: #1f2937;
+            color: #a6b5ca;
             margin: 0;
+        }
+        .fullbody{
+            background-color: #9eb5d6;
         }
         .quick-view-text {
             cursor: pointer;
@@ -321,7 +324,7 @@
         }
     </style>
 </head>
-<body>
+<body class="fullbody">
     <%- include('../Partials/user/navbar', { user: user, cartCount: cartCount, search: search }) %>
 
     <!-- Toast Notification -->
@@ -368,41 +371,6 @@
         </button>
     </div>
 
-    <section class="container my-5 watch-gallery" data-aos="fade-up">
-        <h2 class="section-title">Featured Watches</h2>
-        <div class="row g-4">
-            <div class="col-md-4 col-6">
-                <div class="gallery-item">
-                    <img src="https://images.unsplash.com/photo-1523170335258-f5ed11844a49" alt="Fastrack Automatics">
-                </div>
-            </div>
-            <div class="col-md-4 col-6">
-                <div class="gallery-item">
-                    <img src="https://images.unsplash.com/photo-1542496658-e33a6d0d50f6" alt="Rolex Classic">
-                </div>
-            </div>
-            <div class="col-md-4 col-6">
-                <div class="gallery-item">
-                    <img src="https://images.unsplash.com/photo-1594576722512-582bcd46fba3" alt="Luxury Chronograph">
-                </div>
-            </div>
-            <div class="col-md-4 col-6">
-                <div class="gallery-item">
-                    <img src="https://images.unsplash.com/photo-1612817288484-6f916006741a" alt="Classic Diver">
-                </div>
-            </div>
-            <div class="col-md-4 col-6">
-                <div class="gallery-item">
-                    <img src="https://images.unsplash.com/photo-1522312346375-d1a52e2b99b3" alt="Minimalist Watch">
-                </div>
-            </div>
-            <div class="col-md-4 col-6">
-                <div class="gallery-item">
-                    <img src="https://tse1.mm.bing.net/th?id=OIP.YhEUnnUK46ymQHtzJFfWbgHaHa&pid=Api&P=0&h=180" alt="Sport Chrono">
-                </div>
-            </div>
-        </div>
-    </section>
 
     <!-- New Arrivals -->
     <section class="container my-5" data-aos="fade-up">
@@ -432,7 +400,7 @@
                                         <i class="far fa-star text-muted" aria-hidden="true"></i>
                                     <% } %>
                                 </div>
-                                <p class="product-price fw-bold">$<%= product.salePrice?.toFixed(2) || '0.00' %></p>
+                                <p class="product-price fw-bold">₹<%= product.salePrice?.toFixed(2) || '0.00' %></p>
                             </div>
                         </a>
                         <span class="quick-view-text" data-bs-toggle="modal" data-bs-target="#quickViewModal" data-product-id="<%= product._id %>">
@@ -492,7 +460,7 @@
                                         <i class="far fa-star text-muted" aria-hidden="true"></i>
                                     <% } %>
                                 </div>
-                                <p class="product-price fw-bold">$<%= product.salePrice?.toFixed(2) || '0.00' %></p>
+                                <p class="product-price fw-bold">₹<%= product.salePrice?.toFixed(2) || '0.00' %></p>
                             </div>
                         </a>
                         <span class="quick-view-text" data-bs-toggle="modal" data-bs-target="#quickViewModal" data-product-id="<%= product._id %>">
@@ -508,6 +476,44 @@
             <% }); %>
         </div>
     </section>
+
+          <section class="container my-5 watch-gallery" data-aos="fade-up">
+        <h2 class="section-title">Featured Watches</h2>
+        <div class="row g-4">
+            <div class="col-md-4 col-6">
+                <div class="gallery-item">
+                    <img src="https://images.unsplash.com/photo-1523170335258-f5ed11844a49" alt="Fastrack Automatics">
+                </div>
+            </div>
+            <div class="col-md-4 col-6">
+                <div class="gallery-item">
+                    <img src="https://images.unsplash.com/photo-1542496658-e33a6d0d50f6" alt="Rolex Classic">
+                </div>
+            </div>
+            <div class="col-md-4 col-6">
+                <div class="gallery-item">
+                    <img src="https://images.unsplash.com/photo-1594576722512-582bcd46fba3" alt="Luxury Chronograph">
+                </div>
+            </div>
+            <div class="col-md-4 col-6">
+                <div class="gallery-item">
+                    <img src="https://images.unsplash.com/photo-1612817288484-6f916006741a" alt="Classic Diver">
+                </div>
+            </div>
+            <div class="col-md-4 col-6">
+                <div class="gallery-item">
+                    <img src="https://images.unsplash.com/photo-1522312346375-d1a52e2b99b3" alt="Minimalist Watch">
+                </div>
+            </div>
+            <div class="col-md-4 col-6">
+                <div class="gallery-item">
+                    <img src="https://tse1.mm.bing.net/th?id=OIP.YhEUnnUK46ymQHtzJFfWbgHaHa&pid=Api&P=0&h=180" alt="Sport Chrono">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    
 
     <!-- Explore More -->
     <section class="container my-5" data-aos="fade-up">
@@ -537,7 +543,7 @@
                                         <i class="far fa-star text-muted" aria-hidden="true"></i>
                                     <% } %>
                                 </div>
-                                <p class="product-price fw-bold">$<%= product.salePrice?.toFixed(2) || '0.00' %></p>
+                                <p class="product-price fw-bold">₹<%= product.salePrice?.toFixed(2) || '0.00' %></p>
                             </div>
                         </a>
                         <span class="quick-view-text" data-bs-toggle="modal" data-bs-target="#quickViewModal" data-product-id="<%= product._id %>">
@@ -587,6 +593,8 @@
             </div>
         </div>
     </div>
+
+  
 
     <%- include('.././Partials/user/footer') %>
 
@@ -875,4 +883,4 @@
     });
 </script>
 </body>
-</html>
+</html> 

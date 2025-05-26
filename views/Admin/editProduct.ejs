@@ -38,11 +38,14 @@
 </head>
 <body class="d-flex">
   <aside class="sidebar">
-    <%- include('.././Partials/admin/adminsidebar', { activePage: 'product' }) %>
+      <%- include('.././partials/admin/adminsidebar', { activePage: 'products', admin: admin || {} }) %>
+
   </aside>
   <div class="flex-grow-1 main-content">
-    <%- include('.././Partials/admin/navbar') %>
-    <section class="content-main">
+ <!-- Include the sidebar -->
+  
+  <!-- Include the navbar -->
+  <%- include('.././partials/admin/navbar', { admin: admin || {} }) %>    <section class="content-main">
       <div class="content-header">
         <h2 class="content-title">Edit Watch</h2>
       </div>

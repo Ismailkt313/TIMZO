@@ -172,7 +172,6 @@ await Wishlist.updateOne(
 );
 
 
-    // ✅ ADD TO CART
     const existingCart = await Cart.findOne({ userId: userId });
     
     if (existingCart) {
@@ -208,7 +207,6 @@ await Wishlist.updateOne(
       await newCart.save();
     }
 
-    // ✅ RESPOND TO CLIENT
     const cart = await Cart.findOne({ userId: userId });
     const cartCount = cart.items.reduce((acc, item) => acc + item.quantity, 0);
 

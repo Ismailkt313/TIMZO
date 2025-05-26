@@ -1,3 +1,50 @@
-<footer class="bg-gray-100 mt-10 p-4 text-center text-gray-600 text-sm shadow-inner">
-  &copy; <%= new Date().getFullYear() %> Timzo Admin Panel. All rights reserved.
+<footer class="bg-white dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 py-4 px-4 md:px-6 mt-auto transition-all duration-300 lg:ml-72" id="footer">
+  <div class="container mx-auto flex flex-col md:flex-row justify-between items-center">
+    <div class="text-slate-600 dark:text-slate-400 text-sm mb-4 md:mb-0 text-center md:text-left">
+      &copy; <%= new Date().getFullYear() %> Timzo Admin Panel. All rights reserved.
+    </div>
+    
+    <div class="flex flex-wrap items-center justify-center md:justify-end gap-2 md:gap-4">
+      <a href="#" class="text-slate-600 dark:text-slate-400 hover:text-amber-500 dark:hover:text-amber-400 text-sm">
+        Privacy Policy
+      </a>
+      <span class="text-slate-300 dark:text-slate-600 hidden md:inline">|</span>
+      <a href="#" class="text-slate-600 dark:text-slate-400 hover:text-amber-500 dark:hover:text-amber-400 text-sm">
+        Terms of Service
+      </a>
+      <span class="text-slate-300 dark:text-slate-600 hidden md:inline">|</span>
+      <a href="#" class="text-slate-600 dark:text-slate-400 hover:text-amber-500 dark:hover:text-amber-400 text-sm">
+        Help Center
+      </a>
+    </div>
+  </div>
 </footer>
+
+<script>
+  // Adjust footer based on sidebar state
+  function adjustFooter() {
+    const footer = document.getElementById('footer');
+    const sidebar = document.getElementById('sidebar');
+    
+    // Only adjust on large screens
+    if (window.innerWidth >= 1024) { // lg breakpoint
+      if (sidebar.classList.contains('-translate-x-full')) {
+        footer.classList.remove('lg:ml-72');
+      } else {
+        footer.classList.add('lg:ml-72');
+      }
+    } else {
+      footer.classList.remove('lg:ml-72');
+    }
+  }
+  
+  // Initialize on page load
+  document.addEventListener('DOMContentLoaded', adjustFooter);
+  
+  // Update on window resize
+  window.addEventListener('resize', adjustFooter);
+  
+  // Listen for sidebar toggle events
+  document.getElementById('sidebarToggle')?.addEventListener('click', adjustFooter);
+  document.getElementById('mobileMenuBtn')?.addEventListener('click', adjustFooter);
+</script>

@@ -21,8 +21,9 @@ const loadProducts = async (req, res) => {
     try {
         const categories = await Category.find({ isListed: true });
         const brands = await Brand.find({ isListed: true });
-
+        const admin = req.session.admin
         res.render('Admin/addProduct', {
+            admin,
             cat: categories,
             brand: brands,
             error: null,
@@ -67,9 +68,12 @@ const addProducts = async (req, res) => {
                 return null;
             }
         });
-
-        const existingProduct = await Product.findOne({ name: productName });
-        if (existingProduct) {
+           
+           const existingProduct = await Product.find({
+             name: { $regex: `^${productName}$`, $options: 'i' },
+             isDeleted: false
+           });
+        if (existingProduct.length > 0) {
             console.log('Product already exists:', productName);
             const categories = await Category.find({ isListed: true });
             const brands = await Brand.find({ isListed: true });
@@ -101,7 +105,7 @@ const addProducts = async (req, res) => {
         const imageUrls = [];
         for (let i = 0; i < req.files.length; i++) {
             const file = req.files[i];
-            imageUrls.push(file.path); // Cloudinary URL
+            imageUrls.push(file.path);
         }
 
         const newProduct = new Product({
@@ -178,8 +182,10 @@ const getProduct = async (req, res) => {
         if (!categories || !brands) {
             return res.status(500).render('Admin/error404', { error: 'Failed to load categories or brands' });
         }
+        const admin = req.session.admin
 
         res.status(200).render('Admin/products', {
+            admin,
             data: productData,
             currentPage: page,
             totalPages: Math.ceil(count / limit),
@@ -343,12 +349,13 @@ const loadEditProduct = async (req, res) => {
         const product = await Product.findById(productId).populate('category').populate('brand');
         const categories = await Category.find({ isListed: true });
         const brands = await Brand.find({ isListed: true });
-
+        const admin = req.session.admin
         if (!product || product.isDeleted) {
             return res.redirect('/admin/error404');
         }
 
         res.render('Admin/editProduct', {
+            admin,
             product,
             cat: categories,
             brand: brands,
@@ -381,6 +388,7 @@ const editProduct = async (req, res) => {
             cropData3,
             cropData4
         } = req.body;
+
 
         const cropDataArray = [cropData1, cropData2, cropData3, cropData4].map(data => {
             try {
@@ -424,9 +432,9 @@ const editProduct = async (req, res) => {
         let imageUrls = product.images;
         if (req.files && req.files.length > 0) {
             imageUrls = [];
-            for (let i = 0; i < req.files.length; i++) {
+            for (let i = 0; i < req.files.length; i++) {   
                 const file = req.files[i];
-                imageUrls.push(file.path); // Cloudinary URL
+                imageUrls.push(file.path);
             }
         }
 
@@ -444,7 +452,6 @@ const editProduct = async (req, res) => {
         product.movementType = movementType;
         product.images = imageUrls;
 
-        // Recalculate salePrice if there's a product offer
         if (product.ProductOffer > 0) {
             product.salePrice = Math.floor(product.regularPrice * (1 - (product.ProductOffer / 100)));
         } else {
@@ -478,7 +485,7 @@ module.exports = {
     removeProductOffer,
     blockProduct,
     unblockProduct,
-    softDeleteProduct,
+    softDeleteProduct, 
     undoDeleteProduct,
     permanentlyDeleteProduct,
     loadEditProduct,

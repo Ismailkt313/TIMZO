@@ -12,7 +12,9 @@ const getbrand = async (req,res)=>{
         const totalbrands = await Brand.countDocuments()
         const totalPages = Math.ceil(totalbrands/limit)
         const revercebrand = branddata.reverse()
+        const admin = req.session.admin
         res.render("Admin/brand",{
+            admin,
             data:revercebrand,
             currentPage:page,
             totalPages:totalPages,

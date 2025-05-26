@@ -38,23 +38,19 @@ const createAddress = async (req, res) => {
 
         const { fullName, addressLine1, addressLine2, city, state, postalCode, country, phone, addressType, landmark, isDefault } = req.body;
 
-        // Validate required fields
         if (!fullName || !addressLine1 || !city || !state || !postalCode || !country || !phone) {
             return res.status(400).json({ success: false, message: 'All required fields must be filled' });
         }
 
-        // Validate phone (basic regex for 10-digit numbers)
         if (!/^\d{10}$/.test(phone)) {
             return res.status(400).json({ success: false, message: 'Phone number must be 10 digits' });
         }
 
-        // Validate postal code (basic regex for 6-digit Indian PIN)
         if (!/^\d{6}$/.test(postalCode)) {
             return res.status(400).json({ success: false, message: 'Postal code must be 6 digits' });
         }
 
 
-        // If setting as default, unset other defaults
         if (isDefault === 'true' || isDefault === true) {
             await Address.updateMany({ userId, isDefault: true }, { isDefault: false });
         }
@@ -114,17 +110,14 @@ const editAddress = async (req, res) => {
         const addressId = req.params.addressId;
         const { fullName, addressLine1, addressLine2, city, state, postalCode, country, phone, addressType, landmark, isDefault } = req.body;
 
-        // Validate required fields
         if (!fullName || !addressLine1 || !city || !state || !postalCode || !country || !phone) {
             return res.status(400).json({ success: false, message: 'All required fields must be filled' });
         }
 
-        // Validate phone
         if (!/^\d{10}$/.test(phone)) {
             return res.status(400).json({ success: false, message: 'Phone number must be 10 digits' });
         }
 
-        // Validate postal code
         if (!/^\d{6}$/.test(postalCode)) {
             return res.status(400).json({ success: false, message: 'Postal code must be 6 digits' });
         }
@@ -134,7 +127,6 @@ const editAddress = async (req, res) => {
             return res.status(404).json({ success: false, message: 'Address not found' });
         }
 
-        // Update address fields
         address.fullName = fullName;
         address.addressLine1 = addressLine1;
         address.addressLine2 = addressLine2 || '';
@@ -147,7 +139,6 @@ const editAddress = async (req, res) => {
         address.landmark = landmark || '';
         address.isDefault = isDefault === 'true' || isDefault === true;
 
-        // If setting as default, unset other defaults
         if (address.isDefault) {
             await Address.updateMany({ userId, isDefault: true, _id: { $ne: addressId } }, { isDefault: false });
         }

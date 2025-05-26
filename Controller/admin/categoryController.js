@@ -19,13 +19,31 @@ const loadcategories = async (req, res) => {
         const totalcategories = await Category.countDocuments(query);
         const totalPages = Math.ceil(totalcategories / limit);
 
+        const stock = await Product.aggregate([
+            { $match: { isDeleted: false } },
+            { $group: { _id: '$category', totalstock: { $sum: '$stock' } } }
+        ]);
+
+        const stockMap = {};
+        stock.forEach(item => {
+            stockMap[item._id.toString()] = item.totalstock;
+        });
+
+        const categoriesWithStock = categories.map(category => {
+            return {
+                ...category.toObject(),
+                stock: stockMap[category._id.toString()] || 0
+            };
+        });
+
         res.render('Admin/categories', {
-            categories: categories,
+            categories: categoriesWithStock,
             currentpage: page,
             totalPage: totalPages,
             totalcategories: totalcategories,
-            showDeleted
+            showDeleted,
         });
+
     } catch (error) {
         console.log(error);
         res.redirect('/error404');
@@ -59,7 +77,10 @@ const loadaddcategory = async (req, res) => {
 const addcategory = async (req, res) => {
     const { name, description } = req.body;
     try {
-        const existingcategory = await Category.find({ name, isDeleted: false });
+        const existingcategory = await Category.find({
+            name: { $regex: `^${name}$`, $options: 'i' },
+            isDeleted: false
+        });
         if (existingcategory.length > 0) {
             return res.status(400).json({ error: "Category already exists" });
         }
@@ -78,29 +99,33 @@ const addcategory = async (req, res) => {
 const addcategoryOffer = async (req, res) => {
     try {
         const percentage = parseInt(req.body.percentage);
+        console.log(req.body)
         const categoryId = req.body.categoryId;
 
-        const category = await Category.findById(categoryId);
-        if (!category || category.isDeleted) {
-            return res.status(404).json({ status: false, message: "Category not found or has been deleted" });
-        }
+ const category = await Category.findById(categoryId);
+if (!category || category.isDeleted) {
+    return res.status(404).json({ status: false, message: "Category not found or has been deleted" });
+}
 
-        const products = await Product.find({ category: category._id });
+const products = await Product.find({ category: category._id });
 
-        const hasProductOffer = products.some(product => product.ProductOffer > percentage);
-        if (hasProductOffer) {
-            return res.json({ status: false, message: "Product within the category already has higher product offers" });
-        }
+await Category.updateOne({ _id: categoryId }, { $set: { categoryOffer: percentage } });
 
-        await Category.updateOne({ _id: categoryId }, { $set: { categoryOffer: percentage } });
+let updatedCount = 0;
 
-        for (const product of products) {
-            product.ProductOffer = 0;
-            product.salePrice = Math.floor(product.regularPrice * (1 - (percentage / 100)));
-            await product.save();
-        }
+for (const product of products) {
+    if (product.ProductOffer === 0 || product.ProductOffer < percentage) {
+        product.ProductOffer = percentage;
+        product.salePrice = Math.floor(product.regularPrice * (1 - (percentage / 100)));
+        await product.save();
+        updatedCount++;
+    }
+}
 
-        res.json({ status: true, message: "Category offer applied successfully" });
+res.json({
+    status: true,
+    message: `Category offer applied to ${updatedCount} product(s). Skipped products with higher existing offers.`,
+});
     } catch (error) {
         console.error(error);
         res.status(500).json({ status: false, message: 'Internal server error' });
@@ -112,7 +137,6 @@ const removecategoryoffer = async (req, res) => {
         const { categoryId } = req.body;
         console.log('Received categoryId:', categoryId);
 
-        // Validate categoryId
         if (!categoryId) {
             return res.status(400).json({ status: false, message: "Category ID is required" });
         }
@@ -124,7 +148,6 @@ const removecategoryoffer = async (req, res) => {
             return res.status(404).json({ status: false, message: "Category not found or has been deleted" });
         }
 
-        // Check if there's an offer to remove
         if (!category.categoryOffer || category.categoryOffer === 0) {
             return res.status(400).json({ status: false, message: "No offer to remove for this category" });
         }
@@ -151,7 +174,6 @@ const removecategoryoffer = async (req, res) => {
         );
         console.log('Category update result:', updateResult);
 
-        // Verify the update
         const updatedCategory = await Category.findById(categoryId);
         console.log('Updated category:', updatedCategory);
 
@@ -234,32 +256,32 @@ const undoDeleteCategory = async (req, res) => {
     }
 };
 
-const 
-permanentlyDeleteCategory = async (req, res) => {
-    try {
-        const categoryId = req.query.id;
-        const category = await Category.findById(categoryId);
-        if (!category) {
-            return res.status(404).json({ success: false, message: 'Category not found' });
+const
+    permanentlyDeleteCategory = async (req, res) => {
+        try {
+            const categoryId = req.query.id;
+            const category = await Category.findById(categoryId);
+            if (!category) {
+                return res.status(404).json({ success: false, message: 'Category not found' });
+            }
+
+            if (!category.isDeleted) {
+                return res.status(400).json({ success: false, message: 'Category must be soft-deleted before permanent deletion' });
+            }
+
+            const products = await Product.find({ category: category._id });
+            if (products.length > 0) {
+                return res.status(400).json({ success: false, message: 'Cannot delete category with associated products' });
+            }
+
+            await Category.findByIdAndDelete(categoryId);
+
+            res.status(200).json({ success: true, message: 'Category permanently deleted' });
+        } catch (error) {
+            console.error('Error permanently deleting category:', error);
+            res.status(500).json({ success: false, message: 'Failed to permanently delete category' });
         }
-
-        if (!category.isDeleted) {
-            return res.status(400).json({ success: false, message: 'Category must be soft-deleted before permanent deletion' });
-        }
-
-        const products = await Product.find({ category: category._id });
-        if (products.length > 0) {
-            return res.status(400).json({ success: false, message: 'Cannot delete category with associated products' });
-        }
-
-        await Category.findByIdAndDelete(categoryId);
-
-        res.status(200).json({ success: true, message: 'Category permanently deleted' });
-    } catch (error) {
-        console.error('Error permanently deleting category:', error);
-        res.status(500).json({ success: false, message: 'Failed to permanently delete category' });
-    }
-};
+    };
 
 const loadeditcategory = async (req, res) => {
     try {
@@ -270,9 +292,9 @@ const loadeditcategory = async (req, res) => {
             return res.redirect('/error404');
         }
 
-        res.render("Admin/editcategory", { 
+        res.render("Admin/editcategory", {
             category,
-            error: null // Pass error as null initially
+            error: null
         });
     } catch (error) {
         console.error(error);
@@ -287,20 +309,20 @@ const editcategory = async (req, res) => {
 
         const category = await Category.findById(id);
         if (!category || category.isDeleted) {
-            return res.status(404).render('Admin/editcategory', { 
+            return res.status(404).render('Admin/editcategory', {
                 category,
                 error: "Category not found or has been deleted"
             });
         }
 
-        const existingcategory = await Category.findOne({ 
-            name: categoryName, 
-            isDeleted: false, 
-            _id: { $ne: id } 
+        const existingcategory = await Category.findOne({
+            name: categoryName,
+            isDeleted: false,
+            _id: { $ne: id }
         });
 
         if (existingcategory) {
-            return res.status(400).render('Admin/editcategory', { 
+            return res.status(400).render('Admin/editcategory', {
                 category,
                 error: "Category name already exists, please choose another one"
             });
@@ -318,14 +340,14 @@ const editcategory = async (req, res) => {
         if (updatedCategory) {
             res.redirect('/admin/categories');
         } else {
-            res.status(404).render('Admin/editcategory', { 
+            res.status(404).render('Admin/editcategory', {
                 category,
                 error: "Category not found"
             });
         }
     } catch (error) {
         console.error('Error updating category:', error);
-        res.status(500).render('Admin/editcategory', { 
+        res.status(500).render('Admin/editcategory', {
             category: { _id: req.params.id, name: req.body.categoryName, description: req.body.description },
             error: "Internal server error"
         });

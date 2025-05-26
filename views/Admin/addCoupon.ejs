@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+  <style>
+    .dashboard-container {
+      display: flex;
+      min-height: 100vh;
+    }
+    .sidebar {
+      width: 250px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100%;
+      background-color: #1f2937;
+      color: white;
+      padding-top: 20px;
+      transition: transform 0.3s ease;
+    }
+    .sidebar.collapsed {
+      transform: translateX(-250px);
+    }
+    .navbar {
+      background-color: #ffffff;
+      border-bottom: 1px solid #e5e7eb;
+      padding: 1rem;
+      margin-left: 250px;
+      width: calc(100% - 250px);
+      position: fixed;
+      top: 0;
+      z-index: 10;
+      transition: margin-left 0.3s ease, width 0.3s ease;
+    }
+    .main-content-wrapper {
+      margin-left: 40px;
+      width: 1700px;
+    }
+    .main-content {
+      margin-left: 250px;
+      margin-top: 64px;
+      padding: 24px;
+      width: calc(100% - 250px);
+      background-color: #f3f4f6;
+      min-height: calc(100vh - 64px);
+      transition: margin-left 0.3s ease, width 0.3s ease;
+    }
+    .error {
+      color: #dc2626;
+      font-size: 0.875rem;
+      margin-top: 0.25rem;
+    }
+    @media (max-width: 768px) {
+      .sidebar { width: 200px; }
+      .navbar, .main-content {
+        margin-left: 200px;
+        width: calc(100% - 200px);
+      }
+      .sidebar.collapsed ~ .navbar,
+      .sidebar.collapsed ~ .main-content {
+        margin-left: 0;
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body class="font-sans">
+  <div class="dashboard-container">
+    <!-- Sidebar Partial -->
+    <%- include('.././partials/admin/adminsidebar', { activePage: 'coupons', admin: admin || {} }) %>
+
+    <!-- Main Content Area -->
+    <div class="main-content-wrapper">
+      <!-- Navbar Partial -->
+      <%- include('.././partials/admin/navbar', { admin: admin || {} }) %>
+
+      <!-- Main Content -->
+      <div class="main-content">
+        <% if (error && error.length) { %>
+          <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4">
+            <%= error %>
+          </div>
+        <% } %>
+        <h1 class="text-3xl font-bold text-gray-800 mb-6"><%= title %></h1>
+        <div class="bg-white shadow-md rounded-lg p-6">
+          <form action="<%= isEdit ? '/admin/coupons/edit/' + coupon._id : '/admin/coupons/add' %>" method="POST">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <!-- Coupon Code -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700">Coupon Code</label>
+                <input type="text" name="code" value="<%= coupon.code %>" class="mt-1 block w-full p-2 border rounded-md shadow-sm <% if (errors.code) { %> border-red-500 <% } %>" placeholder="Enter coupon code">
+                <% if (errors.code) { %>
+                  <p class="error"><%= errors.code %></p>
+                <% } %>
+              </div>
+              <!-- Description -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700">Description</label>
+                <input type="text" name="description" value="<%= coupon.description || '' %>" class="mt-1 block w-full p-2 border rounded-md shadow-sm <% if (errors.description) { %> border-red-500 <% } %>" placeholder="Enter description">
+                <% if (errors.description) { %>
+                  <p class="error"><%= errors.description %></p>
+                <% } %>
+              </div>
+              <!-- Discount Type -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700">Discount Type</label>
+                <select name="discountType" class="mt-1 block w-full p-2 border rounded-md shadow-sm <% if (errors.discountType) { %> border-red-500 <% } %>">
+                  <option value="percentage" <%= coupon.discountType === 'percentage' ? 'selected' : '' %>>Percentage</option>
+                  <option value="fixed" <%= coupon.discountType === 'fixed' ? 'selected' : '' %>>Fixed Amount</option>
+                </select>
+                <% if (errors.discountType) { %>
+                  <p class="error"><%= errors.discountType %></p>
+                <% } %>
+              </div>
+              <!-- Discount Amount -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700">Discount Amount</label>
+                <input type="number" name="discountAmount" value="<%= coupon.discountAmount || '' %>" step="0.01" class="mt-1 block w-full p-2 border rounded-md shadow-sm <% if (errors.discountAmount) { %> border-red-500 <% } %>" placeholder="Enter discount amount">
+                <% if (errors.discountAmount) { %>
+                  <p class="error"><%= errors.discountAmount %></p>
+                <% } %>
+              </div>
+              <!-- Max Discount (for percentage) -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700">Max Discount (for percentage)</label>
+                <input type="number" name="maxDiscount" value="<%= coupon.maxDiscount || '' %>" step="0.01" class="mt-1 block w-full p-2 border rounded-md shadow-sm <% if (errors.maxDiscount) { %> border-red-500 <% } %>" placeholder="Enter max discount">
+                <% if (errors.maxDiscount) { %>
+                  <p class="error"><%= errors.maxDiscount %></p>
+                <% } %>
+              </div>
+              <!-- Minimum Purchase -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700">Minimum Purchase</label>
+                <input type="number" name="minPurchase" value="<%= coupon.minPurchase || 0 %>" step="0.01" class="mt-1 block w-full p-2 border rounded-md shadow-sm <% if (errors.minPurchase) { %> border-red-500 <% } %>" placeholder="Enter minimum purchase">
+                <% if (errors.minPurchase) { %>
+                  <p class="error"><%= errors.minPurchase %></p>
+                <% } %>
+              </div>
+              <!-- Usage Limit -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700">Usage Limit (optional)</label>
+                <input type="number" name="usageLimit" value="<%= coupon.usageLimit || '' %>" class="mt-1 block w-full p-2 border rounded-md shadow-sm <% if (errors.usageLimit) { %> border-red-500 <% } %>" placeholder="Enter usage limit">
+                <% if (errors.usageLimit) { %>
+                  <p class="error"><%= errors.usageLimit %></p>
+                <% } %>
+              </div>
+              <!-- Per User Limit -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700">Per User Limit</label>
+                <input type="number" name="perUserLimit" value="<%= coupon.perUserLimit || 1 %>" class="mt-1 block w-full p-2 border rounded-md shadow-sm <% if (errors.perUserLimit) { %> border-red-500 <% } %>" placeholder="Enter per user limit">
+                <% if (errors.perUserLimit) { %>
+                  <p class="error"><%= errors.perUserLimit %></p>
+                <% } %>
+              </div>
+              <!-- Valid From -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700">Valid From</label>
+                <input type="date" name="validFrom" value="<%= coupon.validFrom ? new Date(coupon.validFrom).toISOString().split('T')[0] : '' %>"class="mt-1 block w-full p-2 border rounded-md shadow-sm <% if (errors.validFrom) { %> border-red-500 <% } %>">
+                <% if (errors.validFrom) { %>
+                  <p class="error"><%= errors.validFrom %></p>
+                <% } %>
+              </div>
+              <!-- Valid Until -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700">Valid Until</label>
+                <input type="date" name="validUntil" value="<%= coupon.validUntil ? new Date(coupon.validUntil).toISOString().split('T')[0] : '' %>" class="mt-1 block w-full p-2 border rounded-md shadow-sm <% if (errors.validUntil) { %> border-red-500 <% } %>">
+                <% if (errors.validUntil) { %>
+                  <p class="error"><%= errors.validUntil %></p>
+                <% } %>
+              </div>
+              <!-- Is Active -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700">Active</label>
+                <input type="checkbox" name="isActive" <%= coupon.isActive ? 'checked' : '' %> class="mt-1 h-4 w-4">
+              </div>
+              <!-- Is Referral -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700">Referral Coupon</label>
+                <input type="checkbox" name="isReferral" <%= coupon.isReferral ? 'checked' : '' %> class="mt-1 h-4 w-4">
+              </div>
+            </div>
+            <div class="mt-6 flex justify-end space-x-4">
+              <a href="/admin/coupons" class="bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400">Cancel</a>
+              <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                <%= isEdit ? 'Update Coupon' : 'Add Coupon' %>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function showToast(message, type = 'success') {
+      Toastify({
+        text: message,
+        duration: 3000,
+        gravity: 'top',
+        position: 'right',
+        backgroundColor: type === 'success' ? '#10b981' : '#ef4444',
+      }).showToast();
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const form = document.querySelector('form');
+      form.addEventListener('submit', async (e) => {
+        // Optional: Client-side validation can be added here
+      });
+    });
+  </script>
+</body>
+</html>

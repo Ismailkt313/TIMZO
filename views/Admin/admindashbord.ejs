@@ -11,11 +11,13 @@
   <body class="bg-gray-100 min-h-screen flex flex-col">
 
  
-    <%- include('.././Partials/admin/navbar') %>
-
+ <!-- Include the sidebar -->
+  <%- include('.././partials/admin/adminsidebar', { activePage: 'dashboard', admin: admin || {} }) %>
+  
+  <!-- Include the navbar -->
+  <%- include('.././partials/admin/navbar', { admin: admin || {} }) %>
     <div class="flex flex-1">
 
-      <%- include('.././Partials/admin/adminsidebar', { activePage: 'dashboard' }) %> 
 
 
       <main class="flex-1 ml-64 p-6"> 

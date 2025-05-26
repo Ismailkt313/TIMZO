@@ -69,12 +69,14 @@
 </head>
 
 <body>
-  <%- include('.././Partials/admin/navbar') %>
-
+ <!-- Include the sidebar -->
+  <%- include('.././partials/admin/adminsidebar', { activePage: 'brand', admin: admin || {} }) %>
+  
+  <!-- Include the navbar -->
+  <%- include('.././partials/admin/navbar', { admin: admin || {} }) %>
   <div class="container-fluid">
     <div class="row">
       <div class="col-md-2 sidebar">
-        <%- include('.././Partials/admin/adminsidebar', { activePage: 'brand' }) %>
       </div>
 
       <div class="col-md-10 col-12 content-area">

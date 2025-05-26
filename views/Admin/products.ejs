@@ -21,11 +21,13 @@
 </head>
 
 <body class="bg-gray-100">
-  <%- include('.././Partials/admin/navbar') %>
-
+ <!-- Include the sidebar -->
+  
+  <!-- Include the navbar -->
+  <%- include('.././partials/admin/navbar', { admin: admin || {} }) %>
     <div class="flex min-h-screen">
-      <div class="w-64 bg-dark text-white">
-        <%- include('.././Partials/admin/adminsidebar', { activePage: 'product' }) %>
+      <div class="w-64 bg-dark text-white"> 
+         <%- include('.././partials/admin/adminsidebar', { activePage: 'product', admin: admin || {} }) %>
       </div>
       <style>
         body {

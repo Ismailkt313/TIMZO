@@ -9,10 +9,12 @@ const loadAdminOrder = async (req, res) => {
         const page = parseInt(req.query.page) || 1;
         const limit = 8;
         const skip = (page - 1) * limit;
+        const admin = req.session.admin
 
         const totalOrders = await Order.countDocuments();
         const orders = await Order.find().populate("user").sort({ orderDate: -1 }).skip(skip).limit(limit);
         res.render("Admin/OrderManagement", {
+            admin,
             orders,
             currentPage: page,
             totalPages: Math.ceil(totalOrders / limit),
@@ -149,8 +151,10 @@ const loadRequstManagement = async (req, res) => {
                 }));
         });
 
+        const admin = req.session.admin
+
         console.log('Loaded requests:', requests.length);
-        res.render('Admin/adminRequests', { requests, activePage: 'requests' });
+        res.render('Admin/adminRequests', { admin,requests, activePage: 'requests' });
     } catch (error) {
         console.error("Error loading request management:", error);
         res.status(500).render("error404", { message: 'Internal Server Error' });
@@ -180,7 +184,7 @@ const loadOrders = async (req, res) => {
     }
 };
 
-const adminHandleRequest = async (req, res) => {
+const  adminHandleRequest = async (req, res) => {
     try {
         const { orderId, productId, action, approve } = req.body;
         console.log('adminHandleRequest called:', { orderId, productId, action, approve });
@@ -228,6 +232,11 @@ const adminHandleRequest = async (req, res) => {
             wallet = new Wallet({ userId: order.user, balance: 0, transactions: [] });
         }
 
+        const baseAmount = item.quantity * item.price;
+        const taxAmount = baseAmount * 0.10; 
+        const totalRefund = baseAmount + taxAmount;
+
+
         if (approve) {
             if (isCancel) {
                 item.status = 'Cancelled';
@@ -240,10 +249,10 @@ const adminHandleRequest = async (req, res) => {
                 }, { new: true });
                 console.log('Restocked item:', item.productId, 'Quantity:', item.quantity);
                 if (order.paymentMethod === 'Wallet' || order.paymentMethod === 'Online') {
-                    wallet.balance += item.quantity * item.price;
+                    wallet.balance += totalRefund;
                     wallet.transactions.push({
                         type: 'credit',
-                        amount: item.quantity * item.price,
+                        amount: totalRefund,
                         description: `Refund for cancelled item: ${item.productName} (${item.quantity} pcs)`,
                         date: new Date()
                     });
@@ -257,11 +266,11 @@ const adminHandleRequest = async (req, res) => {
                     $inc: { stock: item.quantity }
                 }, { new: true });
                 console.log('Restocked item:', item.productId, 'Quantity:', item.quantity);
-                if (order.paymentMethod === 'Wallet' || order.paymentMethod === 'Online') {
-                    wallet.balance += item.quantity * item.price;
+                if (order.paymentMethod === 'Wallet' || order.paymentMethod === 'Online' || order.paymentMethod === 'COD') {
+                    wallet.balance += totalRefund ;
                     wallet.transactions.push({
                         type: 'credit',
-                        amount: item.quantity * item.price,
+                        amount: totalRefund,
                         description: `Refund for returned item: ${item.productName} (${item.quantity} pcs)`,
                         date: new Date()
                     });
@@ -277,17 +286,23 @@ const adminHandleRequest = async (req, res) => {
             console.log('Request rejected, item status reset:', { productId, newStatus: item.status });
         }
 
-        // Recalculate subtotal and totalAmount
-        order.subtotal = order.items.reduce((sum, i) => {
-            if (i.status !== 'Returned' && i.status !== 'Cancelled') {
-                return sum + (i.quantity * i.price);
-            }
-            return sum;
-        }, 0);
-        order.totalAmount = order.subtotal + order.shippingFee + order.tax - (order.discount || 0);
-        console.log('Recalculated order totals:', { subtotal: order.subtotal, totalAmount: order.totalAmount });
+order.subtotal = order.items.reduce((sum, i) => {
+    if (i.status !== 'Returned' && i.status !== 'Cancelled') {
+        return sum + (i.quantity * i.price);
+    }
+    return sum;
+}, 0);
 
-        // Update order status if all items are processed
+order.tax = Math.round(order.subtotal * 0.10); 
+
+order.totalAmount = order.subtotal + order.shippingFee + order.tax - (order.discount || 0);
+
+console.log('Recalculated order totals:', {
+    subtotal: order.subtotal,
+    tax: order.tax,
+    totalAmount: order.totalAmount
+});
+
         const allItemsProcessed = order.items.every(i => i.status === 'Returned' || i.status === 'Cancelled');
         if (allItemsProcessed) {
             order.orderStatus = 'Cancelled';

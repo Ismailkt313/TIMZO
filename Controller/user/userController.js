@@ -169,10 +169,6 @@ const signup = async (req, res) => {
             return res.render('/signUp', { error: "Passwords do not match" });
         }
 
-        // if(typeof(mobile)!==Number){
-        //     return res.render('user/signUp', { error: "enter a valid number" })
-        // }
-
         if (!fullname || !email || !mobile || !password || !conformPassword) {
             return res.render('user/signUp', { error: "All fields are required" });
         }

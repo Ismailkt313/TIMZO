@@ -23,15 +23,12 @@ const loadWallet = async (req, res) => {
             await wallet.save();
         }
 
-        // Pagination parameters
         const page = parseInt(req.query.page) || 1;
         const limit = 10;
         const startIndex = (page - 1) * limit;
 
-        // Log transactions before sorting
         console.log('Transactions before sorting:', wallet.transactions);
 
-        // Sort transactions by date (newest first)
         wallet.transactions.sort((a, b) => {
             const dateA = new Date(a.date);
             const dateB = new Date(b.date);
@@ -42,15 +39,12 @@ const loadWallet = async (req, res) => {
             return dateB - dateA;
         });
 
-        // Log transactions after sorting
         console.log('Transactions after sorting:', wallet.transactions);
 
-        // Paginate transactions
         const totalTransactions = wallet.transactions.length;
         const paginatedTransactions = wallet.transactions.slice(startIndex, startIndex + limit);
         const totalPages = Math.ceil(totalTransactions / limit);
 
-        // Log pagination info
         console.log('Pagination:', { page, limit, startIndex, totalTransactions, totalPages });
 
         res.render('user/wallet', {

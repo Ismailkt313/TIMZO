@@ -107,17 +107,17 @@ const orderSchema = new mongoose.Schema({
         default: 'Pending'
     },
     orderStatus: {
+    type: String,
+    required: true,
+    enum: ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'], // 👈 add 'Pending'
+    default: 'Pending'
+},
+statusHistory: [{
+    status: {
         type: String,
         required: true,
-        enum: ['Processing', 'Shipped', 'Delivered', 'Cancelled'],
-        default: 'Processing'
+        enum: ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'] // 👈 add 'Pending'
     },
-    statusHistory: [{
-        status: {
-            type: String,
-            required: true,
-            enum: ['Processing', 'Shipped', 'Delivered', 'Cancelled']
-        },
         date: {
             type: Date,
             default: Date.now
