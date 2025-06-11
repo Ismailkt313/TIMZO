@@ -29,6 +29,23 @@ const orderSchema = new mongoose.Schema({
         price: {
             type: Number,
             required: true
+        },   
+         itemTotal: { 
+        type: Number,
+        required: true
+    },
+    discount: {  
+        type: Number,
+        required: true
+    },
+    finalPrice: { 
+        type: Number, 
+        required: true
+    },
+    tax: {  
+            type: Number,
+            required: true,
+            default: 0
         },
         status: {
             type: String,
@@ -73,6 +90,10 @@ const orderSchema = new mongoose.Schema({
         type: Number,
         required: true
     },
+    coupon: {
+        code: { type: String },
+        discount: { type: Number, default: 0 }
+    },
     totalAmount: {
         type: Number,
         required: true
@@ -109,14 +130,14 @@ const orderSchema = new mongoose.Schema({
     orderStatus: {
     type: String,
     required: true,
-    enum: ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'], // 👈 add 'Pending'
+    enum: ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'],
     default: 'Pending'
 },
 statusHistory: [{
     status: {
         type: String,
         required: true,
-        enum: ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'] // 👈 add 'Pending'
+        enum: ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'] 
     },
         date: {
             type: Date,

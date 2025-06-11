@@ -15,7 +15,6 @@ const loadUsers = async (req, res) => {
 
     const now = new Date();
 
-    // Month date boundaries
     const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
     const lastDayOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
     const firstDayOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
@@ -24,7 +23,6 @@ const loadUsers = async (req, res) => {
     const totalUsers = await customer.countDocuments();
     const totalPages = Math.ceil(totalUsers / limit);
 
-    // Count users this month and last month
     const newUsers = await customer.countDocuments({
       createdAt: { $gte: firstDayOfMonth, $lte: lastDayOfMonth },
     });
@@ -37,12 +35,10 @@ const loadUsers = async (req, res) => {
       ? Math.round(((newUsers - lastMonthUsers) / lastMonthUsers) * 100)
       : newUsers > 0 ? 100 : 0;
 
-    // Also calculating newUsersPercent compared to total users
     const newUsersPercent = totalUsers > 0
       ? Math.round((newUsers / totalUsers) * 100)
       : 0;
 
-    // Blocked and active user stats
     const blockedUsers = await customer.countDocuments({ isBlocked: true });
     const activeUsers = await customer.countDocuments({ isBlocked: false });
 

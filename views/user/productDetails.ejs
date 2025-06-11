@@ -14,6 +14,7 @@
       font-family: 'Poppins', sans-serif;
       background-color: #f8f9fa;
       color: #333;
+      overflow-x: hidden;
     }
     .container {
       max-width: 1200px;
@@ -75,44 +76,42 @@
       height: 100%;
       object-fit: cover;
       cursor: crosshair;
+      transition: transform 0.3s ease;
     }
-#zoomLens {
-  position: absolute;
-  width: 120px;
-  height: 120px;
-  border: 2px solid #6f42c1;
-  background: rgba(111, 66, 193, 0.2);
-  border-radius: 8px;
-  pointer-events: none;
-  display: none;
-  z-index: 5;
-}
-
-#zoomResult {
-  position: absolute;
-  top: 0;
-  left: 80%; /* move to the right of image */
-  margin-left: 20px;
-  width: 400px;
-  height: 400px;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
-  background: #fff;
-  display: none;
-  z-index: 10;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  pointer-events: none; /* important */
-}
-
-#zoomImage {
-  position: absolute;
-  width: 1200px; /* 3x zoom */
-  height: 1200px;
-  object-fit: cover;
-  pointer-events: none; /* important */
-}
-
-
+    .main-image:hover {
+      transform: scale(1.1);
+    }
+    #zoomLens {
+      position: absolute;
+      width: 120px;
+      height: 120px;
+      border: 2px solid #6f42c1;
+      background: rgba(111, 66, 193, 0.2);
+      border-radius: 8px;
+      pointer-events: none;
+      display: none;
+      z-index: 5;
+    }
+    #zoomResult {
+      position: absolute;
+      top: 0;
+      left: 105%;
+      width: 1400px;
+      height: 400px;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      background: #fff;
+      display: none;
+      z-index: 10;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+    }
+    #zoomImage {
+      position: absolute;
+      width: 1200px; /* 3x zoom */
+      height: 1200px;
+      object-fit: cover;
+    }
     .product-info h1 {
       font-size: 2rem;
       font-weight: 700;
@@ -183,7 +182,6 @@
       color: #1f2937;
       transform: scale(1.1);
     }
-
     .wishlist-btn.active {
       color: #ef4444;
       background: #ffe4e1;
@@ -213,6 +211,10 @@
       width: 100%;
       height: 180px;
       object-fit: cover;
+      transition: transform 0.3s ease;
+    }
+    .product-card img:hover {
+      transform: scale(1.1);
     }
     .product-card .content {
       padding: 1rem;
@@ -233,8 +235,73 @@
       margin-bottom: 1.5rem;
       text-align: center;
     }
+    .star-rating {
+      display: inline-flex;
+      gap: 5px;
+    }
+    .star-rating i {
+      font-size: 1rem;
+      color: #d1d5db;
+    }
+    .star-rating i.active {
+      color: #f59e0b;
+    }
+    .review-card {
+      background: #f9fafb;
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+    }
+    .review-actions button {
+      background: none;
+      border: none;
+      color: #6f42c1;
+      font-size: 0.9rem;
+      margin-right: 1rem;
+      cursor: pointer;
+    }
+    .review-actions button:hover {
+      color: #5a32a3;
+    }
+    #reviewModal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(5px);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+    #reviewModal.active {
+      display: flex;
+    }
+    #reviewModal .modal-content {
+      background: #ffffff;
+      border-radius: 15px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+      padding: 20px;
+      max-width: 500px;
+      width: 90%;
+      transform: scale(0.95);
+      transition: transform 0.3s ease;
+    }
+    #reviewModal.active .modal-content {
+      transform: scale(1);
+    }
+    #reviewModal textarea {
+      resize: vertical;
+      min-height: 100px;
+      max-height: 200px;
+    }
+    #reviewModal input:focus,
+    #reviewModal textarea:focus {
+      border-color: #28a745;
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.1);
+    }
     @media (max-width: 991px) {
-      .zoom-result {
+      #zoomResult {
         display: none !important;
       }
     }
@@ -256,8 +323,20 @@
         width: 100%;
         height: 300px;
       }
-      .zoom-lens, .zoom-result {
+      #zoomLens, #zoomResult {
         display: none !important;
+      }
+      .product-info h1 {
+        font-size: 1.5rem;
+      }
+      .product-info .price {
+        font-size: 1.25rem;
+      }
+      .review-card {
+        padding: 0.75rem;
+      }
+      #reviewModal .modal-content {
+        width: 95%;
       }
     }
   </style>
@@ -305,11 +384,17 @@
 
       <!-- Product Info -->
       <div class="col-lg-6 product-info">
-        <div class="d-flex align-items-center">
-          <h1><%= product.name %></h1>
+        <div class="d-flex align-items-center mb-2">
+          <h1 class="me-3"><%= product.name %></h1>
           <button class="wishlist-btn <%= wishlist.includes(product._id.toString()) ? 'active' : '' %>" data-product-id="<%= product._id %>" aria-label="Add to Wishlist">
-                                <i class="<%= wishlist.includes(product._id.toString()) ? 'fas fa-heart' : 'far fa-heart' %>"></i>
-                            </button>
+            <i class="<%= wishlist.includes(product._id.toString()) ? 'fas fa-heart' : 'far fa-heart' %>"></i>
+          </button>
+        </div>
+        <div class="star-rating mb-2">
+          <% for (let i = 1; i <= 5; i++) { %>
+            <i class="fas fa-star <%= i <= averageRating ? 'active' : '' %>"></i>
+          <% } %>
+          <span class="ms-2 text-gray-600">(<%= reviews.length %> reviews)</span>
         </div>
         <% if (product.brand && product.brand.name) { %>
           <p class="text-gray-600">Brand: <%= product.brand.name %></p>
@@ -345,17 +430,9 @@
         <button onclick="addToCart('<%= product._id %>')" class="add-to-cart-btn mt-3" <%= product.stock === 0 ? 'disabled' : '' %>>
           <i class="fas fa-shopping-cart mr-2"></i> Add to Cart
         </button>
-
-        <!-- Cart Summary (Optional) -->
-        <% if (cart && cart.items.length > 0) { %>
-          <div class="mt-4">
-            <p class="text-gray-600">Cart Total: <span class="font-weight-bold">$<%= total.toFixed(2) %></span></p>
-            <a href="/user/cart" class="text-purple-600 hover:text-yellow-500">View Cart</a>
-          </div>
-        <% } %>
       </div>
 
-      <!-- Additional Details -->
+      <!-- Additional Details and Reviews -->
       <div class="col-12 mt-4">
         <ul class="nav nav-tabs details-tabs" id="productTabs" role="tablist">
           <li class="nav-item" role="presentation">
@@ -363,6 +440,9 @@
           </li>
           <li class="nav-item" role="presentation">
             <button class="nav-link" id="details-tab" data-bs-toggle="tab" data-bs-target="#details" type="button" role="tab">Details</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="reviews-tab" data-bs-toggle="tab" data-bs-target="#reviews" type="button" role="tab">Reviews (<%= reviews.length %>)</button>
           </li>
         </ul>
         <div class="tab-content mt-3" id="productTabsContent">
@@ -374,20 +454,50 @@
               <li><strong>Material:</strong> <%= product.material || 'Not specified' %></li>
               <li><strong>Dimensions:</strong> <%= product.dimensions || 'Not specified' %></li>
               <li><strong>Warranty:</strong> <%= product.warranty || 'Not specified' %></li>
-              <li><strong>Category:</strong> <%= product.category || 'Not specified' %></li>
+              <li><strong>Category:</strong> <%= product.category?.name || 'Not specified' %></li>
               <li><strong>Water Resistance:</strong> <%= product.waterResistance || 'Not specified' %></li>
               <li><strong>Movement Type:</strong> <%= product.movementType || 'Not specified' %></li>
             </ul>
           </div>
-        </div>
+          <div class="tab-pane fade" id="reviews" role="tabpanel">
+            <% if (user) { %>
+            <% } %>
+            <% if (reviews.length > 0) { %>
+              <% reviews.forEach(review => { %>
+                <div class="review-card">
+                  <div class="d-flex align-items-center mb-2">
+                    <strong><%= review.user.name %></strong>
+                    <br>
+                    <div class="star-rating">
+                      <% for (let i = 1; i <= 5; i++) { %>
+                        <i class="fas fa-star <%= i <= review.rating ? 'active' : '' %>"></i>
+                      <% } %>
+                          </div>
+      <div class="ms-3 flex-grow-1">
+        <span class="text-gray-500 text-sm">
+          <%= new Date(review.createdAt).toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric' }) %>
+        </span>
       </div>
-    </div>
+      
+                  <p class="mb-2"><%= review.comment %></p>
+                  <% if (user && user._id.toString() === review.user._id.toString()) { %>
+                    <div class="review-actions">
+                      <button onclick="openReviewModal('<%= review._id %>', <%= review.rating %>, '<%= review.comment %>')">Edit</button>
+                      <button onclick="deleteReview('<%= review._id %>')">Delete</button>
+                    </div>
+                  <% } %>
+                </div>
+              <% }); %>
+            <% } else { %>
+              <p>No reviews yet. Be the first to review this product!</p>
+            <% } %>
+          </div>
+      </div>
 
-    <!-- You May Also Like -->
     <% if (youMayAlsoLike && youMayAlsoLike.length > 0) { %>
       <div class="mt-5">
         <h2 class="section-title">You May Also Like</h2>
-        <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-3">
           <% youMayAlsoLike.forEach(product => { %>
             <div class="col">
               <div class="product-card">
@@ -397,15 +507,12 @@
                 </a>
                 <div class="content">
                   <h4><a href="/products/<%= product._id %>"><%= product.name %></a></h4>
-                  <p class="text-gray-600"><%= product.brand && product.brand.name ? product.brand.name : 'No Brand' %></p>
+                  <p class="text-gray-600"><%= product.brand?.name || 'No Brand' %></p>
                   <div class="d-flex align-items-center">
-                    <span class="price">$<%= product.salePrice.toFixed(2) %></span>
+                    <span class="price">₹<%= product.salePrice.toFixed(2) %></span>
                     <% if (product.regularPrice && product.regularPrice > product.salePrice) { %>
                       <span class="text-muted text-decoration-line-through mx-2">
-                        $<%= product.regularPrice.toFixed(2) %>
-                      </span>
-                      <span class="discount">
-                        <%= Math.round((1 - product.salePrice / product.regularPrice) * 100) %>% OFF
+                        ₹<%= product.regularPrice.toFixed(2) %>
                       </span>
                     <% } %>
                   </div>
@@ -421,46 +528,75 @@
     <% } %>
 
     <!-- Recently Viewed Products -->
-    <% if (recentlyViewed && recentlyViewed.length > 0) { %>
-      <div class="mt-5">
-        <h2 class="section-title">Recently Viewed</h2>
-        <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
-          <% recentlyViewed.forEach(product => { %>
-            <div class="col">
-              <div class="product-card">
-                <a href="/products/<%= product._id %>">
-                  <img src="<%= product.images && product.images.length > 0 ? product.images[0] : '/images/default-watch.jpg' %>"
-                       alt="<%= product.name %>">
-                </a>
-                <div class="content">
-                  <h4><a href="/products/<%= product._id %>"><%= product.name %></a></h4>
-                  <p class="text-gray-600"><%= product.brand && product.brand.name ? product.brand.name : 'No Brand' %></p>
-                  <div class="d-flex align-items-center">
-                    <span class="price">₹<%= product.salePrice.toFixed(2) %></span>
-                    <% if (product.regularPrice && product.regularPrice > product.salePrice) { %>
-                      <span class="text-muted text-decoration-line-through mx-2">
-                        ₹<%= product.regularPrice.toFixed(2) %>
-                      </span>
-                      <span class="discount">
-                        <%= Math.round((1 - product.salePrice / product.regularPrice) * 100) %>% OFF
-                      </span>
-                    <% } %>
-                  </div>
-                  <button onclick="addToCart('<%= product._id %>')" class="add-to-cart-btn mt-2 w-100">
-                    Add to Cart
-                  </button>
-                </div>
+<% if (recentlyViewed && recentlyViewed.length > 0) { %>
+  <div class="mt-5">
+    <h2 class="section-title">Recently Viewed</h2>
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-3">
+      <% recentlyViewed.forEach(product => { %>
+        <div class="col">
+          <div class="product-card">
+            <a href="/products/<%= product._id %>">
+              <img src="<%= product.images && product.images.length > 0 ? product.images[0] : '/images/default-watch.jpg' %>"
+                   alt="<%= product.name %>">
+            </a>
+            <div class="content">
+              <h4><a href="/products/<%= product._id %>"><%= product.name %></a></h4>
+              <p class="text-gray-600"><%= product.brand?.name || 'No Brand' %></p>
+              <div class="d-flex align-items-center">
+                <span class="price">₹<%= product.salePrice.toFixed(2) %></span>
+                <% if (product.regularPrice && product.regularPrice > product.salePrice) { %>
+                  <span class="text-muted text-decoration-line-through mx-2">
+                    ₹<%= product.regularPrice.toFixed(2) %>
+                  </span>
+                <% } %>
               </div>
+              <button onclick="addToCart('<%= product._id %>')" class="add-to-cart-btn mt-2 w-100">
+                Add to Cart
+              </button>
             </div>
-          <% }); %>
+          </div>
         </div>
-      </div>
-    <% } %>
+      <% }); %>
+    </div>
+  </div>
+<% } %>
+  </div>
+
+  <!-- Review Modal -->
+  <div id="reviewModal">
+    <div class="modal-content">
+      <button class="absolute top-4 right-4 text-gray-600 hover:text-gray-800" onclick="closeReviewModal()">
+        <i class="fas fa-times"></i>
+      </button>
+      <h2 class="text-xl font-semibold text-gray-800 mb-6 text-center" id="reviewModalTitle">Write a Review</h2>
+      <form id="reviewForm">
+        <input type="hidden" id="reviewId">
+        <div class="mb-6">
+          <label class="block text-sm font-medium text-gray-700 text-center mb-2">Rating</label>
+          <div class="star-rating flex justify-center gap-2">
+            <i class="fas fa-star" data-value="1"></i>
+            <i class="fas fa-star" data-value="2"></i>
+            <i class="fas fa-star" data-value="3"></i>
+            <i class="fas fa-star" data-value="4"></i>
+            <i class="fas fa-star" data-value="5"></i>
+          </div>
+          <input type="hidden" id="reviewRating" required>
+        </div>
+        <div class="mb-6">
+          <label for="reviewComment" class="block text-sm font-medium text-gray-700">Review</label>
+          <textarea id="reviewComment" required class="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" rows="5" placeholder="Write your review (5-500 characters)"></textarea>
+        </div>
+        <div class="flex justify-end space-x-3">
+          <button type="button" onclick="closeReviewModal()" class="btn btn-secondary px-4 py-2">Cancel</button>
+          <button type="submit" class="btn btn-primary px-4 py-2">Submit Review</button>
+        </div>
+      </form>
+    </div>
   </div>
 
   <!-- Toast Notification -->
   <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
-    <div id="cartToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+    <div id="toast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
       <div class="toast-header">
         <strong class="me-auto">Notification</strong>
         <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
@@ -469,16 +605,14 @@
     </div>
   </div>
 
-  <%- include('../Partials/user/footer') %>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script>
-    const toastEl = document.getElementById('cartToast');
+    const toastEl = document.getElementById('toast');
     const toast = new bootstrap.Toast(toastEl);
     let quantity = 1;
 
     const initialWishlist = <%- JSON.stringify(wishlist) %>;
-    console.log('Initial wishlist from server:', initialWishlist);
 
     function changeMainImage(element) {
       const mainImage = document.getElementById('mainImage');
@@ -501,69 +635,57 @@
       plusBtn.disabled = quantity === parseInt(input.max);
     }
 
-    function addToCart(productId) {
+    async function addToCart(productId) {
       const isLoggedIn = <%= user ? 'true' : 'false' %>;
       if (!isLoggedIn) {
         Swal.fire({
           icon: 'warning',
           title: 'Please Log In',
           text: 'You need to be logged in to add items to your cart.',
-          showConfirmButton: true,
-          confirmButtonText: 'Log In'
+          confirmButtonText: 'Log In',
         }).then(result => {
           if (result.isConfirmed) window.location.href = '/login';
         });
         return;
       }
 
-      fetch('/user/add-to-cart', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          productId: productId,
-          quantity: parseInt(document.getElementById('quantityInput').value)
-        })
-      })
-      .then(response => response.json())
-      .then(data => {
+      try {
+        const response = await fetch('/user/add-to-cart', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            productId,
+            quantity: parseInt(document.getElementById('quantityInput').value),
+          }),
+        });
+        const data = await response.json();
+        toastEl.querySelector('.toast-body').textContent = data.message || (data.success ? 'Product added to cart' : 'Failed to add item to cart');
+        toast.show();
         if (data.success) {
-          toastEl.querySelector('.toast-body').textContent = data.message || 'Product added to cart';
-          toast.show();
           const cartCountElement = document.querySelector('.cart-count');
           if (cartCountElement) {
             cartCountElement.textContent = data.cartCount || (parseInt(cartCountElement.textContent) + parseInt(document.getElementById('quantityInput').value));
           }
-        } else {
-          toastEl.querySelector('.toast-body').textContent = data.message || 'Failed to add item to cart';
-          toast.show();
         }
-      })
-      .catch(error => {
+      } catch (error) {
         console.error('Error:', error);
         toastEl.querySelector('.toast-body').textContent = 'An error occurred while adding item to cart';
         toast.show();
-      });
+      }
     }
 
     async function syncWishlist() {
       const isLoggedIn = <%= user ? 'true' : 'false' %>;
-      if (!isLoggedIn) {
-        console.log('User not logged in, skipping wishlist sync');
-        return;
-      }
+      if (!isLoggedIn) return;
 
       try {
         const response = await fetch('/user/wishlist', {
           method: 'GET',
-          headers: { 'Content-Type': 'application/json' }
+          headers: { 'Content-Type': 'application/json' },
         });
         const data = await response.json();
-        console.log('Wishlist from server:', data.wishlist);
         if (data.success && data.wishlist) {
           const wishlist = data.wishlist.map(item => item.productId._id.toString());
-          console.log('Applying wishlist to UI:', wishlist);
           document.querySelectorAll('.wishlist-btn').forEach(button => {
             const productId = button.getAttribute('data-product-id');
             const isInWishlist = wishlist.includes(productId);
@@ -571,10 +693,7 @@
             const icon = button.querySelector('i');
             icon.classList.toggle('far', !isInWishlist);
             icon.classList.toggle('fas', isInWishlist);
-            console.log(`Updated button for product ${productId}: ${isInWishlist ? 'in wishlist' : 'not in wishlist'}`);
           });
-        } else {
-          console.log('Failed to sync wishlist:', data.message);
         }
       } catch (error) {
         console.error('Error syncing wishlist:', error);
@@ -582,52 +701,47 @@
     }
 
     document.querySelectorAll('.wishlist-btn').forEach(button => {
-            button.addEventListener('click', async (e) => {
-                e.stopPropagation();
-                const productId = button.getAttribute('data-product-id');
-                const isLoggedIn = <%= user ? 'true' : 'false' %>;
+      button.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        const productId = button.getAttribute('data-product-id');
+const isLoggedIn = "<%= user ? 'true' : 'false' %>" === "true";
 
-                if (!isLoggedIn) {
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'Please Log In',
-                        text: 'You need to be logged in to add items to your wishlist.',
-                        confirmButtonText: 'Log In'
-                    }).then(result => {
-                        if (result.isConfirmed) window.location.href = '/login';
-                    });
-                    return;
-                }
+        if (!isLoggedIn) {
+          Swal.fire({
+            icon: 'warning',
+            title: 'Please Log In',
+            text: 'You need to be logged in to add items to your wishlist.',
+            confirmButtonText: 'Log In',
+          }).then(result => {
+            if (result.isConfirmed) window.location.href = '/login';
+          });
+          return;
+        }
 
-                try {
-                    const isInWishlist = button.classList.contains('active');
-                    const endpoint = isInWishlist ? '/user/remove-from-wishlist' : '/user/wishlist/add';
-                    const response = await fetch(endpoint, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ productId })
-                    });
+        try {
+          const isInWishlist = button.classList.contains('active');
+          const endpoint = isInWishlist ? '/user/remove-from-wishlist' : '/user/wishlist/add';
+          const response = await fetch(endpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ productId }),
+          });
 
-                    const data = await response.json();
-                    if (data.success) {
-                        button.classList.toggle('active');
-                        button.querySelector('i').classList.toggle('far');
-                        button.querySelector('i').classList.toggle('fas');
-                        toastEl.querySelector('.toast-body').textContent = data.message || (isInWishlist ? 'Removed from Wishlist' : 'Added to Wishlist');
-                        toast.show();
-                        console.log(`Product ${productId} ${isInWishlist ? 'removed from' : 'added to'} wishlist`);
-                    } else {
-                        toastEl.querySelector('.toast-body').textContent = data.message || 'Failed to update wishlist';
-                        toast.show();
-                        console.log(`Failed to update wishlist for product ${productId}: ${data.message}`);
-                    }
-                } catch (error) {
-                    console.error('Error updating wishlist:', error);
-                    toastEl.querySelector('.toast-body').textContent = 'An error occurred while updating wishlist';
-                    toast.show();
-                }
-            });
-        });
+          const data = await response.json();
+          toastEl.querySelector('.toast-body').textContent = data.message || (isInWishlist ? 'Removed from Wishlist' : 'Added to Wishlist');
+          toast.show();
+          if (data.success) {
+            button.classList.toggle('active');
+            button.querySelector('i').classList.toggle('far');
+            button.querySelector('i').classList.toggle('fas');
+          }
+        } catch (error) {
+          console.error('Error updating wishlist:', error);
+          toastEl.querySelector('.toast-body').textContent = 'An error occurred while updating wishlist';
+          toast.show();
+        }
+      });
+    });
 
     window.addEventListener('load', syncWishlist);
 
@@ -680,6 +794,157 @@
         initializeZoom();
       }
     });
+
+    function openReviewModal(reviewId = '', rating = 0, comment = '') {
+      const modal = document.getElementById('reviewModal');
+      const form = document.getElementById('reviewForm');
+      const title = document.getElementById('reviewModalTitle');
+      const reviewIdInput = document.getElementById('reviewId');
+      const ratingInput = document.getElementById('reviewRating');
+      const commentInput = document.getElementById('reviewComment');
+      const stars = document.querySelectorAll('.star-rating i');
+
+      reviewIdInput.value = reviewId;
+      title.textContent = reviewId ? 'Edit Review' : 'Write a Review';
+      ratingInput.value = rating;
+      commentInput.value = comment;
+
+      stars.forEach(star => {
+        const value = parseInt(star.getAttribute('data-value'));
+        star.classList.toggle('active', value <= rating);
+      });
+
+      modal.classList.add('active');
+    }
+
+    function closeReviewModal() {
+      const modal = document.getElementById('reviewModal');
+      modal.classList.remove('active');
+      document.getElementById('reviewForm').reset();
+      document.querySelectorAll('.star-rating i').forEach(star => star.classList.remove('active'));
+      document.getElementById('reviewId').value = '';
+    }
+
+    document.querySelectorAll('.star-rating i').forEach(star => {
+      star.addEventListener('click', () => {
+        const rating = parseInt(star.getAttribute('data-value'));
+        document.getElementById('reviewRating').value = rating;
+        const stars = document.querySelectorAll('.star-rating i');
+        stars.forEach(s => {
+          s.classList.toggle('active', parseInt(s.getAttribute('data-value')) <= rating);
+        });
+      });
+    });
+
+    document.getElementById('reviewForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const reviewId = document.getElementById('reviewId').value;
+      const rating = parseInt(document.getElementById('reviewRating').value);
+      const comment = document.getElementById('reviewComment').value.trim();
+
+      if (!rating || rating < 1 || rating > 5) {
+        Swal.fire('Error', 'Please select a rating between 1 and 5 stars', 'error');
+        return;
+      }
+
+      if (comment.length < 5 || comment.length > 500) {
+        Swal.fire('Error', 'Review must be between 5 and 500 characters', 'error');
+        return;
+      }
+
+      try {
+        Swal.fire({
+          title: 'Submitting...',
+          allowOutsideClick: false,
+          didOpen: () => Swal.showLoading(),
+        });
+
+        const endpoint = reviewId ? `/user/reviews/${reviewId}` : '/user/reviews';
+        const method = reviewId ? 'PUT' : 'POST';
+        const body = reviewId
+          ? { rating, comment }
+          : {
+              orderId: "<%= product.orders && product.orders.length > 0 ? product.orders[0]._id : '' %>", 
+              productId: '<%= product._id %>',
+              rating,
+              comment,
+            };
+
+        const response = await fetch(endpoint, {
+          method,
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify(body),
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          Swal.fire({
+            title: reviewId ? 'Review Updated' : 'Review Submitted',
+            text: data.message,
+            icon: 'success',
+            timer: 1500,
+            showConfirmButton: false,
+          });
+          closeReviewModal();
+          setTimeout(() => window.location.reload(), 1500);
+        } else {
+          Swal.fire('Error', data.message || 'Failed to submit review', 'error');
+        }
+      } catch (error) {
+        console.error('Error submitting review:', error);
+        Swal.fire('Error', 'Failed to submit review. Please try again.', 'error');
+      }
+    });
+
+    async function deleteReview(reviewId) {
+      const result = await Swal.fire({
+        title: 'Delete Review',
+        text: 'Are you sure you want to delete this review?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, Delete',
+        cancelButtonText: 'Cancel',
+      });
+
+      if (result.isConfirmed) {
+        try {
+          Swal.fire({
+            title: 'Deleting...',
+            allowOutsideClick: false,
+            didOpen: () => Swal.showLoading(),
+          });
+
+          const response = await fetch(`/user/reviews/${reviewId}`, {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+          });
+
+          const data = await response.json();
+
+          if (data.success) {
+            Swal.fire({
+              title: 'Deleted',
+              text: data.message,
+              icon: 'success',
+              timer: 1500,
+              showConfirmButton: false,
+            });
+            setTimeout(() => window.location.reload(), 1500);
+          } else {
+            Swal.fire('Error', data.message || 'Failed to delete review', 'error');
+          }
+        } catch (error) {
+          console.error('Error deleting review:', error);
+          Swal.fire('Error', 'Failed to delete review. Please try again.', 'error');
+        }
+      }
+    }
   </script>
+
 </body>
+
 </html>

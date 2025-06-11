@@ -8,88 +8,180 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="icon" type="image/x-icon" href="/images/TIMZO.jpg">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <style>
         body {
-            background-color: #f4f4f4;
-            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #f0f4f8, #d9e2ec);
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            overflow-x: hidden;
+        }
+        .loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+        .loader.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #e5e7eb;
+            border-top: 5px solid #28a745;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
         .order-details-section {
-            max-width: 800px;
+            max-width: 900px;
             margin: auto;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+        .order-details-section.visible {
+            opacity: 1;
+            transform: translateY(0);
         }
         .order-details-card {
-            background-color: #ffffff;
-            border-radius: 16px;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-            padding: 20px;
+            background: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+            padding: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+        .order-details-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #28a745, #34c759);
         }
         .order-details-card p {
             margin: 5px 0;
-            color: #666;
+            color: #6c757d;
+            font-size: 0.95rem;
         }
         .order-details-card p strong {
-            color: #333;
-            font-weight: 500;
+            color: #212529;
+            font-weight: 600;
         }
         .badge {
             font-size: 0.75rem;
-            padding: 4px 8px;
-            border-radius: 12px;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+        .collapsible-section {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .collapsible-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+        .collapsible-content.active {
+            max-height: 500px;
         }
         .order-items table {
             width: 100%;
-            border-collapse: collapse;
+            border-collapse: separate;
+            border-spacing: 0;
             margin-top: 15px;
         }
         .order-items th,
         .order-items td {
-            padding: 10px;
+            padding: 12px 15px;
             text-align: left;
-            border-bottom: 1px solid #e5e7eb;
+            border-bottom: 1px solid #e9ecef;
+            font-size: 0.9rem;
         }
         .order-items th {
-            background-color: #f9fafb;
-            color: #1a1a1a;
+            background: #f1f3f5;
+            color: #343a40;
             font-weight: 600;
+            border-bottom: 2px solid #dee2e6;
         }
         .order-items .total-row {
-            border-top: 2px solid #e5e7eb;
-            font-weight: 700;
-            color: #1a1a1a;
+            border-top: 2px solid #dee2e6;
+            font-weight: 600;
+            color: #212529;
+            background: #f8f9fa;
+        }
+        .discount-row {
+            color: #28a745;
+            font-weight: 500;
+            background: #e6f4ea;
         }
         .btn-custom {
-            background-color: #1a1a1a;
+            background: linear-gradient(90deg, #212529, #343a40);
             color: #ffffff;
             padding: 8px 16px;
-            border-radius: 8px;
+            border-radius: 50px;
             font-weight: 500;
-            transition: all 0.3s;
+            transition: all 0.3s ease;
         }
         .btn-custom:hover {
-            background-color: #ffd700;
-            color: #1a1a1a;
+            background: linear-gradient(90deg, #28a745, #34c759);
+            color: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
         .btn-cancel {
-            background-color: #ef4444;
+            background: #ef4444;
             color: #ffffff;
             padding: 8px 16px;
-            border-radius: 8px;
+            border-radius: 50px;
             font-weight: 500;
-            transition: all 0.3s;
+            transition: all 0.3s ease;
         }
         .btn-cancel:hover {
-            background-color: #dc2626;
+            background: #dc2626;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
         .btn-return {
-            background-color: #ffd700;
-            color: #1a1a1a;
+            background: #ffd700;
+            color: #212529;
             padding: 8px 16px;
-            border-radius: 8px;
+            border-radius: 50px;
             font-weight: 500;
-            transition: all 0.3s;
+            transition: all 0.3s ease;
         }
         .btn-return:hover {
-            background-color: #eab308;
+            background: #eab308;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        .btn-retry {
+            background: #f59e0b;
+            color: #ffffff;
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        .btn-retry:hover {
+            background: #d97706;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
         .tracking-timeline {
             position: relative;
@@ -103,13 +195,21 @@
             transform: translateX(-50%);
             width: 4px;
             height: 100%;
-            background-color: #e5e7eb;
+            background: #e5e7eb;
+            transition: background 0.5s ease;
         }
         .tracking-step {
             position: relative;
             width: 50%;
             padding: 20px;
             text-align: center;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+        .tracking-step.visible {
+            opacity: 1;
+            transform: translateY(0);
         }
         .tracking-step:nth-child(odd) {
             left: 0;
@@ -122,10 +222,11 @@
             top: 20px;
             width: 24px;
             height: 24px;
-            background-color: #e5e7eb;
+            background: #e5e7eb;
             border: 4px solid #e5e7eb;
             border-radius: 50%;
             z-index: 1;
+            transition: all 0.3s ease;
         }
         .tracking-step:nth-child(odd) .step-circle {
             right: -12px;
@@ -134,44 +235,100 @@
             left: -12px;
         }
         .tracking-step.active .step-circle {
-            background-color: #1a1a1a;
-            border-color: #ffd700;
+            background: #28a745;
+            border-color: #34c759;
         }
         .tracking-step.completed .step-circle {
-            background-color: #10b981;
+            background: #10b981;
             border-color: #10b981;
         }
         .tracking-step .step-content {
-            background-color: #ffffff;
+            background: #ffffff;
             padding: 15px;
             border-radius: 8px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+        .tracking-step .step-content i {
+            margin-right: 8px;
+            color: #28a745;
         }
         .request-info {
             font-size: 0.9rem;
-            color: #666;
+            color: #6c757d;
         }
-        .search-bar {
-            max-width: 300px;
-            margin: 0 auto 20px;
+        footer {
+            background: #ffffff;
+            padding: 20px;
+            text-align: center;
+            color: #6c757d;
+            font-size: 0.9rem;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+        }
+        /* Review Modal Styles */
+        #reviewModal {
+            display: none;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+        #reviewModal.active {
+            display: flex;
+        }
+        #reviewModal .modal-content {
+            background: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            max-width: 500px;
+            width: 90%;
+            transform: scale(0.95);
+            transition: transform 0.3s ease;
+        }
+        #reviewModal.active .modal-content {
+            transform: scale(1);
+        }
+        .star-rating {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .star-rating i {
+            font-size: 24px;
+            color: #d1d5db;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+        .star-rating i.active {
+            color: #f59e0b;
+        }
+        #reviewModal textarea {
+            resize: vertical;
+            min-height: 100px;
+            max-height: 200px;
+        }
+        #reviewModal input:focus,
+        #reviewModal textarea:focus {
+            border-color: #28a745;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.1);
         }
         @media (max-width: 767px) {
-            .main-content {
-                padding: 15px;
-            }
             .order-details-section {
                 min-width: 100%;
-            }
-            .order-details-section h1 {
-                font-size: 1.25rem;
             }
             .order-details-card {
                 padding: 15px;
             }
+            .order-details-card h1 {
+                font-size: 1.5rem;
+            }
             .order-items th,
             .order-items td {
-                font-size: 0.875rem;
-                padding: 8px;
+                font-size: 0.85rem;
+                padding: 10px;
             }
             .tracking-timeline::before {
                 left: 20px;
@@ -189,18 +346,23 @@
             .request-info {
                 font-size: 0.8rem;
             }
-            .search-bar {
-                max-width: 100%;
+            #reviewModal .modal-content {
+                width: 95%;
             }
         }
     </style>
 </head>
 <body>
+    <!-- Loading Animation -->
+    <div class="loader" id="loader">
+        <div class="spinner"></div>
+    </div>
+
     <div class="container-fluid min-h-screen flex">
         <%- include('../Partials/user/userSidebar', { user: user, currentPage: 'orders' }) %>
         <div class="flex-1 p-6 mt-16">
-            <div class="order-details-section">
-                <h1 class="text-2xl font-bold text-gray-800 mb-6 text-center">Order Details</h1>
+            <div class="order-details-section" id="orderDetailsSection">
+                <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">Order Details</h1>
                 <div class="order-details-card">
                     <div class="flex justify-between items-center mb-4">
                         <p>
@@ -210,7 +372,7 @@
                             </span>
                         </p>
                         <button class="btn-custom text-sm" onclick="downloadInvoice('<%= order._id %>')">
-                            <i class="fas fa-download"></i> Download Invoice
+                            <i class="fas fa-download mr-2"></i> Download Invoice
                         </button>
                     </div>
                     <p><strong>Date:</strong> <%= new Date(order.orderDate).toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' }) %></p>
@@ -218,34 +380,38 @@
                     <p><strong>Payment Method:</strong> <%= order.paymentMethod %></p>
                     <p><strong>Payment Status:</strong> <%= order.paymentStatus %></p>
                     <p><strong>Order Status:</strong> <%= order.orderStatus %></p>
-                    <p><strong>Shipping Address:</strong></p>
-                    <p><%= order.shippingAddress.fullName %></p>
-                    <p><%= order.shippingAddress.addressLine1 %> <%= order.shippingAddress.addressLine2 ? ', ' + order.shippingAddress.addressLine2 : '' %></p>
-                    <p><%= order.shippingAddress.city %>, <%= order.shippingAddress.state %> <%= order.shippingAddress.postalCode %>, <%= order.shippingAddress.country %></p>
-                    <p>Phone: <%= order.shippingAddress.phone %></p>
-                    <% if (order.shippingAddress.landmark) { %>
-                        <p>Landmark: <%= order.shippingAddress.landmark %></p>
-                    <% } %>
+                    <div class="collapsible-section" onclick="toggleCollapsible(this)">
+                        <p><strong>Shipping Address:</strong> <i class="fas fa-chevron-down ml-2"></i></p>
+                        <div class="collapsible-content">
+                            <p><%= order.shippingAddress.fullName %></p>
+                            <p><%= order.shippingAddress.addressLine1 %> <%= order.shippingAddress.addressLine2 ? ', ' + order.shippingAddress.addressLine2 : '' %></p>
+                            <p><%= order.shippingAddress.city %>, <%= order.shippingAddress.state %> <%= order.shippingAddress.postalCode %>, <%= order.shippingAddress.country %></p>
+                            <p>Phone: <%= order.shippingAddress.phone %></p>
+                            <% if (order.shippingAddress.landmark) { %>
+                                <p>Landmark: <%= order.shippingAddress.landmark %></p>
+                            <% } %>
+                        </div>
+                    </div>
 
-                    <div class="tracking-timeline mt-4">
+                    <div class="tracking-timeline mt-6">
                         <div class="tracking-step <%= order.orderStatus === 'Processing' || order.orderStatus === 'Shipped' || order.orderStatus === 'Delivered' ? 'completed' : '' %>">
                             <div class="step-circle"></div>
                             <div class="step-content">
-                                <h4 class="text-base font-semibold text-gray-800">Order Placed</h4>
+                                <h4 class="text-base font-semibold text-gray-800"><i class="fas fa-shopping-cart"></i> Order Placed</h4>
                                 <p class="text-sm text-gray-600">We have received your order on <%= new Date(order.orderDate).toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric' }) %>.</p>
                             </div>
                         </div>
                         <div class="tracking-step <%= order.orderStatus === 'Shipped' || order.orderStatus === 'Delivered' ? 'completed' : order.orderStatus === 'Processing' ? 'active' : '' %>">
                             <div class="step-circle"></div>
                             <div class="step-content">
-                                <h4 class="text-base font-semibold text-gray-800">Order Shipped</h4>
+                                <h4 class="text-base font-semibold text-gray-800"><i class="fas fa-truck"></i> Order Shipped</h4>
                                 <p class="text-sm text-gray-600">Your order has been shipped. It’s on its way!</p>
                             </div>
                         </div>
                         <div class="tracking-step <%= order.orderStatus === 'Delivered' ? 'completed' : order.orderStatus === 'Shipped' ? 'active' : '' %>">
                             <div class="step-circle"></div>
                             <div class="step-content">
-                                <h4 class="text-base font-semibold text-gray-800">Order Delivered</h4>
+                                <h4 class="text-base font-semibold text-gray-800"><i class="fas fa-check-circle"></i> Order Delivered</h4>
                                 <p class="text-sm text-gray-600">Your order has been delivered on <%= order.orderStatus === 'Delivered' && order.updatedAt ? new Date(order.updatedAt).toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric' }) : 'TBD' %>.</p>
                             </div>
                         </div>
@@ -253,14 +419,14 @@
                             <div class="tracking-step completed">
                                 <div class="step-circle"></div>
                                 <div class="step-content">
-                                    <h4 class="text-base font-semibold text-gray-800">Order Cancelled</h4>
+                                    <h4 class="text-base font-semibold text-gray-800"><i class="fas fa-times-circle"></i> Order Cancelled</h4>
                                     <p class="text-sm text-gray-600">Your order was cancelled on <%= new Date(order.updatedAt).toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric' }) %>.</p>
                                 </div>
                             </div>
                         <% } %>
                     </div>
 
-                    <div class="order-items mt-4">
+                    <div class="order-items mt-6">
                         <h3 class="text-lg font-semibold text-gray-700 mb-2">Items</h3>
                         <table>
                             <thead>
@@ -268,6 +434,7 @@
                                     <th>Product</th>
                                     <th>Quantity</th>
                                     <th>Price</th>
+                                    <th>Discount</th>
                                     <th>Total</th>
                                     <th>Status</th>
                                     <th>Actions</th>
@@ -279,7 +446,8 @@
                                         <td><%= item.productName %></td>
                                         <td><%= item.quantity %></td>
                                         <td>₹<%= item.price.toFixed(2) %></td>
-                                        <td>₹<%= (item.quantity * item.price).toFixed(2) %></td>
+                                        <td><%= item.discount > 0 ? `-₹${item.discount.toFixed(2)}` : '—' %></td>
+                                        <td>₹<%= typeof item.finalPrice === 'number' ? item.finalPrice.toFixed(2) : '0.00' %></td>
                                         <td>
                                             <span class="badge <%= item.status === 'Delivered' ? 'bg-green-500' : (item.status === 'Returned' || item.status === 'Cancelled') ? 'bg-red-500' : (item.status === 'CancelRequested' || item.status === 'ReturnRequested') ? 'bg-yellow-500' : 'bg-blue-500' %> text-white">
                                                 <%= item.status %>
@@ -290,6 +458,10 @@
                                                 <button class="btn-cancel text-sm" onclick="promptItemAction('<%= order._id %>', '<%= item.productId._id %>', '<%= item.productName %>', 'cancel')">Request Cancel</button>
                                             <% } else if (order.orderStatus === 'Delivered' && item.status === 'Delivered') { %>
                                                 <button class="btn-return text-sm" onclick="promptItemAction('<%= order._id %>', '<%= item.productId._id %>', '<%= item.productName %>', 'return')">Request Return</button>
+                                                <% const reviewKey = item.productId._id + '_' + order._id; %>
+                                                <% if (!reviewedProductOrderMap[reviewKey]) { %>
+                                                    <button class="btn-custom text-sm mt-2" onclick="openReviewModal('<%= order._id %>', '<%= item.productId._id %>', '<%= item.productName %>')">Write Review</button>
+                                                <% } %>
                                             <% } else if (item.status === 'CancelRequested') { %>
                                                 <div class="request-info">
                                                     <p>Cancel request pending</p>
@@ -318,44 +490,44 @@
                                     </tr>
                                 <% }) %>
                                 <tr>
-                                    <td colspan="5">Subtotal</td>
+                                    <td colspan="6">Subtotal</td>
                                     <td>₹<%= order.subtotal.toFixed(2) %></td>
                                 </tr>
                                 <% if (order.discount > 0) { %>
-                                    <tr>
-                                        <td colspan="5">Discount</td>
+                                    <tr class="discount-row">
+                                        <td colspan="6">Total Discount</td>
                                         <td>-₹<%= order.discount.toFixed(2) %></td>
                                     </tr>
                                 <% } %>
                                 <tr>
-                                    <td colspan="5">Shipping Fee</td>
+                                    <td colspan="6">Shipping Fee</td>
                                     <td>₹<%= order.shippingFee.toFixed(2) %></td>
                                 </tr>
                                 <tr>
-                                    <td colspan="5">Tax</td>
+                                    <td colspan="6">Tax</td>
                                     <td>₹<%= order.tax.toFixed(2) %></td>
                                 </tr>
                                 <tr class="total-row">
-                                    <td colspan="5">Total Amount</td>
+                                    <td colspan="6">Total Amount</td>
                                     <td>₹<%= order.totalAmount.toFixed(2) %></td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
 
-                    <% if (order.orderStatus === 'Processing') { %>
-                        <div class="text-center mt-4">
+                    <div class="text-center mt-6">
+                        <% if (order.orderStatus === 'Processing') { %>
                             <button class="btn-cancel" onclick="cancelOrder('<%= order._id %>')">Cancel Entire Order</button>
-                        </div>
-                    <% } else if (order.orderStatus === 'Delivered') { %>
-                        <div class="text-center mt-4">
+                        <% } else if (order.orderStatus === 'Delivered') { %>
                             <button class="btn-return" onclick="returnOrder('<%= order._id %>')">Request Return Entire Order</button>
-                        </div>
-                    <% } %>
+                        <% } %>
 
-                    <div class="text-center mt-4">
+
+                    </div>
+
+                    <div class="text-center mt-6">
                         <a href="/orders" class="btn-custom">
-                            <i class="fas fa-arrow-left"></i> Back to Orders
+                            <i class="fas fa-arrow-left mr-2"></i> Back to Orders
                         </a>
                     </div>
                 </div>
@@ -363,12 +535,161 @@
         </div>
     </div>
 
-    <footer class="bg-gray-100 p-4 text-center text-gray-600 text-sm shadow-inner mt-6">
+    <!-- Review Modal -->
+    <div id="reviewModal" class="fixed inset-0 flex items-center justify-center z-50">
+        <div class="modal-content">
+            <button class="absolute top-4 right-4 text-gray-600 hover:text-gray-800" onclick="closeReviewModal()">
+                <i class="fas fa-times"></i>
+            </button>
+            <h2 class="text-xl font-semibold text-gray-800 mb-6 text-center">Write a Review for <span id="productNameDisplay"></span></h2>
+            <form id="reviewForm">
+                <input type="hidden" id="reviewOrderId">
+                <input type="hidden" id="reviewProductId">
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 text-center mb-2">Rating</label>
+                    <div class="star-rating">
+                        <i class="fas fa-star" data-value="1"></i>
+                        <i class="fas fa-star" data-value="2"></i>
+                        <i class="fas fa-star" data-value="3"></i>
+                        <i class="fas fa-star" data-value="4"></i>
+                        <i class="fas fa-star" data-value="5"></i>
+                    </div>
+                    <input type="hidden" id="reviewRating" name="rating" required>
+                </div>
+                <div class="mb-6">
+                    <label for="reviewComment" class="block text-sm font-medium text-gray-700">Review</label>
+                    <textarea id="reviewComment" name="comment" required class="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" rows="5" placeholder="Write your review (5-500 characters)"></textarea>
+                </div>
+                <div class="flex justify-end space-x-3">
+                    <button type="button" onclick="closeReviewModal()" class="btn-custom px-4 py-2">Cancel</button>
+                    <button type="submit" class="btn-custom bg-green-500 hover:bg-green-600 px-4 py-2">Submit Review</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <footer class="bg-white p-4 text-center text-gray-600 text-sm">
         © <%= new Date().getFullYear() %> Timzo. All rights reserved.
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.getElementById('loader').classList.add('hidden');
+                document.getElementById('orderDetailsSection').classList.add('visible');
+                animateTrackingSteps();
+            }, 1000);
+        });
+
+        function animateTrackingSteps() {
+            const steps = document.querySelectorAll('.tracking-step');
+            steps.forEach((step, index) => {
+                setTimeout(() => {
+                    step.classList.add('visible');
+                }, index * 300);
+            });
+        }
+
+        function toggleCollapsible(element) {
+            const content = element.querySelector('.collapsible-content');
+            const icon = element.querySelector('i');
+            content.classList.toggle('active');
+            icon.classList.toggle('fa-chevron-down');
+            icon.classList.toggle('fa-chevron-up');
+        }
+
+        function openReviewModal(orderId, productId, productName) {
+            document.getElementById('reviewOrderId').value = orderId;
+            document.getElementById('reviewProductId').value = productId;
+            document.getElementById('productNameDisplay').textContent = productName;
+            document.getElementById('reviewModal').classList.add('active');
+            document.getElementById('reviewForm').reset();
+            resetStarRating();
+        }
+
+        function closeReviewModal() {
+            document.getElementById('reviewModal').classList.remove('active');
+            document.getElementById('reviewForm').reset();
+            document.getElementById('productNameDisplay').textContent = '';
+            resetStarRating();
+        }
+
+        function resetStarRating() {
+            const stars = document.querySelectorAll('.star-rating i');
+            stars.forEach(star => star.classList.remove('active'));
+            document.getElementById('reviewRating').value = '';
+        }
+
+        document.querySelectorAll('.star-rating i').forEach(star => {
+            star.addEventListener('click', () => {
+                const rating = parseInt(star.getAttribute('data-value'));
+                document.getElementById('reviewRating').value = rating;
+                const stars = document.querySelectorAll('.star-rating i');
+                stars.forEach(s => {
+                    if (parseInt(s.getAttribute('data-value')) <= rating) {
+                        s.classList.add('active');
+                    } else {
+                        s.classList.remove('active');
+                    }
+                });
+            });
+        });
+
+        document.getElementById('reviewForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const orderId = document.getElementById('reviewOrderId').value;
+            const productId = document.getElementById('reviewProductId').value;
+            const rating = parseInt(document.getElementById('reviewRating').value);
+            const comment = document.getElementById('reviewComment').value.trim();
+
+            if (!rating || rating < 1 || rating > 5) {
+                Swal.fire('Error', 'Please select a rating between 1 and 5 stars', 'error');
+                return;
+            }
+
+            if (comment.length < 5 || comment.length > 500) {
+                Swal.fire('Error', 'Review must be between 5 and 500 characters', 'error');
+                return;
+            }
+
+            try {
+                Swal.fire({
+                    title: 'Submitting Review...',
+                    allowOutsideClick: false,
+                    didOpen: () => Swal.showLoading(),
+                });
+
+                const response = await fetch('/user/reviews', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ orderId, productId, rating, comment }),
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    Swal.fire({
+                        title: 'Review Submitted',
+                        text: data.message,
+                        icon: 'success',
+                        timer: 1500,
+                        showConfirmButton: false,
+                    });
+                    closeReviewModal();
+                    setTimeout(() => window.location.reload(), 1500);
+                } else {
+                    Swal.fire('Error', data.message || 'Failed to submit review', 'error');
+                }
+            } catch (error) {
+                console.error('Error submitting review:', error);
+                Swal.fire('Error', 'Failed to submit review. Please try again.', 'error');
+            }
+        });
+
+
         async function cancelOrder(orderId) {
             const result = await Swal.fire({
                 title: 'Cancel Entire Order',
@@ -610,43 +931,6 @@
                 Swal.fire('Error', 'Failed to download invoice. Please try again.', 'error');
             }
         }
-
-        async function searchOrder() {
-            const query = document.getElementById('orderSearch').value.trim();
-            if (!query) {
-                Swal.fire('Error', 'Please enter an Order ID to search', 'error');
-                return;
-            }
-
-            try {
-                const response = await fetch(`/user/orders/search?query=${encodeURIComponent(query)}`, {
-                    method: 'GET',
-                    headers: { 'Content-Type': 'application/json' },
-                    credentials: 'include'
-                });
-
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
-
-                const data = await response.json();
-
-                if (data.success && data.order) {
-                    window.location.href = `/user/orders/${data.order._id}`;
-                } else {
-                    Swal.fire('Error', data.message || 'No order found with that ID', 'error');
-                }
-            } catch (error) {
-                console.error('Error searching order:', error);
-                Swal.fire('Error', 'Failed to search order. Please try again.', 'error');
-            }
-        }
-
-        document.getElementById('orderSearch').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                searchOrder();
-            }
-        });
     </script>
 </body>
 </html>

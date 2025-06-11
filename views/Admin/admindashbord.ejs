@@ -1,86 +1,468 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Timzo Admin - Dashboard</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
-  </head>
-  
-  <body class="bg-gray-100 min-h-screen flex flex-col">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | Timzo Watches</title>
+        <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            color: #333;
+            background-color: #f8f9fa;
+        }
+        .sidebar{
+        background-color: #1f2937 !important
+        }
+        
+        .main-content {
+            margin-left: 288px; 
+            padding: 2rem 1.5rem;
+            min-height: 100vh;
+        }
+        
+        @media (max-width: 1023px) {
+            .main-content {
+                margin-left: 0;
+                padding: 1rem;
+            }
+        }
+        
+        .section-title {
+            font-size: 1.75rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        
+        .dashboard-card {
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            border: none;
+            margin-bottom: 2rem;
+            overflow: hidden;
+        }
+        
+        .dashboard-card .card-body {
+            padding: 1.5rem;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 400px;
+            width: 100%;
+        }
+        
+        .filter-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .filter-btn {
+            background-color: #6f42c1;
+            color: #ffffff;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            border: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            font-size: 0.875rem;
+        }
+        
+        .filter-btn:hover,
+        .filter-btn.active {
+            background-color: #5a32a3;
+            color: #ffffff;
+        }
+        
+        .top-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .top-list li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .top-list li:last-child {
+            border-bottom: none;
+        }
+        
+        .top-list .item-name {
+            font-weight: 500;
+            color: #333;
+        }
+        
+        .top-list .item-count {
+            font-weight: 600;
+            color: #6f42c1;
+            background-color: #f8f9ff;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.875rem;
+        }
+        
+        .generate-ledger-btn {
+            background-color: #28a745;
+            color: #ffffff;
+            padding: 0.75rem 2rem;
+            border-radius: 8px;
+            font-weight: 500;
+            border: none;
+            transition: all 0.3s ease;
+        }
+        
+        .generate-ledger-btn:hover {
+            background-color: #218838;
+            color: #ffffff;
+        }
+        
+        .no-data-message {
+            text-align: center;
+            color: #6c757d;
+            font-style: italic;
+            padding: 2rem 0;
+        }
+        
+        @media (max-width: 767px) {
+            .section-title {
+                font-size: 1.5rem;
+            }
+            
+            .dashboard-card .card-body {
+                padding: 1rem;
+            }
+            
+            .filter-buttons {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .filter-btn {
+                margin-bottom: 0.5rem;
+                text-align: center;
+            }
+            
+            .chart-container {
+                height: 300px;
+            }
+            
+            .top-list li {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+            
+            .top-list .item-count {
+                align-self: flex-end;
+            }
+            
+            .generate-ledger-btn {
+                width: 100%;
+                padding: 1rem;
+            }
+        }
+        
+        @media (max-width: 575px) {
+            .main-content {
+                padding: 0.75rem;
+            }
+            
+            .section-title {
+                font-size: 1.25rem;
+                margin-bottom: 1rem;
+            }
+            
+            .dashboard-card {
+                margin-bottom: 1rem;
+            }
+        }
+    </style>
+</head>
 
- 
- <!-- Include the sidebar -->
-  <%- include('.././partials/admin/adminsidebar', { activePage: 'dashboard', admin: admin || {} }) %>
-  
-  <!-- Include the navbar -->
-  <%- include('.././partials/admin/navbar', { admin: admin || {} }) %>
-    <div class="flex flex-1">
+<body>
+    <aside class="sidebar">
+        <%- include('.././partials/admin/adminsidebar', { activePage: 'dashboard', admin: admin || {} }) %>
+    </aside>
 
-
-
-      <main class="flex-1 ml-64 p-6"> 
-        <h1 class="text-2xl font-semibold mb-6">Dashboard</h1>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-6">
-          <div class="bg-white p-4 rounded-xl shadow-md">
-            <h2 class="text-lg font-bold text-gray-700">Total Customers</h2>
-            <p class="text-2xl font-semibold mt-2">1,234</p>
-          </div>
-          <div class="bg-white p-4 rounded-xl shadow-md">
-            <h2 class="text-lg font-bold text-gray-700">Total Orders</h2>
-            <p class="text-2xl font-semibold mt-2">567</p>
-          </div>
-          <div class="bg-white p-4 rounded-xl shadow-md">
-            <h2 class="text-lg font-bold text-gray-700">Total Sales</h2>
-            <p class="text-2xl font-semibold mt-2">$34,890</p>
-          </div>
-          <div class="bg-white p-4 rounded-xl shadow-md">
-            <h2 class="text-lg font-bold text-gray-700">Pending</h2>
-            <p class="text-2xl font-semibold mt-2">12</p>
-          </div>
-        </div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div class="bg-white p-6 rounded-xl shadow-md">
-            <h2 class="text-lg font-bold mb-4">Sales Progress</h2>
-            <div class="text-center">
-              <div class="relative w-32 h-32 mx-auto">
-                <svg class="absolute w-full h-full transform -rotate-90">
-                  <circle cx="50%" cy="50%" r="45" stroke="#f3f4f6" stroke-width="10" fill="none" />
-                  <circle cx="50%" cy="50%" r="45" stroke="#3b82f6" stroke-width="10" fill="none" stroke-dasharray="282.74" stroke-dashoffset="85" />
-                </svg>
-                <div class="absolute inset-0 flex items-center justify-center text-xl font-bold">70%</div>
-              </div>
-              <div class="mt-4 text-sm">
-                <p>Revenue: $28,000</p>
-                <p>Target: $40,000</p>
-                <p>Today: $1,500</p>
-              </div>
-            </div>
-          </div>
-
-          <div class="bg-white p-6 rounded-xl shadow-md">
-            <h2 class="text-lg font-bold mb-4">Monthly Activity</h2>
-            <div class="grid grid-cols-12 gap-2 h-36">
-              <% const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun","jul"]; 
-                 const heights = [20, 40, 60, 80, 50, 70, 100]; 
-              %>
-              <% months.forEach((month, index) => { %>
-                <div class="flex flex-col items-center justify-end">
-                  <div class="bg-blue-400 w-6 rounded-md" style="height: <%= heights[index] %>px"></div>
-                  <span class="text-sm mt-1"><%= month %></span>
+    <div class="main-content">
+        <div class="container-fluid">
+            <div class="row mb-4">
+                <div class="col-12">
+                    <h1 class="h3 mb-0 text-gray-800">Dashboard Overview</h1>
+                    <p class="text-muted">Welcome to your admin dashboard</p>
                 </div>
-              <% }) %>
             </div>
-          </div>
+
+            <div class="row">
+                <div class="col-12">
+                    <div class="card dashboard-card">
+                        <div class="card-body">
+                            <h2 class="section-title">Sales Overview</h2>
+                            <div class="filter-buttons">
+                                <button class="btn filter-btn active" onclick="updateChart('daily')">Daily</button>
+                                <button class="btn filter-btn" onclick="updateChart('weekly')">Weekly</button>
+                                <button class="btn filter-btn" onclick="updateChart('monthly')">Monthly</button>
+                                <button class="btn filter-btn" onclick="updateChart('yearly')">Yearly</button>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="salesChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card dashboard-card h-100">
+                        <div class="card-body">
+                            <h3 class="h5 card-title text-center mb-3">Top 10 Best-Selling Products</h3>
+                            <% if (bestSellingProducts && bestSellingProducts.length > 0) { %>
+                                <ul class="top-list">
+                                    <% bestSellingProducts.forEach(product => { %>
+                                        <li>
+                                            <span class="item-name"><%= product.name %></span>
+                                            <span class="item-count"><%= product.totalSold %> units</span>
+                                        </li>
+                                    <% }); %>
+                                </ul>
+                            <% } else { %>
+                                <div class="no-data-message">
+                                    <i class="fas fa-box-open fa-2x mb-2 d-block"></i>
+                                    No products sold yet.
+                                </div>
+                            <% } %>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card dashboard-card h-100">
+                        <div class="card-body">
+                            <h3 class="h5 card-title text-center mb-3">Top 10 Best-Selling Categories</h3>
+                            <% if (bestSellingCategories && bestSellingCategories.length > 0) { %>
+                                <ul class="top-list">
+                                    <% bestSellingCategories.forEach(category => { %>
+                                        <li>
+                                            <span class="item-name"><%= category.name %></span>
+                                            <span class="item-count"><%= category.totalSold %> units</span>
+                                        </li>
+                                    <% }); %>
+                                </ul>
+                            <% } else { %>
+                                <div class="no-data-message">
+                                    <i class="fas fa-tags fa-2x mb-2 d-block"></i>
+                                    No categories sold yet.
+                                </div>
+                            <% } %>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-12 mb-4">
+                    <div class="card dashboard-card h-100">
+                        <div class="card-body">
+                            <h3 class="h5 card-title text-center mb-3">Top 10 Best-Selling Brands</h3>
+                            <% if (bestSellingBrands && bestSellingBrands.length > 0) { %>
+                                <ul class="top-list">
+                                    <% bestSellingBrands.forEach(brand => { %>
+                                        <li>
+                                            <span class="item-name"><%= brand.name %></span>
+                                            <span class="item-count"><%= brand.totalSold %> units</span>
+                                        </li>
+                                    <% }); %>
+                                </ul>
+                            <% } else { %>
+                                <div class="no-data-message">
+                                    <i class="fas fa-certificate fa-2x mb-2 d-block"></i>
+                                    No brands sold yet.
+                                </div>
+                            <% } %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-12">
+                    <div class="card dashboard-card">
+                        <div class="card-body text-center">
+                            <h2 class="section-title">Ledger Book</h2>
+                            <p class="text-muted mb-3">Generate a comprehensive ledger book report in PDF format</p>
+                            <button class="btn generate-ledger-btn" onclick="generateLedger()">
+                                <i class="fas fa-file-pdf me-2"></i>Generate Ledger Book (PDF)
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-      </main>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let salesChart;
+        const chartData = {
+            daily: {
+                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                values: [1200, 1900, 3000, 5000, 2000, 3000, 4500]
+            },
+            weekly: {
+                labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+                values: [12000, 19000, 30000, 25000]
+            },
+            monthly: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                values: [45000, 52000, 48000, 61000, 55000, 67000]
+            },
+            yearly: {
+                labels: ['2021', '2022', '2023', '2024'],
+                values: [450000, 520000, 680000, 750000]
+            }
+        };
 
-    <%- include('.././Partials/admin/footer') %>
+        function initializeChart(filter = 'daily') {
+            const ctx = document.getElementById('salesChart').getContext('2d');
+            const data = chartData[filter];
 
-  </body>
+            if (salesChart) {
+                salesChart.destroy();
+            }
+
+            salesChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.labels,
+                    datasets: [{
+                        label: `Sales (${filter.charAt(0).toUpperCase() + filter.slice(1)})`,
+                        data: data.values,
+                        borderColor: '#6f42c1',
+                        backgroundColor: 'rgba(111, 66, 193, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        borderWidth: 2,
+                        pointBackgroundColor: '#6f42c1',
+                        pointBorderColor: '#ffffff',
+                        pointBorderWidth: 2,
+                        pointRadius: 4,
+                        pointHoverRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Total Sales (₹)',
+                                font: {
+                                    weight: 'bold'
+                                }
+                            },
+                            grid: {
+                                color: 'rgba(0,0,0,0.1)'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: filter.charAt(0).toUpperCase() + filter.slice(1),
+                                font: {
+                                    weight: 'bold'
+                                }
+                            },
+                            grid: {
+                                color: 'rgba(0,0,0,0.1)'
+                            }
+                        }
+                    },
+                    interaction: {
+                        intersect: false,
+                        mode: 'index'
+                    }
+                }
+            });
+
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.textContent.toLowerCase() === filter) {
+                    btn.classList.add('active');
+                }
+            });
+        }
+
+        function updateChart(filter) {
+            initializeChart(filter);
+        }
+
+        async function generateLedger() {
+            try {
+                const response = await fetch('/admin/generate-ledger', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                const data = await response.json();
+                if (data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Ledger Generated',
+                        text: 'Your ledger book has been generated and will download shortly.',
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                    const link = document.createElement('a');
+                    link.href = data.pdfUrl;
+                    link.download = 'ledger-book.pdf';
+                    link.click();
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: data.message || 'Failed to generate ledger book.',
+                    });
+                }
+            } catch (error) {
+                console.error('Error generating ledger:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'An error occurred while generating the ledger book.',
+                });
+            }
+        }
+
+        window.addEventListener('load', () => {
+            initializeChart('daily');
+        });
+
+        window.addEventListener('resize', () => {
+            if (salesChart) {
+                salesChart.resize();
+            }
+        });
+    </script>
+</body>
 </html>

@@ -14,11 +14,8 @@
 </head>
 <body class="bg-gray-100">
 
-   <!-- Include the sidebar -->
   <%- include('.././partials/admin/adminsidebar', { activePage: 'categories', admin: admin || {} }) %>
   
-  <!-- Include the navbar -->
-  <%- include('.././partials/admin/navbar', { admin: admin || {} }) %>
 
   <div class="flex min-h-screen">
     <div class="w-64 bg-dark text-white">
@@ -149,7 +146,6 @@
   <%- include('.././Partials/admin/footer') %>
   
   <script>
-    // Toggle Show Deleted Categories
     function toggleDeletedView() {
       const showDeleted = document.getElementById('showDeleted').checked;
       const currentUrl = new URL(window.location.href);
@@ -157,7 +153,6 @@
       window.location.href = currentUrl.toString();
     }
 
-    // List/Unlist Category
     document.querySelectorAll('.toggle-category-btn').forEach(button => {
       button.addEventListener('click', async () => {
         const categoryId = button.dataset.id;
@@ -205,7 +200,6 @@
       });
     });
 
-    // Soft Delete Category
     document.querySelectorAll('.soft-delete-btn').forEach(button => {
       button.addEventListener('click', async () => {
         const categoryId = button.dataset.id;
@@ -242,7 +236,6 @@
       });
     });
 
-    // Undo Delete Category
     document.querySelectorAll('.undo-delete-btn').forEach(button => {
       button.addEventListener('click', async () => {
         const categoryId = button.dataset.id;
@@ -279,7 +272,6 @@
       });
     });
 
-    // Permanently Delete Category
     document.querySelectorAll('.permanently-delete-btn').forEach(button => {
       button.addEventListener('click', async () => {
         const categoryId = button.dataset.id;
@@ -317,7 +309,6 @@
       });
     });
 
-    // Add Category Offer
     document.querySelectorAll('.add-offer-btn').forEach(button => {
       button.addEventListener('click', async () => {
         const categoryId = button.dataset.id;
@@ -356,7 +347,6 @@
       });
     });
 
-    // Remove Category Offer
     document.querySelectorAll('.remove-offer-btn').forEach(button => {
       button.addEventListener('click', async () => {
         const categoryId = button.dataset.id;

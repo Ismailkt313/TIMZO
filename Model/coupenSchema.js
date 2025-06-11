@@ -23,16 +23,16 @@ const couponSchema = new mongoose.Schema({
     min: 0
   },
   maxDiscount: {
-    type: Number, // Only applies to percentage discount
+    type: Number, 
     default: null
   },
   minPurchase: {
     type: Number,
-    default: 0 // Minimum order value to apply the coupon
+    default: 0
   },
   usageLimit: {
     type: Number,
-    default: null // Total times the coupon can be used (globally)
+    default: null
   },
   usedCount: {
     type: Number,
@@ -40,7 +40,7 @@ const couponSchema = new mongoose.Schema({
   },
   perUserLimit: {
     type: Number,
-    default: 1 // Times a single user can use it
+    default: 1 
   },
   validFrom: {
     type: Date,

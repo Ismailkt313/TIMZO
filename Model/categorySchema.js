@@ -10,5 +10,5 @@ const categorySchema = new mongoose.Schema({
   isDeleted: { type: Boolean, default: false }, 
   deletedAt: { type: Date } 
 });
-
+ 
 module.exports = mongoose.model('Category', categorySchema);

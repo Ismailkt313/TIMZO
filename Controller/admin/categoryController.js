@@ -1,4 +1,5 @@
 const Category = require('../../Model/categorySchema');
+const mongoose = require('mongoose');
 const Product = require('../../Model/productSchema');
 
 const loadcategories = async (req, res) => {
@@ -75,26 +76,33 @@ const loadaddcategory = async (req, res) => {
 };
 
 const addcategory = async (req, res) => {
-    const { name, description } = req.body;
+    let { name, description } = req.body;
+
     try {
-        const existingcategory = await Category.find({
+        name = name.trim(); // Trim name before using
+
+        const existingCategory = await Category.find({
             name: { $regex: `^${name}$`, $options: 'i' },
             isDeleted: false
         });
-        if (existingcategory.length > 0) {
+
+        if (existingCategory.length > 0) {
             return res.status(400).json({ error: "Category already exists" });
         }
+
         const newCategory = new Category({
             name,
             description,
             isDeleted: false
         });
+
         await newCategory.save();
         return res.json({ message: "Category added successfully" });
     } catch (error) {
-        return res.json({ message: 'Internal Server error' });
+        return res.status(500).json({ message: 'Internal Server Error' });
     }
 };
+
 
 const addcategoryOffer = async (req, res) => {
     try {
@@ -256,8 +264,7 @@ const undoDeleteCategory = async (req, res) => {
     }
 };
 
-const
-    permanentlyDeleteCategory = async (req, res) => {
+const permanentlyDeleteCategory = async (req, res) => {
         try {
             const categoryId = req.query.id;
             const category = await Category.findById(categoryId);
@@ -301,57 +308,60 @@ const loadeditcategory = async (req, res) => {
         res.redirect('/error404');
     }
 };
-
 const editcategory = async (req, res) => {
-    try {
-        const id = req.params.id;
-        const { categoryName, description } = req.body;
+  try {
+    const id = req.params.id;
+    const { categoryName, description } = req.body;
 
-        const category = await Category.findById(id);
-        if (!category || category.isDeleted) {
-            return res.status(404).render('Admin/editcategory', {
-                category,
-                error: "Category not found or has been deleted"
-            });
-        }
-
-        const existingcategory = await Category.findOne({
-            name: categoryName,
-            isDeleted: false,
-            _id: { $ne: id }
-        });
-
-        if (existingcategory) {
-            return res.status(400).render('Admin/editcategory', {
-                category,
-                error: "Category name already exists, please choose another one"
-            });
-        }
-
-        const updatedCategory = await Category.findByIdAndUpdate(
-            id,
-            {
-                name: categoryName,
-                description: description,
-            },
-            { new: true }
-        );
-
-        if (updatedCategory) {
-            res.redirect('/admin/categories');
-        } else {
-            res.status(404).render('Admin/editcategory', {
-                category,
-                error: "Category not found"
-            });
-        }
-    } catch (error) {
-        console.error('Error updating category:', error);
-        res.status(500).render('Admin/editcategory', {
-            category: { _id: req.params.id, name: req.body.categoryName, description: req.body.description },
-            error: "Internal server error"
-        });
+    // Validate ObjectId
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).render('Admin/editcategory', {
+        category: { _id: id, name: categoryName, description },
+        error: "Invalid category ID"
+      });
     }
+
+    // Fetch the category
+    const category = await Category.findById(id);
+    if (!category || category.isDeleted) {
+      return res.status(404).render('Admin/editcategory', {
+        category: { _id: id, name: categoryName, description },
+        error: "Category not found or has been deleted"
+      });
+    }
+
+    // Check if the name already exists (case-insensitive) and not the same category
+    const existingCategory = await Category.findOne({
+      name: { $regex: new RegExp(`^${categoryName.trim()}$`, 'i') },
+      isDeleted: false,
+      _id: { $ne: category._id }
+    });
+
+    if (existingCategory) {
+      return res.status(400).render('Admin/editcategory', {
+        category: { _id: id, name: categoryName, description },
+        error: "Category name already exists, please choose another one"
+      });
+    }
+
+    // Update the category
+    category.name = categoryName.trim();
+    category.description = description?.trim() || "";
+    await category.save();
+
+    return res.redirect('/admin/categories');
+
+  } catch (error) {
+    console.error('🔴 Internal Server Error:', error);
+    return res.status(500).render('Admin/editcategory', {
+      category: {
+        _id: req.params.id,
+        name: req.body.categoryName,
+        description: req.body.description
+      },
+      error: "Internal server error"
+    });
+  }
 };
 
 module.exports = {
@@ -367,4 +377,4 @@ module.exports = {
     softDeleteCategory,
     undoDeleteCategory,
     permanentlyDeleteCategory
-};
+}; 

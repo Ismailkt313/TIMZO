@@ -21,13 +21,11 @@
 </footer>
 
 <script>
-  // Adjust footer based on sidebar state
   function adjustFooter() {
     const footer = document.getElementById('footer');
     const sidebar = document.getElementById('sidebar');
     
-    // Only adjust on large screens
-    if (window.innerWidth >= 1024) { // lg breakpoint
+    if (window.innerWidth >= 1024) {
       if (sidebar.classList.contains('-translate-x-full')) {
         footer.classList.remove('lg:ml-72');
       } else {
@@ -38,13 +36,10 @@
     }
   }
   
-  // Initialize on page load
   document.addEventListener('DOMContentLoaded', adjustFooter);
   
-  // Update on window resize
   window.addEventListener('resize', adjustFooter);
   
-  // Listen for sidebar toggle events
   document.getElementById('sidebarToggle')?.addEventListener('click', adjustFooter);
   document.getElementById('mobileMenuBtn')?.addEventListener('click', adjustFooter);
 </script>

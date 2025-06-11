@@ -6,7 +6,7 @@ const productSchema = new mongoose.Schema({
   brand: { type: mongoose.Schema.Types.ObjectId, ref: 'Brand', required: true },
   category: { type: mongoose.Schema.Types.ObjectId, ref: 'Category', required: true },
   regularPrice: { type: Number, required: true },
-  salePrice: { type: Number, required: true },
+  salePrice: { type: Number},
   stock: { type: Number, required: true },
   color: { type: String, required: true }, 
   material: { 
@@ -20,7 +20,7 @@ const productSchema = new mongoose.Schema({
   movementType: { type: String, required: true },
   images: [{ type: String }],
   status: { type: String, default: 'available' },
-  isDeleted: { type: Boolean, default: false }, 
+  isDeleted: { type: Boolean, default: false },
   deletedAt: { type: Date } ,
   isListed: { type: Boolean, default: true },
   ProductOffer: { type: Number, default: 0 }

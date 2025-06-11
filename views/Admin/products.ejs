@@ -17,14 +17,33 @@
     .blocked-row {
       background-color: #ffeeba;
     }
+    @media (max-width: 767px) {
+      body {
+        padding-top: 56px; 
+      }
+      .sidebar {
+        display: none; 
+      }
+      .content-area {
+        padding: 15px; 
+        width: 100%;
+      }
+      .card-body {
+        padding: 15px; 
+      }
+      .table th, .table td {
+        font-size: 14px; 
+      }
+      .table img {
+        max-width: 50px;
+      }
+    }
+
   </style>
 </head>
 
 <body class="bg-gray-100">
- <!-- Include the sidebar -->
   
-  <!-- Include the navbar -->
-  <%- include('.././partials/admin/navbar', { admin: admin || {} }) %>
     <div class="flex min-h-screen">
       <div class="w-64 bg-dark text-white"> 
          <%- include('.././partials/admin/adminsidebar', { activePage: 'product', admin: admin || {} }) %>
@@ -39,6 +58,24 @@
           <div class="flex justify-between items-center mb-6">
             <h1 class="text-2xl font-bold">Products</h1>
             <div class="d-flex align-items-center gap-2">
+              <form class="d-flex gap-2" role="search" action="/admin/getProduct" method="GET">
+  <input
+    class="form-control"
+    type="search"
+    name="query"
+    placeholder="Search..."
+    aria-label="Search"
+    value="<%= search || '' %>"
+    
+  >
+  <input type="hidden" name="showDeleted" value="<%= showDeleted ? 'true' : 'false' %>" />
+  <button class="btn btn-outline-primary" type="submit">Search</button>
+
+  <% if (search && search.trim().length > 0) { %>
+    <a href="/admin/getProduct?showDeleted=<%= showDeleted ? 'true' : 'false' %>" class="btn btn-outline-secondary">Clear</a>
+  <% } %>
+</form>
+
               <div class="form-check">
                 <input class="form-check-input" type="checkbox" id="showDeleted" <%=showDeleted ? 'checked' : '' %>
                 onchange="toggleDeletedView()">
@@ -238,6 +275,16 @@
             }
           });
         });
+        function toggleDeletedView() {
+  const showDeleted = document.getElementById('showDeleted').checked;
+  const query = new URLSearchParams(window.location.search);
+  if (showDeleted) {
+    query.set('showDeleted', 'true');
+  } else {
+    query.delete('showDeleted');
+  }
+  window.location.href = `/admin/getProduct?${query.toString()}`;
+}
 
         document.querySelectorAll('.soft-delete-btn').forEach(button => {
           button.addEventListener('click', async () => {

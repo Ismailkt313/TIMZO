@@ -39,9 +39,7 @@
         </svg>
       </button>
       
-      <!-- Notifications -->
-    
-      <!-- Profile Dropdown -->
+     
       <div class="relative" id="profileDropdown">
         <button class="flex items-center gap-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg p-1.5 transition-colors">
           <div class="w-8 h-8 rounded-full bg-amber-500 flex items-center justify-center text-slate-900 font-bold">
@@ -71,7 +69,6 @@
     </div>
   </div>
   
-  <!-- Mobile search bar - hidden by default -->
   <div id="mobileSearchBar" class="px-4 py-2 border-t border-slate-200 dark:border-slate-700 hidden md:hidden">
     <div class="relative">
       <input type="text" placeholder="Search..." class="bg-slate-100 dark:bg-slate-700 text-slate-800 dark:text-slate-200 rounded-lg pl-10 pr-4 py-2 text-sm w-full focus:outline-none focus:ring-2 focus:ring-amber-500 dark:focus:ring-amber-400 transition-all">
@@ -83,7 +80,6 @@
 </nav>
 
 <script>
-  // Profile dropdown toggle
   const profileDropdown = document.getElementById('profileDropdown');
   const profileMenu = document.getElementById('profileMenu');
   
@@ -92,12 +88,10 @@
     profileMenu.classList.toggle('hidden');
   });
   
-  // Close dropdown when clicking outside
   document.addEventListener('click', () => {
     profileMenu.classList.add('hidden');
   });
   
-  // Mobile menu button - connects to sidebar toggle
   const mobileMenuBtn = document.getElementById('mobileMenuBtn');
   const sidebar = document.getElementById('sidebar');
   const sidebarBackdrop = document.getElementById('sidebarBackdrop');
@@ -106,14 +100,12 @@
   
   mobileMenuBtn.addEventListener('click', () => {
     if (sidebar.classList.contains('-translate-x-full')) {
-      // Open sidebar
       sidebar.classList.remove('-translate-x-full');
       sidebarBackdrop.classList.remove('opacity-0', 'pointer-events-none');
       menuIcon.classList.add('hidden');
       closeIcon.classList.remove('hidden');
       document.body.classList.add('overflow-hidden', 'lg:overflow-auto');
     } else {
-      // Close sidebar
       sidebar.classList.add('-translate-x-full');
       sidebarBackdrop.classList.add('opacity-0', 'pointer-events-none');
       menuIcon.classList.remove('hidden');
@@ -122,7 +114,6 @@
     }
   });
   
-  // Mobile search toggle
   const mobileSearchBtn = document.getElementById('mobileSearchBtn');
   const mobileSearchBar = document.getElementById('mobileSearchBar');
   
@@ -130,11 +121,9 @@
     mobileSearchBar.classList.toggle('hidden');
   });
   
-  // Theme toggle
   const themeToggle = document.getElementById('themeToggle');
   const html = document.documentElement;
   
-  // Check for saved theme preference or use system preference
   if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
     html.classList.add('dark');
   } else {
@@ -144,7 +133,6 @@
   themeToggle.addEventListener('click', () => {
     html.classList.toggle('dark');
     
-    // Save preference
     if (html.classList.contains('dark')) {
       localStorage.theme = 'dark';
     } else {

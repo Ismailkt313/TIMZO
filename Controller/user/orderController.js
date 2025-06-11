@@ -3,6 +3,7 @@ const User = require("../../Model/userSchema");
 const Order = require("../../Model/orderSchema");
 const Product = require("../../Model/productSchema");
 const Wallet = require("../../Model/walletSchema");
+const Review = require('../../Model/review')
 const path = require('path');
 const fs = require('fs');
 const { generateInvoicePDF } = require('../../Helpers/pdfService');
@@ -27,11 +28,22 @@ const viewOrderDetail = async (req, res) => {
         if (order.user.toString() !== userId) {
             return res.status(403).render("error404", { message: "Unauthorized access to order" });
         }
+const reviewedProductOrderMap = new Map();
+
+const reviews = await Review.find({ user:userId}); 
+
+reviews.forEach(review => {
+  const key = `${review.product}_${review.order}`;
+  reviewedProductOrderMap.set(key, true);
+});
+const reviewedMapObject = Object.fromEntries(reviewedProductOrderMap);
+
 
         res.render("user/orderDetails", {
             user: req.session.user,
             order,
-            currentPage: 'orders'
+            currentPage: 'orders',
+            reviewedProductOrderMap: reviewedMapObject
         });
     } catch (error) {
         console.error("Error loading order details:", error);
@@ -63,7 +75,6 @@ const getOrder = async (req, res) => {
         res.status(500).json({ success: false, message: 'Error fetching order' });
     }
 };
-
 const cancelOrder = async (req, res) => {
     try {
         const userId = req.session.user?._id;
@@ -105,23 +116,24 @@ const cancelOrder = async (req, res) => {
         if (!wallet) {
             wallet = new Wallet({ userId, balance: 0, transactions: [] });
         }
-      
 
+        let totalRefund = 0;
         for (const item of order.items) {
-              const baseAmount = item.quantity * item.price;
-        const taxAmount = baseAmount * 0.10; 
-        const totalRefund = baseAmount + taxAmount;
             if (item.status === 'Ordered' || item.status === 'Processing') {
                 item.status = 'Cancelled';
                 item.cancelDate = new Date();
+
                 await Product.findByIdAndUpdate(item.productId, {
                     $inc: { stock: item.quantity }
                 }, { new: true });
+                const refundAmount = item.finalPrice + (item.tax || 0); 
+                totalRefund += refundAmount;
+
                 if (order.paymentMethod === 'Wallet' || order.paymentMethod === 'Online') {
-                    wallet.balance += totalRefund
+                    wallet.balance += refundAmount;
                     wallet.transactions.push({
                         type: 'credit',
-                        amount: totalRefund,
+                        amount: refundAmount,
                         description: `Refund for cancelled item: ${item.productName} (${item.quantity} pcs)`,
                         date: new Date()
                     });
@@ -129,19 +141,29 @@ const cancelOrder = async (req, res) => {
             }
         }
 
-        order.subtotal = 0;
-        order.tax = 0;
-        order.totalAmount = 0;
+        const remainingItems = order.items.filter(item => item.status !== 'Cancelled');
+        if (remainingItems.length === 0) {
+            order.subtotal = 0;
+            order.tax = 0;
+            order.totalAmount = 0;
+        } else {
+            order.subtotal = remainingItems.reduce((sum, item) => sum + item.itemTotal, 0);
+            
+            const originalSubtotal = order.subtotal + order.items.filter(item => item.status === 'Cancelled').reduce((sum, item) => sum + item.itemTotal, 0);
+            const remainingDiscount = (order.subtotal / originalSubtotal) * (order.coupon?.discount || 0);
+            
+            order.tax = order.subtotal * 0.10; 
+            order.totalAmount = Math.max(0, order.subtotal - remainingDiscount + order.shippingFee + order.tax);
+        }
 
         await Promise.all([order.save(), wallet.save()]);
-        console.log('Order cancelled:', { orderId, userId });
+        console.log('Order cancelled:', { orderId, userId, totalRefund });
         res.status(200).json({ success: true, message: "Order cancelled successfully" });
     } catch (error) {
         console.error("Error cancelling order:", error);
         res.status(500).json({ success: false, message: "Failed to cancel order: " + error.message });
     }
 };
-
 const requestItemAction = async (req, res) => {
     try {
         const userId = req.session.user?._id;
@@ -314,20 +336,31 @@ const downloadInvoice = async (req, res) => {
       .populate("user", "name email")
       .populate("items.productId", "name");
 
-    if (!order) return res.status(404).json({ message: "Order not found" });
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    // ❌ Block if payment not completed
+    if (order.paymentStatus !== 'Completed') {
+      return res.status(403).json({ message: "Invoice not available for unpaid orders." });
+    }
 
     const filePath = path.join(__dirname, `../pdfs/invoice-${orderId}.pdf`);
     await generateInvoicePDF(order, filePath);
 
     res.download(filePath, `invoice-${orderId}.pdf`, (err) => {
-      if (err) console.log("Download error:", err);
-      else fs.unlinkSync(filePath); 
+      if (err) {
+        console.log("Download error:", err);
+      } else {
+        fs.unlinkSync(filePath); // Delete after download
+      }
     });
   } catch (err) {
     console.error("Invoice error:", err);
     res.status(500).json({ message: "Failed to generate invoice" });
   }
 };
+
 
 module.exports = {
     viewOrderDetail,

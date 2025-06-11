@@ -8,12 +8,15 @@ const brandcontroller = require('../../Controller/admin/brandcontroller');
 const productController = require('../../Controller/admin/productController');
 const orderController = require('../../Controller/admin/orderController');
 const couponController = require('../../Controller/admin/couponController');
+const saleController = require('../../Controller/admin/salesController')
+const dashboardController = require('../../Controller/admin/dashboardController')
 const { uploadProducts, uploadBrand } = require('../../Helpers/multer');
 const { adminAuth } = require('../../MiddleWares/auth');
 
 router.get('/login', adminControllerauth.loadsign);
 router.post('/login', adminControllerauth.login);
-router.get('/dashboard', adminAuth, adminControllerauth.loaddashboard);
+router.get('/dashboard', adminAuth, dashboardController.loadAdminDashboard);
+router.post('/generate-ledger',adminAuth,dashboardController.generateLedger)
 router.get('/logout', adminAuth, adminControllerauth.logout);
 router.get('/users', adminAuth, costomerController.loadUsers);
 router.get('/search-users', adminAuth, costomerController.searchUsers);
@@ -33,10 +36,9 @@ router.post('/editcategory/:id', adminAuth, categoyController.editcategory);
 router.post('/softDeleteCategory', adminAuth, categoyController.softDeleteCategory);
 router.post('/undoDeleteCategory', adminAuth, categoyController.undoDeleteCategory);
 router.post('/permanentlyDeleteCategory', adminAuth, categoyController.permanentlyDeleteCategory);
-router.get('/brand', adminAuth, brandcontroller.getbrand);
-router.post('/addbrand', adminAuth, uploadBrand.single('images'), brandcontroller.addbrand);
-router.patch('/blockBrand', adminAuth, brandcontroller.blockBrand);
-router.patch('/unblockBrand', adminAuth, brandcontroller.unblockBrand);
+router.get('/brand', adminAuth, brandcontroller.getBrands);
+router.post('/addbrand', adminAuth, uploadBrand.single('image'), brandcontroller.addBrand);
+router.patch('/brand/:id/status', adminAuth, brandcontroller.toggleBrandStatus);
 router.delete('/deleteBrand', adminAuth, brandcontroller.deleteBrand);
 router.get('/product', adminAuth, productController.loadProducts);
 router.post('/addproducts', adminAuth, uploadProducts.array('images', 4), productController.addProducts);
@@ -63,5 +65,9 @@ router.delete('/coupons/delete/:id', adminAuth, couponController.deleteCoupon);
 router.get('/coupons/edit/:id', adminAuth, couponController.loadEditCouponForm);
 router.post('/coupons/edit/:id', adminAuth, couponController.editCoupon);
 router.put('/coupons/toggle-status/:id', adminAuth, couponController.toggleStatus);
+
+router.get('/sales-report',adminAuth,saleController.generateAdminSalesReport )
+router.get('/sales-report/pdf',adminAuth,saleController.generateSalesReportPDF)
+router.get('/sales-report/excel',adminAuth,saleController.generateSalesReportExcel)
 
 module.exports = router;

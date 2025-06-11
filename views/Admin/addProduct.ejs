@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Add Watch - TIMZO Admin</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     .error-message {
@@ -55,9 +56,8 @@
     }
 
     .main-content {
-      margin-left: 250px;
+      margin-left: 290px;
       padding: 2rem;
-      background-color: #f7fafc;
     }
 
     .content-header {
@@ -162,10 +162,7 @@
   </aside>
   <div class="flex-grow-1 main-content">
 
- <!-- Include the sidebar -->
-  
-  <!-- Include the navbar -->
-  <%- include('.././partials/admin/navbar', { admin: admin || {} }) %>
+
 
       <section class="content-main">
         <div class="content-header">
@@ -220,7 +217,7 @@
                   <div class="row">
                     <div class="col-lg-4 mb-4">
                       <label class="form-label">Regular Price</label>
-                      <input placeholder="$" name="regularPrice" type="text" class="form-control"
+                      <input placeholder="₹" name="regularPrice" type="text" class="form-control"
                         value="<%= formData.regularPrice || '' %>" />
                       <div id="regularPrice-error" class="error-message"></div>
                     </div>
@@ -323,259 +320,317 @@
       <%- include('../Partials/admin/footer') %>
   </div>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"></script>
-  <script>
-    let currentCropIndex = null;
-    let cropData = {};
+<script>
+  let currentCropIndex = null;
+  let cropData = {};
 
-    function viewImage(event, index) {
-      const input = event.target;
-      if (!input.files[0]) return;
-      const reader = new FileReader();
-      reader.onload = function () {
-        const dataURL = reader.result;
-        const image = document.getElementById(`imgView${index}`);
-        image.src = dataURL;
-        image.style.display = 'block';
+ function viewImage(event, index) {
+  const input = event.target;
+  const file = input.files[0];
+  if (!file) return;
 
-        // Setup cropping
-        const cropContainer = document.getElementById(`cropContainer${index}`);
-        cropContainer.style.display = 'block';
-        setupCropper(index, image);
-        handleFileSelect();
-      };
-      reader.readAsDataURL(input.files[0]);
-    }
+  const validImageTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/webp'];
+  if (!validImageTypes.includes(file.type)) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Invalid File Type',
+      text: 'Only JPG, JPEG, PNG, or WEBP images are allowed.',
+      confirmButtonColor: '#d33'
+    });
+    input.value = ''; // Clear the invalid file
+    return;
+  }
 
-    function setupCropper(index, image) {
-      const canvas = document.getElementById(`cropCanvas${index}`);
-      const ctx = canvas.getContext('2d');
-      const cropBox = document.getElementById(`cropBox${index}`);
-      const cropDataInput = document.getElementById(`cropData${index}`);
+  const reader = new FileReader();
+  reader.onload = function () {
+    const dataURL = reader.result;
+    const image = document.getElementById(`imgView${index}`);
+    image.src = dataURL;
+    image.style.display = 'block';
 
-      const img = new Image();
-      img.src = image.src;
-      img.onload = function () {
-        const maxWidth = 300;
-        const maxHeight = 200;
-        const ratio = Math.min(maxWidth / img.width, maxHeight / img.height);
-        canvas.width = img.width * ratio;
-        canvas.height = img.height * ratio;
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    const cropContainer = document.getElementById(`cropContainer${index}`);
+    cropContainer.style.display = 'block';
+    setupCropper(index, image);
+    handleFileSelect();
+  };
+  reader.readAsDataURL(file);
+}
 
-        let cropWidth = Math.min(150, canvas.width * 0.5);
-        let cropHeight = Math.min(150, canvas.height * 0.5);
-        let cropX = (canvas.width - cropWidth) / 2;
-        let cropY = (canvas.height - cropHeight) / 2;
 
-        cropBox.style.width = `${cropWidth}px`;
-        cropBox.style.height = `${cropHeight}px`;
-        cropBox.style.left = `${cropX}px`;
-        cropBox.style.top = `${cropY}px`;
+  function setupCropper(index, image) {
+    const canvas = document.getElementById(`cropCanvas${index}`);
+    const ctx = canvas.getContext('2d');
+    const cropBox = document.getElementById(`cropBox${index}`);
+    const cropDataInput = document.getElementById(`cropData${index}`);
 
-        cropData[index] = { x: cropX, y: cropY, width: cropWidth, height: cropHeight };
-        cropDataInput.value = JSON.stringify(cropData[index]);
+    const img = new Image();
+    img.src = image.src;
+    img.onload = function () {
+      const maxWidth = 300;
+      const maxHeight = 200;
+      const ratio = Math.min(maxWidth / img.width, maxHeight / img.height);
+      canvas.width = img.width * ratio;
+      canvas.height = img.height * ratio;
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-        let isDragging = false;
-        let isResizing = false;
-        let startX, startY;
+      let cropWidth = Math.min(150, canvas.width * 0.5);
+      let cropHeight = Math.min(150, canvas.height * 0.5);
+      let cropX = (canvas.width - cropWidth) / 2;
+      let cropY = (canvas.height - cropHeight) / 2;
 
-        cropBox.addEventListener('mousedown', (e) => {
-          if (e.target.classList.contains('resize-handle')) {
-            isResizing = true;
-          } else {
-            isDragging = true;
-          }
+      cropBox.style.width = `${cropWidth}px`;
+      cropBox.style.height = `${cropHeight}px`;
+      cropBox.style.left = `${cropX}px`;
+      cropBox.style.top = `${cropY}px`;
+
+      cropData[index] = { x: cropX, y: cropY, width: cropWidth, height: cropHeight };
+      cropDataInput.value = JSON.stringify(cropData[index]);
+
+      let isDragging = false;
+      let isResizing = false;
+      let startX, startY;
+
+      cropBox.addEventListener('mousedown', (e) => {
+        if (e.target.classList.contains('resize-handle')) {
+          isResizing = true;
+        } else {
+          isDragging = true;
+        }
+        startX = e.clientX;
+        startY = e.clientY;
+      });
+
+      document.addEventListener('mousemove', (e) => {
+        if (isDragging) {
+          const dx = e.clientX - startX;
+          const dy = e.clientY - startY;
+          cropX = Math.max(0, Math.min(cropX + dx, canvas.width - cropWidth));
+          cropY = Math.max(0, Math.min(cropY + dy, canvas.height - cropHeight));
+          cropBox.style.left = `${cropX}px`;
+          cropBox.style.top = `${cropY}px`;
           startX = e.clientX;
           startY = e.clientY;
-        });
-
-        document.addEventListener('mousemove', (e) => {
-          if (isDragging) {
-            const dx = e.clientX - startX;
-            const dy = e.clientY - startY;
-            cropX = Math.max(0, Math.min(cropX + dx, canvas.width - cropWidth));
-            cropY = Math.max(0, Math.min(cropY + dy, canvas.height - cropHeight));
-            cropBox.style.left = `${cropX}px`;
-            cropBox.style.top = `${cropY}px`;
-            startX = e.clientX;
-            startY = e.clientY;
-            cropData[index].x = cropX;
-            cropData[index].y = cropY;
-            cropDataInput.value = JSON.stringify(cropData[index]);
-          } else if (isResizing) {
-            const dx = e.clientX - startX;
-            const dy = e.clientY - startY;
-            cropWidth = Math.max(50, Math.min(cropWidth + dx, canvas.width - cropX));
-            cropHeight = Math.max(50, Math.min(cropHeight + dy, canvas.height - cropY));
-            cropBox.style.width = `${cropWidth}px`;
-            cropBox.style.height = `${cropHeight}px`;
-            startX = e.clientX;
-            startY = e.clientY;
-            cropData[index].width = cropWidth;
-            cropData[index].height = cropHeight;
-            cropDataInput.value = JSON.stringify(cropData[index]);
-          }
-        });
-
-        document.addEventListener('mouseup', () => {
-          isDragging = false;
-          isResizing = false;
-        });
-      };
-    }
-
-    function saveCrop(index) {
-      const cropContainer = document.getElementById(`cropContainer${index}`);
-      cropContainer.style.display = 'none';
-    }
-
-    const selectedImages = [];
-    document.querySelectorAll('input[name="images"]').forEach(input => {
-      input.addEventListener('change', handleFileSelect);
-    });
-
-    function handleFileSelect() {
-      const thumbnailsContainer = document.getElementById('thumbnailsContainer');
-      thumbnailsContainer.innerHTML = '';
-      selectedImages.length = 0;
-      document.querySelectorAll('input[name="images"]').forEach(input => {
-        if (input.files[0]) {
-          const file = input.files[0];
-          selectedImages.push(file);
-          const thumbnail = document.createElement('div');
-          thumbnail.classList.add('thumbnail');
-          const img = document.createElement('img');
-          img.src = URL.createObjectURL(file);
-          img.alt = 'thumbnail';
-          const removeIcon = document.createElement('span');
-          removeIcon.classList.add('remove-icon');
-          removeIcon.innerHTML = '×';
-          removeIcon.onclick = function () {
-            const index = selectedImages.indexOf(file);
-            if (index !== -1) {
-              selectedImages.splice(index, 1);
-              input.value = '';
-              thumbnail.remove();
-              document.getElementById(`imgView${input.id.replace('input', '')}`).style.display = 'none';
-              document.getElementById(`cropContainer${input.id.replace('input', '')}`).style.display = 'none';
-            }
-          };
-          thumbnail.appendChild(img);
-          thumbnail.appendChild(removeIcon);
-          thumbnailsContainer.appendChild(thumbnail);
+          cropData[index].x = cropX;
+          cropData[index].y = cropY;
+          cropDataInput.value = JSON.stringify(cropData[index]);
+        } else if (isResizing) {
+          const dx = e.clientX - startX;
+          const dy = e.clientY - startY;
+          cropWidth = Math.max(50, Math.min(cropWidth + dx, canvas.width - cropX));
+          cropHeight = Math.max(50, Math.min(cropHeight + dy, canvas.height - cropY));
+          cropBox.style.width = `${cropWidth}px`;
+          cropBox.style.height = `${cropHeight}px`;
+          startX = e.clientX;
+          startY = e.clientY;
+          cropData[index].width = cropWidth;
+          cropData[index].height = cropHeight;
+          cropDataInput.value = JSON.stringify(cropData[index]);
         }
       });
-    }
 
-    function validateForm() {
-      clearErrorMessages();
-      const fields = {
-        productName: { value: document.getElementsByName('productName')[0].value, errorId: 'productName-error' },
-        description: { value: document.getElementById('descriptionid').value, errorId: 'description-error' },
-        brand: { value: document.getElementsByName('brand')[0].value, errorId: 'brand-error' },
-        category: { value: document.getElementsByName('category')[0].value, errorId: 'category-error' },
-        regularPrice: { value: document.getElementsByName('regularPrice')[0].value, errorId: 'regularPrice-error' },
-        salePrice: { value: document.getElementsByName('salePrice')[0].value, errorId: 'salePrice-error' },
-        stock: { value: document.getElementsByName('stock')[0].value, errorId: 'stock-error' },
-        color: { value: document.getElementsByName('color')[0].value, errorId: 'color-error' },
-        movementType: { value: document.getElementsByName('movementType')[0].value, errorId: 'movementType-error' }
-      };
-      const images = document.querySelectorAll('input[name="images"]');
-      let isValid = true;
-
-      if (!fields.productName.value.trim()) {
-        displayErrorMessage(fields.productName.errorId, 'Please enter a watch name.');
-        isValid = false;
-      } else if (!/^[a-zA-Z0-9\s]+$/.test(fields.productName.value.trim())) {
-        displayErrorMessage(fields.productName.errorId, 'Watch name should contain only alphanumeric characters.');
-        isValid = false;
-      }
-
-      if (!fields.description.value.trim()) {
-        displayErrorMessage(fields.description.errorId, 'Please enter a description.');
-        isValid = false;
-      } else if (!/^[a-zA-Z0-9\s.,!:/+\-()@#'"[\]{}&%°]+$/.test(fields.description.value.trim())) {
-        displayErrorMessage(fields.description.errorId, 'Description contains invalid characters.');
-        isValid = false;
-      }
-
-      if (!fields.brand.value) {
-        displayErrorMessage(fields.brand.errorId, 'Please select a brand.');
-        isValid = false;
-      }
-
-      if (!fields.category.value) {
-        displayErrorMessage(fields.category.errorId, 'Please select a category.');
-        isValid = false;
-      }
-
-      if (!/^\d+(\.\d{1,2})?$/.test(fields.regularPrice.value) || parseFloat(fields.regularPrice.value) <= 0) {
-        displayErrorMessage(fields.regularPrice.errorId, 'Please enter a valid positive price.');
-        isValid = false;
-      }
-
-      if (!/^\d+(\.\d{1,2})?$/.test(fields.salePrice.value) || parseFloat(fields.salePrice.value) < 0) {
-        displayErrorMessage(fields.salePrice.errorId, 'Please enter a valid non-negative price.');
-        isValid = false;
-      }
-
-      if (parseFloat(fields.regularPrice.value) <= parseFloat(fields.salePrice.value)) {
-        displayErrorMessage(fields.regularPrice.errorId, 'Regular price must be greater than sale price.');
-        isValid = false;
-      }
-
-      if (!/^\d+$/.test(fields.stock.value) || parseInt(fields.stock.value) < 0) {
-        displayErrorMessage(fields.stock.errorId, 'Please enter a valid non-negative stock quantity.');
-        isValid = false;
-      }
-
-      if (!fields.color.value.trim()) {
-        displayErrorMessage(fields.color.errorId, 'Please enter a color.');
-        isValid = false;
-      }
-
-      if (!fields.movementType.value) {
-        displayErrorMessage(fields.movementType.errorId, 'Please select a movement type.');
-        isValid = false;
-      }
-
-      let hasImage = false;
-      images.forEach(input => {
-        if (input.files.length > 0) hasImage = true;
+      document.addEventListener('mouseup', () => {
+        isDragging = false;
+        isResizing = false;
       });
-      if (!hasImage) {
-        displayErrorMessage('images-error', 'Please select at least one image.');
-        isValid = false;
+    };
+  }
+
+  function saveCrop(index) {
+    const canvas = document.getElementById(`cropCanvas${index}`);
+    const cropContainer = document.getElementById(`cropContainer${index}`);
+    const input = document.getElementById(`input${index}`);
+    const imgView = document.getElementById(`imgView${index}`);
+    const cropDataInput = document.getElementById(`cropData${index}`);
+    const ctx = canvas.getContext('2d');
+    const { x, y, width, height } = cropData[index];
+
+    const tempCanvas = document.createElement('canvas');
+    tempCanvas.width = width;
+    tempCanvas.height = height;
+    const tempCtx = tempCanvas.getContext('2d');
+
+    tempCtx.drawImage(
+      canvas,
+      x,
+      y,
+      width,
+      height,
+      0,
+      0,
+      width,
+      height
+    );
+
+    tempCanvas.toBlob((blob) => {
+      const fileName = `cropped-image-${index}.png`;
+      const file = new File([blob], fileName, { type: 'image/png' });
+
+      const dataTransfer = new DataTransfer();
+      dataTransfer.items.add(file);
+      input.files = dataTransfer.files;
+
+      // Update the preview image
+      imgView.src = URL.createObjectURL(file);
+      imgView.style.display = 'block';
+
+      // Update thumbnails
+      handleFileSelect();
+
+      // Hide crop container
+      cropContainer.style.display = 'none';
+    }, 'image/png');
+
+    // Clear crop data
+    cropDataInput.value = '';
+  }
+
+  const selectedImages = [];
+  document.querySelectorAll('input[name="images"]').forEach(input => {
+    input.addEventListener('change', handleFileSelect);
+  });
+
+  function handleFileSelect() {
+    const thumbnailsContainer = document.getElementById('thumbnailsContainer');
+    thumbnailsContainer.innerHTML = '';
+    selectedImages.length = 0;
+    document.querySelectorAll('input[name="images"]').forEach(input => {
+      if (input.files[0]) {
+        const file = input.files[0];
+        selectedImages.push(file);
+        const thumbnail = document.createElement('div');
+        thumbnail.classList.add('thumbnail');
+        const img = document.createElement('img');
+        img.src = URL.createObjectURL(file);
+        img.alt = 'thumbnail';
+        const removeIcon = document.createElement('span');
+        removeIcon.classList.add('remove-icon');
+        removeIcon.innerHTML = '×';
+        removeIcon.onclick = function () {
+          const index = selectedImages.indexOf(file);
+          if (index !== -1) {
+            selectedImages.splice(index, 1);
+            input.value = '';
+            thumbnail.remove();
+            document.getElementById(`imgView${input.id.replace('input', '')}`).style.display = 'none';
+            document.getElementById(`cropContainer${input.id.replace('input', '')}`).style.display = 'none';
+          }
+        };
+        thumbnail.appendChild(img);
+        thumbnail.appendChild(removeIcon);
+        thumbnailsContainer.appendChild(thumbnail);
       }
+    });
+  }
 
-      return isValid;
+  function validateForm() {
+    clearErrorMessages();
+    const fields = {
+      productName: { value: document.getElementsByName('productName')[0].value, errorId: 'productName-error' },
+      description: { value: document.getElementById('descriptionid').value, errorId: 'description-error' },
+      brand: { value: document.getElementsByName('brand')[0].value, errorId: 'brand-error' },
+      category: { value: document.getElementsByName('category')[0].value, errorId: 'category-error' },
+      regularPrice: { value: document.getElementsByName('regularPrice')[0].value, errorId: 'regularPrice-error' },
+      salePrice: { value: document.getElementsByName('salePrice')[0]?.value || '', errorId: 'salePrice-error' },
+      stock: { value: document.getElementsByName('stock')[0].value, errorId: 'stock-error' },
+      color: { value: document.getElementsByName('color')[0].value, errorId: 'color-error' },
+      movementType: { value: document.getElementsByName('movementType')[0].value, errorId: 'movementType-error' }
+    };
+    const images = document.querySelectorAll('input[name="images"]');
+    let isValid = true;
+
+    if (!fields.productName.value.trim()) {
+      displayErrorMessage(fields.productName.errorId, 'Please enter a watch name.');
+      isValid = false;
+    } else if (!/^[a-zA-Z0-9\s]+$/.test(fields.productName.value.trim())) {
+      displayErrorMessage(fields.productName.errorId, 'Watch name should contain only alphanumeric characters.');
+      isValid = false;
     }
 
-    function displayErrorMessage(elementId, message) {
-      const errorElement = document.getElementById(elementId);
-      errorElement.innerText = message;
-      errorElement.style.display = 'block';
+    if (!fields.description.value.trim()) {
+      displayErrorMessage(fields.description.errorId, 'Please enter a description.');
+      isValid = false;
+    } else if (!/^[a-zA-Z0-9\s.,!:/+\-()@#'"[\]{}&%°]+$/.test(fields.description.value.trim())) {
+      displayErrorMessage(fields.description.errorId, 'Description contains invalid characters.');
+      isValid = false;
     }
 
-    function clearErrorMessages() {
-      document.querySelectorAll('.error-message').forEach(element => {
-        element.innerText = '';
-        element.style.display = 'none';
-      });
+    if (!fields.brand.value) {
+      displayErrorMessage(fields.brand.errorId, 'Please select a brand.');
+      isValid = false;
     }
 
-    window.addEventListener('load', adjustPadding);
-    window.addEventListener('resize', adjustPadding);
-
-    function adjustPadding() {
-      const navbar = document.querySelector('.navbar');
-      const body = document.querySelector('body');
-      if (navbar) {
-        const navbarHeight = navbar.offsetHeight;
-        body.style.paddingTop = `${navbarHeight}px`;
-      }
+    if (!fields.category.value) {
+      displayErrorMessage(fields.category.errorId, 'Please select a category.');
+      isValid = false;
     }
-  </script>
+
+    if (!/^\d+(\.\d{1,2})?$/.test(fields.regularPrice.value) || parseFloat(fields.regularPrice.value) <= 0) {
+      displayErrorMessage(fields.regularPrice.errorId, 'Please enter a valid positive price.');
+      isValid = false;
+    }
+
+    if (fields.salePrice.value && (!/^\d+(\.\d{1,2})?$/.test(fields.salePrice.value) || parseFloat(fields.salePrice.value) < 0)) {
+      displayErrorMessage(fields.salePrice.errorId, 'Please enter a valid non-negative price.');
+      isValid = false;
+    }
+
+    if (fields.salePrice.value && parseFloat(fields.regularPrice.value) <= parseFloat(fields.salePrice.value)) {
+      displayErrorMessage(fields.regularPrice.errorId, 'Regular price must be greater than sale price.');
+      isValid = false;
+    }
+
+    if (!/^\d+$/.test(fields.stock.value) || parseInt(fields.stock.value) < 0) {
+      displayErrorMessage(fields.stock.errorId, 'Please enter a valid non-negative stock quantity.');
+      isValid = false;
+    }
+
+    if (!fields.color.value.trim()) {
+      displayErrorMessage(fields.color.errorId, 'Please enter a color.');
+      isValid = false;
+    }
+
+    if (!fields.movementType.value) {
+      displayErrorMessage(fields.movementType.errorId, 'Please select a movement type.');
+      isValid = false;
+    }
+
+    let hasImage = false;
+    images.forEach(input => {
+      if (input.files.length > 0) hasImage = true;
+    });
+    if (!hasImage) {
+      displayErrorMessage('images-error', 'Please select at least one image.');
+      isValid = false;
+    }
+
+    return isValid;
+  }
+
+  function displayErrorMessage(elementId, message) {
+    const errorElement = document.getElementById(elementId);
+    errorElement.innerText = message;
+    errorElement.style.display = 'block';
+  }
+
+  function clearErrorMessages() {
+    document.querySelectorAll('.error-message').forEach(element => {
+      element.innerText = '';
+      element.style.display = 'none';
+    });
+  }
+
+  window.addEventListener('load', adjustPadding);
+  window.addEventListener('resize', adjustPadding);
+
+  function adjustPadding() {
+    const navbar = document.querySelector('.navbar');
+    const body = document.querySelector('body');
+    if (navbar) {
+      const navbarHeight = navbar.offsetHeight;
+      body.style.paddingTop = `${navbarHeight}px`;
+    }
+  }
+</script> 
 </body>
 
 </html>

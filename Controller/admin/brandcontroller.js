@@ -1,97 +1,158 @@
-const { parse } = require("dotenv")
-const Brand = require("../../Model/brandschema")
-const product = require("../../Model/productSchema")
+const Brand = require("../../Model/brandschema");
+const Product = require("../../Model/productSchema");
 
-
-const getbrand = async (req,res)=>{
+// Get all brands with pagination
+const getBrands = async (req, res) => {
     try {
-        const page = parseInt(req.query.page) || 1
-        const limit = 5
-        const skip = (page-1)*limit
-        const branddata = await Brand.find({}).sort({createdAt:-1}).skip(skip).limit(limit)
-        const totalbrands = await Brand.countDocuments()
-        const totalPages = Math.ceil(totalbrands/limit)
-        const revercebrand = branddata.reverse()
-        const admin = req.session.admin
-        res.render("Admin/brand",{
+        const page = parseInt(req.query.page) || 1;
+        const limit = 5;
+        const skip = (page - 1) * limit;
+        
+        const [brands, totalBrands] = await Promise.all([
+            Brand.find({})
+                .sort({ createdAt: -1 })
+                .skip(skip)
+                .limit(limit)
+                .lean(),
+            Brand.countDocuments()
+        ]);
+
+        const totalPages = Math.ceil(totalBrands / limit);
+        const admin = req.session.admin;
+
+        res.render("Admin/brand", {
             admin,
-            data:revercebrand,
-            currentPage:page,
-            totalPages:totalPages,
-            totalbrands:totalbrands
-        })
+            data: brands.reverse(), // Reverse for display if needed
+            currentPage: page,
+            totalPages,
+            totalBrands,
+            messages: req.flash()
+        });
+
     } catch (error) {
-        res.redirect('/error404')
-
-    }
-}
-
-const addbrand = async (req, res) => {
-    try {
-        const brandName = req.body.name;  
-
-        const findBrand = await Brand.findOne({ name: brandName });  
-
-        if (!findBrand) {  
-            const imageUrl = req.file.path; 
-
-            const newBrand = new Brand({
-                name: brandName,
-                image: imageUrl
-            });
-
-            await newBrand.save();
-            res.redirect("/admin/brand");
-        } else {
-            res.redirect("/admin/brand"); 
-        }
-    } catch (error) {
-        console.error(error); 
-        res.redirect('/error404');
+        console.error("Error fetching brands:", error);
+        req.flash('error', 'Failed to load brands');
+        res.redirect('/admin/dashboard');
     }
 };
 
-const blockBrand = async (req,res)=>{
+// Add new brand
+const addBrand = async (req, res) => {
     try {
-        const id = req.query.id;
-        await Brand.updateOne({_id:id},{$set:{isListed:false}})
-        res.status(200).json({ success: true });
-    } catch (error) {
-        res.status(500).json({ success: false, message: 'Server error' });
-    }
-}
+        const { name } = req.body;
+        const image = req.file;
 
-const unblockBrand = async (req,res)=>{
-    try {
-        const id = req.query.id;
-        await Brand.updateOne({_id:id},{$set:{isListed:true}})
-        res.status(200).json({ success: true });
-    } catch (error) {
-        res.status(500).json({ success: false, message: 'Server error' });
-    }
-}
-
-const deleteBrand = async (req,res)=>{
-    try {
-
-        const {id} = req.query;
-        if(!id){
-            res.status(400).redirect('/error404')
+        // Validation
+        if (!name?.trim()) {
+            req.flash('error', 'Brand name is required');
+            return res.redirect("/admin/brand");
         }
-       
-        await Brand.deleteOne({_id:id})
-        res.status(200).json({ success: true });
-        
-    } catch (error) {
-        res.status(500).json({ success: false, message: 'Server error' });
-    }
+
+        if (!image) {
+            req.flash('error', 'Brand image is required');
+            return res.redirect("/admin/brand");
+        }
+
+        // Check for existing brand (case-insensitive)
+const trimmedName = name.trim();
+
+const existingBrand = await Brand.findOne({ 
+    name: { $regex: new RegExp(`^${trimmedName}$`, 'i') } 
+});
+
+if (existingBrand) {
+    req.flash('error', 'Brand already exists');
+    return res.redirect("/admin/brand");
 }
 
-module.exports={
-    getbrand,
-    addbrand,
-    blockBrand,
-    unblockBrand,
+
+        // Create new brand
+        const newBrand = new Brand({
+            name: name.trim(),
+            image: image.path
+        });
+
+        await newBrand.save();
+
+        req.flash('success', 'Brand added successfully');
+        res.redirect("/admin/brand");
+
+    } catch (error) {
+        console.error("Error adding brand:", error);
+        req.flash('error', 'Failed to add brand');
+        res.redirect("/admin/brand");
+    }
+};
+
+// Toggle brand status
+const toggleBrandStatus = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { action } = req.query; // ✅ fixed here
+
+        if (!id || !['block', 'unblock'].includes(action)) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Invalid brand ID or action' 
+            });
+        }
+
+        const isListed = action === 'unblock';
+        await Brand.findByIdAndUpdate(id, { isListed });
+
+        // Optional: Update related products
+        await Product.updateMany({ brand: id }, { isListed });
+
+        res.status(200).json({ success: true });
+
+    } catch (error) {
+        console.error(`Error toggling brand status:`, error);
+        res.status(500).json({ 
+            success: false, 
+            message: 'Server error' 
+        });
+    }
+};
+
+
+// Delete brand
+const deleteBrand = async (req, res) => {
+    try {
+        const { id } = req.query;
+
+        if (!id) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Brand ID is required' 
+            });
+        }
+
+        // Check if brand has associated products
+        const productsCount = await Product.countDocuments({ brand: id });
+        
+        if (productsCount > 0) {
+            return res.status(400).json({
+                success: false,
+                message: 'Cannot delete brand with associated products'
+            });
+        }
+
+        await Brand.findByIdAndDelete(id);
+
+        res.status(200).json({ success: true });
+
+    } catch (error) {
+        console.error("Error deleting brand:", error);
+        res.status(500).json({ 
+            success: false, 
+            message: 'Server error' 
+        });
+    }
+};
+
+module.exports = {
+    getBrands,
+    addBrand,
+    toggleBrandStatus,
     deleteBrand
-    
-}
+};

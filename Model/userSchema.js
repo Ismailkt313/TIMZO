@@ -29,13 +29,15 @@ const userSchema = new Schema({
   },
   otp: {
     code: { type: String },
-    expiresAt: { type: Date },
+    expiresAt: { type: Date }, 
     verified: { type: Boolean, default: false },
   },
   isBlocked: {
     type: Boolean,
     default: false,
-  },  
+  },
+  referralCode: { type: String, unique: true },
+  referredBy: { type: String, default: null }, 
   isAdmin: {
     type: Boolean,
     default: false,

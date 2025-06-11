@@ -327,7 +327,6 @@
 <body class="fullbody">
     <%- include('../Partials/user/navbar', { user: user, cartCount: cartCount, search: search }) %>
 
-    <!-- Toast Notification -->
     <div class="toast-container position-fixed bottom-0 end-0 p-3">
         <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
             <div class="toast-header">
@@ -335,7 +334,6 @@
                 <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
             </div>
             <div class="toast-body">
-                <!-- Message will be inserted here -->
             </div>
         </div>
     </div>
@@ -372,7 +370,6 @@
     </div>
 
 
-    <!-- New Arrivals -->
     <section class="container my-5" data-aos="fade-up">
         <h2 class="section-title">New Arrivals</h2>
         <div class="row g-4" id="newArrivals">
@@ -417,7 +414,6 @@
         </div>
     </section>
 
-    <!-- Sale Banner with Countdown -->
     <section class="sale-banner text-white text-center" data-aos="fade-up">
         <div class="container">
             <h2 class="display-5 fw-bold">Limited Time Offer</h2>
@@ -432,7 +428,6 @@
         </div>
     </section>
 
-    <!-- Trending -->
     <section class="container my-5" data-aos="fade-up">
         <h2 class="section-title">Trending</h2>
         <div class="row g-4" id="trendingProducts">
@@ -515,7 +510,6 @@
 
     
 
-    <!-- Explore More -->
     <section class="container my-5" data-aos="fade-up">
         <h2 class="section-title">Explore More</h2>
         <div class="row g-4" id="exploreProducts">
@@ -560,7 +554,6 @@
         </div>
     </section>
 
-    <!-- Quick View Modal -->
     <div class="modal fade" id="quickViewModal" tabindex="-1" aria-labelledby="quickViewModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
@@ -792,7 +785,6 @@
                 if (product?.description) {
                     description = product.description;
                 } else {
-                    // Fallback: Fetch product details from server if description is missing
                     const response = await fetch(`/products/${productId}`, {
                         method: 'GET',
                         headers: { 'Content-Type': 'application/json' }

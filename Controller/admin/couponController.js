@@ -140,6 +140,12 @@ const couponAdd = async (req, res) => {
       hasErrors = true;
     }
 
+if (discountType === 'percentage' && discountAmount > 99) {
+  errors.discountAmount = 'Percentage discount cannot be more than 100%';
+  hasErrors = true;
+}
+
+
     const existingCoupon = await Coupon.findOne({ code: code.toUpperCase() });
     if (existingCoupon) {
       errors.code = 'This coupon code already exists';
@@ -313,6 +319,11 @@ const editCoupon = async (req, res) => {
       errors.validUntil = 'Valid until must be after valid from date';
       hasErrors = true;
     }
+
+    if (discountType === 'percentage' && discountAmount > 99) {
+  errors.discountAmount = 'Percentage discount cannot be more than 100%';
+  hasErrors = true;
+}
 
     const existingCoupon = await Coupon.findOne({
       code: code.toUpperCase(),

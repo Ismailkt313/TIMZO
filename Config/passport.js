@@ -6,16 +6,14 @@ const env = require('dotenv').config();
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: "http://localhost:3000/auth/google/callback" // Absolute URL to match Google Cloud Console
+    callbackURL: "http://localhost:3000/auth/google/callback" 
   },
   async (accessToken, refreshToken, profile, done) => {
     try {
-        // Find user by googleId
         const user = await User.findOne({ googleId: profile.id });
 
         if (user) return done(null, user);
 
-        // Create new user if not found
         const newUser = new User({
             fullname: profile.displayName,
             email: profile.emails[0].value,

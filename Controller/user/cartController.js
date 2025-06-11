@@ -1,5 +1,6 @@
 const Cart = require("../../Model/cartSchema");
 const User = require("../../Model/userSchema");
+const Wishlist = require('../../Model/wishlistSchema')
 const Coupon = require('../../Model/coupenSchema')
 const Product = require("../../Model/productSchema"); 
 const loadcart = async (req, res) => {
@@ -26,6 +27,9 @@ const loadcart = async (req, res) => {
         }
 
         let cart = await Cart.findOne({ userId }).populate('items.product');
+        if(!cart){
+            cart = new Cart({ userId, items: [] }); 
+        }
         const availableCoupons = await Coupon.find({
       isActive: true,
       validFrom: { $lte: new Date() },
@@ -38,6 +42,7 @@ const loadcart = async (req, res) => {
         let total = 0;
         let recommended = [];
         let couponDiscount = cart.coupon && cart.coupon.discount ? cart.coupon.discount : 0;
+        const stockError = req.query.stockError === '1';
 
         if (cart) {
             cart.items = cart.items.filter(item => {
@@ -64,6 +69,7 @@ const loadcart = async (req, res) => {
             subtotal,
             tax,
             shippingFee,
+            stockError,
             total,
             recommended,
             availableCoupons,
@@ -87,7 +93,7 @@ const addToCart = async (req, res) => {
         if (!userId) {
             console.log('No userId found in session');
             return res.status(401).json({ success: false, message: "Please log in to add items to cart" });
-        } 
+        }
 
         const { productId, quantity } = req.body;
         if (!productId || !quantity || quantity < 1) {
@@ -110,9 +116,9 @@ const addToCart = async (req, res) => {
         let cart = await Cart.findOne({ userId });
         if (!cart) {
             console.log('Creating new cart for userId:', userId);
-            cart = new Cart({ userId, items: [] }); 
+            cart = new Cart({ userId, items: [] });
         }
-        
+
         const existingItem = cart.items.find(item => item.product.toString() === productId);
         if (existingItem) {
             const newQuantity = existingItem.quantity + parseInt(quantity);
@@ -123,8 +129,6 @@ const addToCart = async (req, res) => {
                 return res.status(400).json({ success: false, message: "Quantity exceeds available stock" });
             }
             existingItem.quantity = newQuantity;
-            // REMOVE this line because you chose Option 1:
-            // existingItem.price = product.salePrice;
         } else {
             cart.items.push({ 
                 product: productId, 
@@ -134,19 +138,27 @@ const addToCart = async (req, res) => {
 
         await cart.save();
 
+        // ✅ Remove from wishlist if exists
+        const wishlist = await Wishlist.findOne({ userId });
+        if (wishlist && wishlist.products.some(p => p.productId.toString() === productId)) {
+            await Wishlist.updateOne(
+                { userId },
+                { $pull: { products: { productId: productId } } }
+            );
+        }
+
         await cart.populate('items.product');
 
         let cartCount = cart.items.reduce((sum, item) => sum + item.quantity, 0);
         let total = cart.items.reduce((sum, item) => {
             if (item.product && !item.product.isDeleted && !item.product.isBlocked && item.product.status === 'available') {
-                // USE item.product.salePrice here
                 return sum + item.product.salePrice * item.quantity;
             }
             return sum;
         }, 0);
 
-        return res.status(200).json({ 
-            success: true, 
+        return res.status(200).json({
+            success: true,
             message: "Product added to cart successfully",
             cartCount,
             total
@@ -156,6 +168,7 @@ const addToCart = async (req, res) => {
         return res.status(500).json({ success: false, message: "Failed to add product to cart" });
     }
 };
+
 
 const updateCart = async (req, res) => {
     try {
@@ -213,12 +226,10 @@ cart.items.forEach(item => {
     }
 });
 
-// ✅ Define tax, shipping, grandTotal here
-let tax = +(total * 0.10).toFixed(2);         // 10% tax
-let shippingFee = 10;                         // ₹10 fixed shipping
+let tax = +(total * 0.10).toFixed(2);         
+let shippingFee = 10;                        
 let grandTotal = +(total + tax + shippingFee).toFixed(2);
 
-// ✅ Send all in response
 res.status(200).json({
     success: true,
     message: "Cart updated successfully",
@@ -263,8 +274,8 @@ cart.items.forEach(item => {
     }
 });
 
-const tax = +(total * 0.10).toFixed(2); // 12% GST (or adjust as needed)
-const shippingFee = total > 0 ? 49 : 0; // or any logic you use
+const tax = +(total * 0.10).toFixed(2);
+const shippingFee = 10; 
 const grandTotal = +(total + tax + shippingFee).toFixed(2);
 
 res.status(200).json({ 

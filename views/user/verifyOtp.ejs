@@ -208,12 +208,21 @@
     });
 
     resendBtn.addEventListener("click", () => {
+      Swal.fire({
+        title: "Sending OTP...",
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        }
+      });
+
       fetch("/user/resend-otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" }
       })
       .then(res => res.json())
       .then(response => {
+        Swal.close();
         if (response.success) {
           timer = 30;
           startTimer();
@@ -227,6 +236,7 @@
         }
       })
       .catch(() => {
+        Swal.close();
         Swal.fire({
           icon: "error",
           title: "Network Error",

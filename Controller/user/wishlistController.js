@@ -164,19 +164,23 @@ const addToCart = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Product not found.' });
     }
 
-   const objectProductId = new mongoose.Types.ObjectId(productId);
+    const objectProductId = new mongoose.Types.ObjectId(productId);
 
-await Wishlist.updateOne(
-  { userId: userId },
-  { $pull: { products: { productId: objectProductId } } }
-);
+    // ✅ Check if the product exists in wishlist before removing
+    const wishlist = await Wishlist.findOne({ userId });
 
+    if (wishlist && wishlist.products.some(item => item.productId.toString() === productId)) {
+      await Wishlist.updateOne(
+        { userId },
+        { $pull: { products: { productId: objectProductId } } }
+      );
+    }
 
-    const existingCart = await Cart.findOne({ userId: userId });
-    
+    let existingCart = await Cart.findOne({ userId });
+
     if (existingCart) {
       const itemIndex = existingCart.items.findIndex(item => item.product.toString() === productId);
-      if (itemIndex > -1 ) {
+      if (itemIndex > -1) {
         const currentQty = existingCart.items[itemIndex].quantity;
         const newQty = currentQty + parseInt(quantity);
 
@@ -194,36 +198,38 @@ await Wishlist.updateOne(
           });
         }
 
-        existingCart.items[itemIndex].quantity += parseInt(quantity);
+        existingCart.items[itemIndex].quantity = newQty;
       } else {
         existingCart.items.push({ product: productId, quantity: parseInt(quantity) });
       }
+
       await existingCart.save();
     } else {
       const newCart = new Cart({
-        userId: userId,
+        userId,
         items: [{ product: productId, quantity: parseInt(quantity) }]
       });
       await newCart.save();
     }
 
-    const cart = await Cart.findOne({ userId: userId });
+    const cart = await Cart.findOne({ userId });
     const cartCount = cart.items.reduce((acc, item) => acc + item.quantity, 0);
 
     res.status(200).json({
       success: true,
-      message: 'Item added to cart and removed from wishlist.',
+      message: 'Item added to cart and removed from wishlist (if present).',
       cartCount
     });
 
   } catch (error) {
-    console.error('Error adding to cart from wishlist', error);
+    console.error('Error adding to cart from wishlist:', error);
     res.status(500).json({
       success: false,
       message: 'Something went wrong. Please try again later.'
     });
   }
 };
+
 
 
 module.exports = {

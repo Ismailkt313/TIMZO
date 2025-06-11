@@ -217,7 +217,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Toast setup (using SweetAlert2 instead)
         function showToast(message, type = 'success') {
             Swal.fire({
                 toast: true,
@@ -230,62 +229,50 @@
             });
         }
 
-        // Validate form fields
         function validateForm(data, isEdit = false) {
             const errors = [];
 
-            // Full Name: Required, 2-50 characters, letters and spaces
             if (!data.fullName || !/^[A-Za-z\s]{2,50}$/.test(data.fullName)) {
                 errors.push('Full Name must be 2-50 characters long and contain only letters and spaces');
             }
 
-            // Address Line 1: Required, 5-100 characters, alphanumeric with ,.- and spaces
             if (!data.addressLine1 || !/^[\w\s,.-]{5,100}$/.test(data.addressLine1)) {
                 errors.push('Address Line 1 must be 5-100 characters long and contain valid address characters');
             }
 
-            // Address Line 2: Optional, 0-100 characters, same format as addressLine1 if provided
             if (data.addressLine2 && !/^[\w\s,.-]{0,100}$/.test(data.addressLine2)) {
                 errors.push('Address Line 2 must be up to 100 characters and contain valid address characters');
             }
 
-            // City: Required, 2-50 characters, letters and spaces
             if (!data.city || !/^[A-Za-z\s]{2,50}$/.test(data.city)) {
                 errors.push('City must be 2-50 characters long and contain only letters and spaces');
             }
 
-            // State: Required, 2-50 characters, letters and spaces
             if (!data.state || !/^[A-Za-z\s]{2,50}$/.test(data.state)) {
                 errors.push('State must be 2-50 characters long and contain only letters and spaces');
             }
 
-            // Postal Code: Required, exactly 6 digits
             if (!data.postalCode || !/^\d{6}$/.test(data.postalCode)) {
                 errors.push('Postal Code must be exactly 6 digits');
             }
 
-            // Country: Required, 2-50 characters, letters and spaces
             if (!data.country || !/^[A-Za-z\s]{2,50}$/.test(data.country)) {
                 errors.push('Country must be 2-50 characters long and contain only letters and spaces');
             }
 
-            // Phone: Required, exactly 10 digits
             if (!data.phone || !/^\d{10}$/.test(data.phone)) {
                 errors.push('Phone number must be exactly 10 digits');
             }
 
-            // Address Type: Required, must be Home, Work, or Other
             if (!data.addressType || !['Home', 'Work', 'Other'].includes(data.addressType)) {
                 errors.push('Address Type must be Home, Work, or Other');
             }
 
-            // Landmark: Optional, 0-100 characters, same format as addressLine1 if provided
             if (data.landmark && !/^[\w\s,.-]{0,100}$/.test(data.landmark)) {
                 errors.push('Landmark must be up to 100 characters and contain valid address characters');
             }
 
-            // isDefault: Optional, no validation needed (defaults to false if not present)
-            // addressId: Only for edit form, required but handled by form structure
+
             if (isEdit && !data.addressId) {
                 errors.push('Address ID is required for editing');
             }
@@ -293,14 +280,12 @@
             return errors;
         }
 
-        // Add Address
         document.getElementById('addAddressForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const formData = new FormData(e.target);
             const data = Object.fromEntries(formData);
             console.log('Add address data:', data);
 
-            // Validate form
             const errors = validateForm(data);
             if (errors.length > 0) {
                 showToast(errors.join('\n'), 'error');
@@ -327,7 +312,6 @@
             }
         });
 
-        // Populate Edit Address Modal
         document.querySelectorAll('.edit-address').forEach(button => {
             button.addEventListener('click', async () => {
                 const addressId = button.getAttribute('data-address-id');
@@ -365,7 +349,6 @@
             });
         });
 
-        // Edit Address
         document.getElementById('editAddressForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const formData = new FormData(e.target);
@@ -373,7 +356,6 @@
             const addressId = data.addressId;
             console.log('Edit address data:', data);
 
-            // Validate form
             const errors = validateForm(data, true);
             if (errors.length > 0) {
                 showToast(errors.join('\n'), 'error');
@@ -400,7 +382,6 @@
             }
         });
 
-        // Delete Address
         document.querySelectorAll('.delete-address').forEach(button => {
             button.addEventListener('click', async () => {
                 const addressId = button.getAttribute('data-address-id');

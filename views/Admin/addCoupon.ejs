@@ -47,7 +47,6 @@
       margin-top: 64px;
       padding: 24px;
       width: calc(100% - 250px);
-      background-color: #f3f4f6;
       min-height: calc(100vh - 64px);
       transition: margin-left 0.3s ease, width 0.3s ease;
     }
@@ -72,15 +71,10 @@
 </head>
 <body class="font-sans">
   <div class="dashboard-container">
-    <!-- Sidebar Partial -->
     <%- include('.././partials/admin/adminsidebar', { activePage: 'coupons', admin: admin || {} }) %>
 
-    <!-- Main Content Area -->
     <div class="main-content-wrapper">
-      <!-- Navbar Partial -->
-      <%- include('.././partials/admin/navbar', { admin: admin || {} }) %>
 
-      <!-- Main Content -->
       <div class="main-content">
         <% if (error && error.length) { %>
           <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4">
@@ -91,7 +85,6 @@
         <div class="bg-white shadow-md rounded-lg p-6">
           <form action="<%= isEdit ? '/admin/coupons/edit/' + coupon._id : '/admin/coupons/add' %>" method="POST">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <!-- Coupon Code -->
               <div>
                 <label class="block text-sm font-medium text-gray-700">Coupon Code</label>
                 <input type="text" name="code" value="<%= coupon.code %>" class="mt-1 block w-full p-2 border rounded-md shadow-sm <% if (errors.code) { %> border-red-500 <% } %>" placeholder="Enter coupon code">
@@ -99,7 +92,6 @@
                   <p class="error"><%= errors.code %></p>
                 <% } %>
               </div>
-              <!-- Description -->
               <div>
                 <label class="block text-sm font-medium text-gray-700">Description</label>
                 <input type="text" name="description" value="<%= coupon.description || '' %>" class="mt-1 block w-full p-2 border rounded-md shadow-sm <% if (errors.description) { %> border-red-500 <% } %>" placeholder="Enter description">

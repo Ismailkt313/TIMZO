@@ -42,21 +42,9 @@ const logout = async (req, res) => {
 };
  
 
-const loaddashboard = async (req, res) => {
-    try {
-        const admin = req.session.admin
-        const notifications = [];
-        res.render('Admin/admindashbord',{ admin,notifications });
-    } catch (error) {
-        res.redirect('/user/error404');
-    }
-};
-
-
 
 module.exports = {
     loadsign,
     login,
     logout,        
-    loaddashboard
 };

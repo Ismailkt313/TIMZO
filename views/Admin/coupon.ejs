@@ -45,11 +45,9 @@
       width: 1700px;
     }
     .main-content {
-      margin-left: 250px;
-      margin-top: 64px;
+      margin-left: 240px;
       padding: 24px;
-      width: calc(100% - 250px);
-      background-color: #f3f4f6;
+      width: 1600px;
       min-height: calc(100vh - 64px);
       transition: margin-left 0.3s ease, width 0.3s ease;
     }
@@ -91,9 +89,6 @@
 
     <!-- Main Content Area -->
     <div class="main-content-wrapper">
-      <!-- Navbar Partial -->
-      <%- include('.././partials/admin/navbar', { admin: admin || {} }) %>
-
       <!-- Main Content -->
       <div class="main-content">
         <% if (success && success.length) { %>
@@ -159,13 +154,25 @@
             </thead>
             <tbody id="couponTableBody" class="bg-white divide-y divide-gray-200">
               <% coupons.forEach(coupon => { %>
-                <tr class="coupon-row" data-status="<%= coupon.isActive ? 'active' : 'inactive' %>" data-referral="<%= coupon.isReferral ? 'referral' : 'non-referral' %>">
+                <% 
+                  // Compute effective status: active if isActive is true AND validUntil is in the future
+                  const currentDate = new Date();
+                  const validUntil = new Date(coupon.validUntil);
+                  const isExpired = validUntil < currentDate;
+                  const effectiveStatus = coupon.isActive && !isExpired ? 'active' : 'inactive';
+                  const statusText = effectiveStatus === 'active' ? 'Active' : 'Inactive';
+                  const statusClass = effectiveStatus === 'active' ? 'text-green-600' : 'text-red-600';
+                  const toggleText = effectiveStatus === 'active' ? 'Deactivate' : 'Activate';
+                  const toggleIcon = effectiveStatus === 'active' ? 'fa-pause' : 'fa-play';
+                  const toggleClass = effectiveStatus === 'active' ? 'text-yellow-600 hover:text-yellow-800' : 'text-green-600 hover:text-green-800';
+                %>
+                <tr class="coupon-row" data-status="<%= effectiveStatus %>" data-referral="<%= coupon.isReferral ? 'referral' : 'non-referral' %>">
                   <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"><%= coupon.code %></td>
                   <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= coupon.description || '-' %></td>
                   <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= coupon.discountType %></td>
                   <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" data-discount="<%= coupon.discountAmount %>">
                     <%= coupon.discountType === 'percentage' ? coupon.discountAmount + '%' : '$' + coupon.discountAmount %>
-                    <%= coupon.maxDiscount && coupon.discountType === 'percentage' ? `(Max $${coupon.maxDiscount})` : '' %>
+                    <%= coupon.maxDiscount && coupon.discountType === 'percentage' ? `(Max ₹${coupon.maxDiscount})` : '' %>
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" data-validity="<%= coupon.validUntil %>">
                     <%= new Date(coupon.validFrom).toLocaleDateString() %> - <%= new Date(coupon.validUntil).toLocaleDateString() %>
@@ -174,8 +181,8 @@
                     <%= coupon.usedCount %> / <%= coupon.usageLimit || 'Unlimited' %>
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap text-sm">
-                    <span class="<%= coupon.isActive ? 'text-green-600' : 'text-red-600' %>">
-                      <%= coupon.isActive ? 'Active' : 'Inactive' %>
+                    <span class="<%= statusClass %>">
+                      <%= statusText %>
                     </span>
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -188,8 +195,8 @@
                     <button class="text-red-600 hover:text-red-800 mr-2 delete-coupon" data-id="<%= coupon._id %>">
                       <i class="fas fa-trash"></i> Delete
                     </button>
-                    <button class="toggle-status <%= coupon.isActive ? 'text-yellow-600 hover:text-yellow-800' : 'text-green-600 hover:text-green-800' %>" data-id="<%= coupon._id %>">
-                      <i class="fas <%= coupon.isActive ? 'fa-pause' : 'fa-play' %>"></i> <%= coupon.isActive ? 'Deactivate' : 'Activate' %>
+                    <button class="toggle-status <%= toggleClass %>" data-id="<%= coupon._id %>">
+                      <i class="fas <%= toggleIcon %>"></i> <%= toggleText %>
                     </button>
                   </td>
                 </tr>
@@ -232,7 +239,6 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-      // Delete Coupon
       const dltButtons = document.querySelectorAll('.delete-coupon');
       dltButtons.forEach(button => {
         button.addEventListener('click', async () => {
@@ -266,7 +272,6 @@
         });
       });
 
-      // Toggle Status
       document.querySelectorAll('.toggle-status').forEach(button => {
         button.addEventListener('click', async () => {
           const id = button.dataset.id;
@@ -304,7 +309,6 @@
         });
       });
 
-      // Sorting
       const sortButtons = document.querySelectorAll('.sort');
       let currentSort = { column: 'code', direction: 'asc' };
 
@@ -350,7 +354,6 @@
         });
       });
 
-      // Filtering
       const searchInput = document.getElementById('searchInput');
       const statusFilter = document.getElementById('statusFilter');
       const referralFilter = document.getElementById('referralFilter');
@@ -379,7 +382,6 @@
       statusFilter.addEventListener('change', filterCoupons);
       referralFilter.addEventListener('change', filterCoupons);
 
-      // Pagination
       document.getElementById('prevPage').addEventListener('click', () => {
         if (<%= page %> > 1) {
           window.location.href = `/admin/coupons?page=<%= page - 1 %>&limit=<%= limit %>`;

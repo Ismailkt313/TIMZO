@@ -13,16 +13,17 @@ const cartSchema = new mongoose.Schema({
             ref: 'Product', 
             required: true 
         }, 
-        quantity: { 
+        quantity: {
             type: Number, 
             required: true, 
             min: 1 
         }
-    }], 
+    }],
     coupon: {
-    code: { type: String },
-    discount: { type: Number, default: 0 }
-  },
+        code: { type: String },
+        percentage: { type: Number, default: 0 }, 
+        maxDiscount: { type: Number, default: 0 } 
+    }
 }, {
     timestamps: true
 });
