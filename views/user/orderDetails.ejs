@@ -440,78 +440,81 @@
                                     <th>Actions</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                <% order.items.forEach(item => { %>
-                                    <tr>
-                                        <td><%= item.productName %></td>
-                                        <td><%= item.quantity %></td>
-                                        <td>₹<%= item.price.toFixed(2) %></td>
-                                        <td><%= item.discount > 0 ? `-₹${item.discount.toFixed(2)}` : '—' %></td>
-                                        <td>₹<%= typeof item.finalPrice === 'number' ? item.finalPrice.toFixed(2) : '0.00' %></td>
-                                        <td>
-                                            <span class="badge <%= item.status === 'Delivered' ? 'bg-green-500' : (item.status === 'Returned' || item.status === 'Cancelled') ? 'bg-red-500' : (item.status === 'CancelRequested' || item.status === 'ReturnRequested') ? 'bg-yellow-500' : 'bg-blue-500' %> text-white">
-                                                <%= item.status %>
-                                            </span>
-                                        </td>
-                                        <td>
-                                            <% if (order.orderStatus === 'Processing' && item.status === 'Ordered') { %>
-                                                <button class="btn-cancel text-sm" onclick="promptItemAction('<%= order._id %>', '<%= item.productId._id %>', '<%= item.productName %>', 'cancel')">Request Cancel</button>
-                                            <% } else if (order.orderStatus === 'Delivered' && item.status === 'Delivered') { %>
-                                                <button class="btn-return text-sm" onclick="promptItemAction('<%= order._id %>', '<%= item.productId._id %>', '<%= item.productName %>', 'return')">Request Return</button>
-                                                <% const reviewKey = item.productId._id + '_' + order._id; %>
-                                                <% if (!reviewedProductOrderMap[reviewKey]) { %>
-                                                    <button class="btn-custom text-sm mt-2" onclick="openReviewModal('<%= order._id %>', '<%= item.productId._id %>', '<%= item.productName %>')">Write Review</button>
-                                                <% } %>
-                                            <% } else if (item.status === 'CancelRequested') { %>
-                                                <div class="request-info">
-                                                    <p>Cancel request pending</p>
-                                                    <p>Requested: <%= new Date(item.cancelRequestDate).toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric' }) %></p>
-                                                </div>
-                                            <% } else if (item.status === 'ReturnRequested') { %>
-                                                <div class="request-info">
-                                                    <p>Return request pending</p>
-                                                    <p>Reason: <%= item.returnReason %></p>
-                                                    <p>Requested: <%= new Date(item.returnRequestDate).toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric' }) %></p>
-                                                </div>
-                                            <% } else if (item.status === 'Returned' && item.returnReason) { %>
-                                                <div class="request-info">
-                                                    <p>Returned</p>
-                                                    <p>Reason: <%= item.returnReason %></p>
-                                                    <p>Date: <%= new Date(item.returnDate).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' }) %></p>
-                                                </div>
-                                            <% } else if (item.status === 'Cancelled') { %>
-                                                <div class="request-info">
-                                                    <p>Cancelled on <%= new Date(item.cancelDate || order.updatedAt).toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric' }) %></p>
-                                                </div>
-                                            <% } else { %>
-                                                <span>—</span>
-                                            <% } %>
-                                        </td>
-                                    </tr>
-                                <% }) %>
-                                <tr>
-                                    <td colspan="6">Subtotal</td>
-                                    <td>₹<%= order.subtotal.toFixed(2) %></td>
-                                </tr>
-                                <% if (order.discount > 0) { %>
-                                    <tr class="discount-row">
-                                        <td colspan="6">Total Discount</td>
-                                        <td>-₹<%= order.discount.toFixed(2) %></td>
-                                    </tr>
-                                <% } %>
-                                <tr>
-                                    <td colspan="6">Shipping Fee</td>
-                                    <td>₹<%= order.shippingFee.toFixed(2) %></td>
-                                </tr>
-                                <tr>
-                                    <td colspan="6">Tax</td>
-                                    <td>₹<%= order.tax.toFixed(2) %></td>
-                                </tr>
-                                <tr class="total-row">
-                                    <td colspan="6">Total Amount</td>
-                                    <td>₹<%= order.totalAmount.toFixed(2) %></td>
-                                </tr>
-                            </tbody>
+<tbody>
+<% order.items.forEach(item => { %>
+    <tr>
+        <td><%= item.productName %></td>
+        <td><%= item.quantity %></td>
+        <td>₹<%= item.price.toFixed(2) %></td>
+        <td>
+            <%= item.discount > 0 ? `-₹${item.discount.toFixed(2)}` : '—' %>
+        </td>
+        <td>₹<%= typeof item.finalPrice === 'number' ? item.finalPrice.toFixed(2) : (item.price * item.quantity).toFixed(2) %></td>
+        <td>
+            <span class="badge <%= item.status === 'Delivered' ? 'bg-green-500' : (item.status === 'Returned' || item.status === 'Cancelled') ? 'bg-red-500' : (item.status === 'CancelRequested' || item.status === 'ReturnRequested') ? 'bg-yellow-500' : 'bg-blue-500' %> text-white">
+                <%= item.status %>
+            </span>
+        </td>
+        <td>
+            <% if (order.orderStatus === 'Processing' && item.status === 'Ordered') { %>
+                <button class="btn-cancel text-sm" onclick="promptItemAction('<%= order._id %>', '<%= item.productId._id %>', '<%= item.productName %>', 'cancel')">Request Cancel</button>
+            <% } else if (order.orderStatus === 'Delivered' && item.status === 'Delivered') { %>
+                <button class="btn-return text-sm" onclick="promptItemAction('<%= order._id %>', '<%= item.productId._id %>', '<%= item.productName %>', 'return')">Request Return</button>
+                <% const reviewKey = item.productId._id + '_' + order._id; %>
+                <% if (!reviewedProductOrderMap[reviewKey]) { %>
+                    <button class="btn-custom text-sm mt-2" onclick="openReviewModal('<%= order._id %>', '<%= item.productId._id %>', '<%= item.productName %>')">Write Review</button>
+                <% } %>
+            <% } else if (item.status === 'CancelRequested') { %>
+                <div class="request-info">
+                    <p>Cancel request pending</p>
+                    <p>Requested: <%= new Date(item.cancelRequestDate).toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric' }) %></p>
+                </div>
+            <% } else if (item.status === 'ReturnRequested') { %>
+                <div class="request-info">
+                    <p>Return request pending</p>
+                    <p>Reason: <%= item.returnReason %></p>
+                    <p>Requested: <%= new Date(item.returnRequestDate).toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric' }) %></p>
+                </div>
+            <% } else if (item.status === 'Returned' && item.returnReason) { %>
+                <div class="request-info">
+                    <p>Returned</p>
+                    <p>Reason: <%= item.returnReason %></p>
+                    <p>Date: <%= new Date(item.returnDate).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' }) %></p>
+                </div>
+            <% } else if (item.status === 'Cancelled') { %>
+                <div class="request-info">
+                    <p>Cancelled on <%= new Date(item.cancelDate || order.updatedAt).toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric' }) %></p>
+                </div>
+            <% } else { %>
+                <span>—</span>
+            <% } %>
+        </td>
+    </tr>
+<% }) %>
+<tr>
+    <td colspan="6">Subtotal</td>
+    <td>₹<%= order.subtotal.toFixed(2) %></td>
+</tr>
+<% if (order.discount > 0) { %>
+<tr class="discount-row">
+    <td colspan="6">Total Discount</td>
+    <td>-₹<%= order.discount.toFixed(2) %></td>
+</tr>
+<% } %>
+<tr>
+    <td colspan="6">Shipping Fee</td>
+    <td>₹<%= order.shippingFee.toFixed(2) %></td>
+</tr>
+<tr>
+    <td colspan="6">Tax</td>
+    <td>₹<%= order.tax.toFixed(2) %></td>
+</tr>
+<tr class="total-row">
+    <td colspan="6">Total Amount</td>
+    <td>₹<%= order.totalAmount.toFixed(2) %></td>
+</tr>
+</tbody>
+
                         </table>
                     </div>
 

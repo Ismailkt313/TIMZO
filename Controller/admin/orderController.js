@@ -211,7 +211,7 @@ const loadRequstManagement = async (req, res) => {
         res.status(500).render("error404", { message: 'Internal Server Error' });
     }
 };
-
+ 
 const loadOrders = async (req, res) => {
     try {
         const { id } = req.params;
@@ -294,8 +294,23 @@ const adminHandleRequest = async (req, res) => {
             console.log('Created new wallet for user:', order.user._id);
         }
 
-        const refundAmount = item.finalPrice + (item.tax || 0);
-        console.log('Refund amount calculated:', refundAmount);
+// Calculate refund without over-discounting
+let refundAmount = (item.itemTotal || 0) + (item.tax || 0);
+
+// Optional: If you want to apply proportional discount, cap it so it doesn't go negative
+const orderDiscount = order.discount || 0;
+const totalItemValue = order.items.reduce((sum, i) => sum + i.itemTotal, 0);
+const itemDiscountShare = totalItemValue > 0
+  ? (item.itemTotal / totalItemValue) * orderDiscount
+  : 0;
+
+// Apply capped discount
+refundAmount = refundAmount - itemDiscountShare;
+
+// Prevent negative refund
+refundAmount = Math.max(Math.round(refundAmount), 0);
+console.log('Refund amount calculated with proportional discount:', refundAmount);
+
 
         if (approve) {
             if (isCancel) {
@@ -354,15 +369,17 @@ const adminHandleRequest = async (req, res) => {
             console.log('Request rejected, reset item status:', { productId: item.productId, newStatus: item.status });
         }
 
-        order.subtotal = order.items.reduce((sum, i) => {
-            if (i.status !== 'Returned' && i.status !== 'Cancelled') {
-                return sum + i.itemTotal;
-            }
-            return sum;
-        }, 0);
+const activeItems = order.items.filter(i => i.status !== 'Returned' && i.status !== 'Cancelled');
+order.subtotal = activeItems.reduce((sum, i) => sum + i.itemTotal, 0);
+order.tax = Math.round(order.subtotal * 0.10);
 
-        order.tax = Math.round(order.subtotal * 0.10);
-        order.totalAmount = order.subtotal + order.shippingFee + order.tax - (order.discount || 0);
+// Recalculate proportional discount only for non-cancelled items
+const totalItemValueBeforeDiscount = order.items.reduce((sum, i) => sum + i.itemTotal, 0);
+const proportionalDiscount = totalItemValueBeforeDiscount > 0
+    ? (order.discount || 0) * (order.subtotal / totalItemValueBeforeDiscount)
+    : 0;
+
+order.totalAmount = Math.round(order.subtotal + order.tax + order.shippingFee - proportionalDiscount);
 
         console.log('Recalculated order totals:', {
             subtotal: order.subtotal,

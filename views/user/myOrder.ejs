@@ -2,243 +2,227 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Orders - Timzo</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="icon" type="image/x-icon" href="/images/TIMZO.jpg">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@600&display=swap"
-        rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Orders - Timzo</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="icon" type="image/x-icon" href="/images/TIMZO.jpg" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@600&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
 
-        h1,
-        h2,
-        h3 {
-            font-family: 'Poppins', sans-serif;
-        }
+    h1,
+    h2,
+    h3 {
+      font-family: 'Poppins', sans-serif;
+    }
 
-        .sidebar {
-            background: linear-gradient(180deg, #1f2937 0%, #111827 100%);
-            transition: transform 0.3s ease-in-out;
-            z-index: 50;
-        }
+    .sidebar {
+      background: linear-gradient(180deg, #1f2937 0%, #111827 100%);
+      transition: transform 0.3s ease-in-out;
+      z-index: 50;
+    }
 
-        .sidebar-hidden {
-            transform: translateX(-100%);
-        }
+    .sidebar-hidden {
+      transform: translateX(-100%);
+    }
 
-        .sidebar-active {
-            transform: translateX(0);
-        }
+    .sidebar-active {
+      transform: translateX(0);
+    }
 
-        .main-content {
-            margin-left: 256px;
-            padding: 2rem;
-            background-color: #f9fafb;
-        }
+    .main-content {
+      margin-left: 256px;
+      padding: 2rem;
+      background-color: #f9fafb;
+    }
 
-        .order-card {
-            background-color: #ffffff;
-            border-radius: 12px;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
-            padding: 24px;
-            transition: transform 0.2s ease-in-out;
-        }
+    .order-card {
+      background-color: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+      padding: 24px;
+      transition: transform 0.2s ease-in-out;
+    }
 
-        .order-card:hover {
-            transform: translateY(-4px);
-        }
+    .order-card:hover {
+      transform: translateY(-4px);
+    }
 
-        .btn-primary {
-            background-color: #1f2937;
-            color: #ffffff;
-            padding: 8px 16px;
-            border-radius: 6px;
-            transition: all 0.3s;
-        }
+    .btn-primary {
+      background-color: #1f2937;
+      color: #ffffff;
+      padding: 8px 16px;
+      border-radius: 6px;
+      transition: all 0.3s;
+    }
 
-        .btn-primary:hover {
-            background-color: #facc15;
-            color: #1f2937;
-        }
+    .btn-primary:hover {
+      background-color: #facc15;
+      color: #1f2937;
+    }
 
-        .btn-danger {
-            background-color: #ef4444;
-            color: #ffffff;
-            padding: 8px 16px;
-            border-radius: 6px;
-            transition: all 0.3s;
-        }
+    .btn-danger {
+      background-color: #ef4444;
+      color: #ffffff;
+      padding: 8px 16px;
+      border-radius: 6px;
+      transition: all 0.3s;
+    }
 
-        .btn-danger:hover {
-            background-color: #dc2626;
-        }
+    .btn-danger:hover {
+      background-color: #dc2626;
+    }
 
-        .btn-retry {
-            background-color: #f59e0b;
-            color: #ffffff;
-            padding: 8px 16px;
-            border-radius: 6px;
-            transition: all 0.3s;
-        }
+    .btn-retry {
+      background-color: #f59e0b;
+      color: #ffffff;
+      padding: 8px 16px;
+      border-radius: 6px;
+      transition: all 0.3s;
+    }
 
-        .btn-retry:hover {
-            background-color: #d97706;
-        }
+    .btn-retry:hover {
+      background-color: #d97706;
+    }
 
-        .status-badge {
-            display: inline-flex;
-            align-items: center;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 0.875rem;
-            font-weight: 500;
-        }
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.875rem;
+      font-weight: 500;
+    }
 
-        .invoice {
-            padding-left: 300px;
-            padding-bottom: 10px;
-        }
+    .status-processing {
+      background-color: #fef3c7;
+      color: #d97706;
+    }
 
-        .status-processing {
-            background-color: #fef3c7;
-            color: #d97706;
-        }
+    .status-delivered {
+      background-color: #d1fae5;
+      color: #059669;
+    }
 
-        .status-delivered {
-            background-color: #d1fae5;
-            color: #059669;
-        }
+    .status-cancelled {
+      background-color: #fee2e2;
+      color: #dc2626;
+    }
 
-        .status-cancelled {
-            background-color: #fee2e2;
-            color: #dc2626;
-        }
+    .progress-bar {
+      height: 6px;
+      background-color: #e5e7eb;
+      border-radius: 3px;
+      overflow: hidden;
+    }
 
-        .progress-bar {
-            height: 6px;
-            background-color: #e5e7eb;
-            border-radius: 3px;
-            overflow: hidden;
-        }
+    .progress-fill {
+      height: 100%;
+      background-color: #10b981;
+      transition: width 0.5s ease-in-out;
+    }
 
-        .progress-fill {
-            height: 100%;
-            background-color: #10b981;
-            transition: width 0.5s ease-in-out;
-        }
+    @media (max-width: 768px) {
+      .sidebar {
+        transform: translateX(-100%);
+      }
 
-        .tooltip {
-            position: relative;
-        }
+      .main-content {
+        margin-left: 0;
+        padding: 1rem;
+      }
 
-        .tooltip:hover::after {
-            content: attr(data-tooltip);
-            position: absolute;
-            left: 100%;
-            top: 50%;
-            transform: translateY(-50%);
-            background: #374151;
-            color: #fff;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 12px;
-            white-space: nowrap;
-            z-index: 10;
-        }
-
-        @media (max-width: 768px) {
-            .sidebar {
-                transform: translateX(-100%);
-            }
-
-            .main-content {
-                margin-left: 0;
-                padding: 1rem;
-            }
-
-            .order-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
+      .order-grid {
+        grid-template-columns: 1fr !important;
+      }
+    }
+  </style>
 </head>
 
 <body class="bg-gray-50">
-    <div class="flex min-h-screen">
-        <%- include('../Partials/user/userSidebar', { user: user, currentPage: 'orders' }) %>
-            <div class="main-content flex-1 flex justify-center">
-                <div class="w-full max-w-5xl">
-                    <h1 class="text-4xl font-bold text-gray-900 mb-10 text-center">My Orders</h1>
-                    <% if (orders.length===0) { %>
-                        <div class="text-center py-16 bg-white rounded-xl shadow-md">
-                            <i class="fas fa-shopping-bag text-gray-400 text-5xl mb-4"></i>
-                            <p class="text-gray-600 text-lg mb-6">No orders found.</p>
-                            <a href="/products" class="btn-primary inline-block px-6 py-3 text-lg">Start Shopping</a>
-                        </div>
-                        <% } else { %>
-                            <div class="order-grid grid grid-cols-2 gap-8">
-                                <% orders.forEach(order=> { %>
-                                    <div class="order-card">
-                                        <div class="invoice">
-                                            <button class="btn-custom btn-link text-sm"
-                                                onclick="downloadInvoice('<%= order._id %>')">
-                                                <i class="fas fa-download"></i> Download Invoice
-                                            </button>
-                                        </div>
-                                        <div class="flex justify-between items-center mb-4">
-                                            <p class="font-semibold text-xl text-gray-900">Order #<%= order.orderId %>
-                                            </p>
-                                            <span class="status-badge status-<%= order.orderStatus.toLowerCase() %>">
-                                                <i class="fas fa-circle text-xs mr-2"></i>
-                                                <%= order.orderStatus %>
-                                            </span>
-                                        </div>
-                                        <p class="text-gray-600 text-sm mb-2">
-                                            <i class="fas fa-calendar-alt mr-2"></i> Placed on: <%= new
-                                                Date(order.orderDate).toLocaleDateString() %>
-                                        </p>
-                                        <p class="text-gray-600 text-sm mb-4">
-                                            <i class="fas fa-rupee-sign mr-2"></i> Total: ₹<%=
-                                                order.totalAmount.toFixed(2) %>
-                                        </p>
-                                        <div class="progress-bar mb-6">
-                                            <div class="progress-fill"
-                                                style="width: <%= order.orderStatus === 'Delivered' ? '100%' : order.orderStatus === 'Processing' ? '50%' : '0%' %>">
-                                            </div>
-                                        </div>
-                                        <div class="flex space-x-4">
-                                            <a href="/orders/<%= order._id %>"
-                                                class="btn-primary flex-1 text-center">View Details</a>
-                                            <% if (order.orderStatus==='Processing' ) { %>
-                                                <button class="btn-danger flex-1 cancel-order"
-                                                    data-order-id="<%= order._id %>">Cancel Order</button>
-                                                <% } %>
-                                                    <% if (order.paymentMethod==='Online' &&
-                                                        order.paymentStatus==='Pending' ) { %>
-                                                        <button class="btn-retry flex-1 retry-payment"
-                                                            data-order-id="<%= order._id %>">Retry Payment</button>
-                                                        <% } %>
-                                        </div>
-                                    </div>
-                                    <% }) %>
-                            </div>
-                            <% } %>
-                </div>
+  <div class="flex min-h-screen">
+    <%- include('../Partials/user/userSidebar', { user: user, currentPage: 'orders' }) %>
+    <div class="main-content flex-1 flex justify-center">
+      <div class="w-full max-w-5xl">
+        <h1 class="text-4xl font-bold text-gray-900 mb-10 text-center">My Orders</h1>
+
+        <% if (orders.length === 0) { %>
+        <div class="text-center py-16 bg-white rounded-xl shadow-md">
+          <i class="fas fa-shopping-bag text-gray-400 text-5xl mb-4"></i>
+          <p class="text-gray-600 text-lg mb-6">No orders found.</p>
+          <a href="/products" class="btn-primary inline-block px-6 py-3 text-lg">Start Shopping</a>
+        </div>
+        <% } else { %>
+        <div class="order-grid grid grid-cols-2 md:grid-cols-2 sm:grid-cols-1 gap-8">
+          <% orders.forEach(order => { %>
+          <div class="order-card">
+            <div class="flex justify-end mb-2">
+              <button class="text-sm text-blue-600 hover:underline" onclick="downloadInvoice('<%= order._id %>')">
+                <i class="fas fa-download mr-1"></i> Download Invoice
+              </button>
             </div>
+            <div class="flex justify-between items-center mb-4">
+              <p class="font-semibold text-xl text-gray-900">Order #<%= order.orderId %></p>
+              <span class="status-badge status-<%= order.orderStatus.toLowerCase() %>">
+                <i class="fas fa-circle text-xs mr-2"></i>
+                <%= order.orderStatus %>
+              </span>
+            </div>
+            <p class="text-gray-600 text-sm mb-2">
+              <i class="fas fa-calendar-alt mr-2"></i> Placed on:
+              <%= new Date(order.orderDate).toLocaleDateString() %>
+            </p>
+<p class="text-gray-600 text-sm mb-1">
+  Subtotal: ₹<%= order.calculated.subtotal.toFixed(2) %>
+</p>
+<p class="text-gray-600 text-sm mb-1">
+  Discount: -₹<%= order.calculated.totalDiscount.toFixed(2) %>
+</p>
+<p class="text-gray-600 text-sm mb-1">
+  Tax (10%): ₹<%= order.calculated.tax.toFixed(2) %>
+</p>
+<p class="text-gray-600 text-sm mb-1">
+  Shipping Fee: ₹<%= order.calculated.shippingFee.toFixed(2) %>
+</p>
+
+<!-- This is the original amount from the database -->
+<p class="text-gray-800 font-semibold text-sm mt-1">
+  Total: ₹<%= order.totalAmount.toFixed(2) %>
+</p>
+
+            <div class="progress-bar mb-6">
+              <div class="progress-fill"
+                style="width: <%= order.orderStatus === 'Delivered' ? '100%' : order.orderStatus === 'Processing' ? '50%' : order.orderStatus === 'Cancelled' ? '0%' : '25%' %>">
+              </div>
+            </div>
+            <div class="flex flex-wrap gap-2">
+              <a href="/orders/<%= order._id %>" class="btn-primary flex-1 text-center">View Details</a>
+              <% if (order.orderStatus === 'Processing') { %>
+              <button class="btn-danger flex-1 cancel-order" data-order-id="<%= order._id %>">Cancel Order</button>
+              <% } %>
+              <% if (order.paymentMethod === 'Online' && order.paymentStatus === 'Pending') { %>
+              <button class="btn-retry flex-1 retry-payment" data-order-id="<%= order._id %>">Retry Payment</button>
+              <% } %>
+            </div>
+          </div>
+          <% }) %>
+        </div>
+        <% } %>
+      </div>
     </div>
+  </div>
 
-    <footer class="bg-white p-6 text-center text-gray-600 text-sm shadow-inner mt-12">
-        © <%= new Date().getFullYear() %> Timzo. All rights reserved.
-    </footer>
+  <footer class="bg-white p-6 text-center text-gray-600 text-sm shadow-inner mt-12">
+    © <%= new Date().getFullYear() %> Timzo. All rights reserved.
+  </footer>
 
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');

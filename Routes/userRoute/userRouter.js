@@ -55,7 +55,7 @@ router.get("/order/success", userAuth, checkoutController.loadSuccess);
 router.get('/order-failed',userAuth,checkoutController.loadFailed)
 router.get("/orders", userAuth, UserProfileController.loadOrders);
 router.get("/orders/:id", userAuth, OrderController.viewOrderDetail); 
-router.get("/user/orders/:id", userAuth, OrderController.getOrder); 
+router.get("/orders/:id", userAuth, OrderController.getOrder); 
 router.post("/orders/cancel/:orderId", userAuth, OrderController.cancelOrder);
 router.post('/orders/return/:orderId', userAuth, OrderController.returnEntireOrder);
 router.get('/orders/invoice/:orderId',userAuth,OrderController.downloadInvoice)

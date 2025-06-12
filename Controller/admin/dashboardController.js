@@ -247,6 +247,7 @@ const loadAdminDashboard = async (req, res) => {
     });
 
     res.render('admin/admindashbord', {
+      activePage : 'dashboard',
       bestSellingProducts: bestSellingProducts || [],
       bestSellingCategories: bestSellingCategories || [],
       bestSellingBrands: bestSellingBrands || [],

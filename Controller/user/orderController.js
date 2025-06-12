@@ -17,33 +17,48 @@ const viewOrderDetail = async (req, res) => {
                 user: null
             });
         }
+
         const { id } = req.params;
         if (!mongoose.Types.ObjectId.isValid(id)) {
             return res.status(400).render("error404", { message: "Invalid order ID" });
         }
+
         const order = await Order.findById(id).populate('items.productId');
         if (!order) {
             return res.status(404).render("error404", { message: "Order not found" });
         }
+
         if (order.user.toString() !== userId) {
             return res.status(403).render("error404", { message: "Unauthorized access to order" });
         }
-const reviewedProductOrderMap = new Map();
 
-const reviews = await Review.find({ user:userId}); 
+        // ✅ Just ensure values are present — DO NOT RECALCULATE
+        const shippingFee = order.shippingFee ?? 10;
+        const subtotal = order.subtotal ?? 0;
+        const tax = order.tax ?? 0;
+        const discount = order.discount ?? 0;
+        const totalAmount = order.totalAmount ?? (subtotal + shippingFee + tax - discount);
 
-reviews.forEach(review => {
-  const key = `${review.product}_${review.order}`;
-  reviewedProductOrderMap.set(key, true);
-});
-const reviewedMapObject = Object.fromEntries(reviewedProductOrderMap);
-
+        // ✅ Reviews
+        const reviews = await Review.find({ user: userId });
+        const reviewedProductOrderMap = {};
+        reviews.forEach(review => {
+            const key = `${review.product}_${review.order}`;
+            reviewedProductOrderMap[key] = true;
+        });
 
         res.render("user/orderDetails", {
             user: req.session.user,
-            order,
+            order: {
+                ...order.toObject(), // clone order
+                subtotal,
+                discount,
+                tax,
+                shippingFee,
+                totalAmount
+            },
             currentPage: 'orders',
-            reviewedProductOrderMap: reviewedMapObject
+            reviewedProductOrderMap
         });
     } catch (error) {
         console.error("Error loading order details:", error);
@@ -51,7 +66,12 @@ const reviewedMapObject = Object.fromEntries(reviewedProductOrderMap);
     }
 };
 
+
+
+
+
 const getOrder = async (req, res) => {
+
     try {
         const userId = req.session.user?._id;
         const { id: orderId } = req.params;
@@ -364,9 +384,9 @@ const downloadInvoice = async (req, res) => {
 
 module.exports = {
     viewOrderDetail,
-    getOrder,
     cancelOrder,
     requestItemAction,
     returnEntireOrder,
-    downloadInvoice
+    downloadInvoice,
+    getOrder
 };

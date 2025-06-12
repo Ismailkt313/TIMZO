@@ -445,88 +445,59 @@
         });
     }
 
-    async function applyCoupon(code) {
+async function applyCoupon(code) {
+    try {
+        const response = await fetch('/user/apply-coupon', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ couponCode: code }),
+            credentials: 'include'
+        });
+
+        const rawText = await response.text();
+        let data;
         try {
-            const response = await fetch('/user/apply-coupon', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ couponCode: code }),
-                credentials: 'include'
-            });
-
-            const data = await response.json();
-
-            if (data.success) {
-                // Update order summary
-                document.getElementById('subtotal').textContent = `₹${data.subtotal.toFixed(2)}`;
-                document.getElementById('shippingFee').textContent = `₹${data.shippingFee.toFixed(2)}`;
-                document.getElementById('tax').textContent = `₹${data.tax.toFixed(2)}`;
-                document.getElementById('totalAmount').textContent = `₹${data.total.toFixed(2)}`;
-
-                // Update coupon discount line
-                const couponDiscountContainer = document.getElementById('couponDiscountContainer');
-                const couponLabel = document.getElementById('couponLabel');
-                const couponDiscountEl = document.getElementById('couponDiscount');
-                if (data.couponDiscount > 0) {
-                    couponDiscountContainer.style.display = 'flex';
-                    couponLabel.textContent = `Coupon (${data.couponCode})`;
-                    couponDiscountEl.textContent = `-₹${data.couponDiscount.toFixed(2)}`;
-
-                    // Add remove coupon button if not already present
-                    let removeCouponEl = document.querySelector('.remove-coupon-btn');
-                    if (!removeCouponEl) {
-                        const removeCouponDiv = document.createElement('div');
-                        removeCouponDiv.classList.add('text-right');
-                        removeCouponDiv.innerHTML = `<span class="remove-coupon-btn" onclick="removeCoupon()">Remove Coupon</span>`;
-                        couponDiscountContainer.parentElement.insertBefore(removeCouponDiv, couponDiscountContainer.nextSibling);
-                    }
-                } else {
-                    couponDiscountContainer.style.display = 'none';
-                    couponLabel.textContent = 'Coupon';
-                    couponDiscountEl.textContent = '₹0.00';
-                    const removeCouponEl = document.querySelector('.remove-coupon-btn');
-                    if (removeCouponEl) removeCouponEl.parentElement.remove();
-                }
-
-                // Update payment method availability
-                const codInput = document.getElementById('cod');
-                const walletInput = document.getElementById('wallet');
-                if (codInput) {
-                    codInput.disabled = data.total > 1000;
-                    const codLabel = codInput.nextElementSibling;
-                    if (data.total > 1000) {
-                        codLabel.innerHTML = `Cash on Delivery <span class="text-red-600 text-sm ml-2">(Maximum amount of COD 1000)</span>`;
-                    } else {
-                        codLabel.innerHTML = 'Cash on Delivery';
-                    }
-                    if (codInput.disabled && codInput.checked) {
-                        codInput.checked = false;
-                        updateButtonState();
-                    }
-                }
-                if (walletInput) {
-                    walletInput.disabled = walletBalance < data.total;
-                    const walletLabel = walletInput.nextElementSibling;
-                    if (walletBalance < data.total) {
-                        walletLabel.innerHTML = `Wallet (Balance: ₹${walletBalance.toFixed(2)}) <span class="text-red-600 text-sm ml-2">(Insufficient balance)</span>`;
-                    } else {
-                        walletLabel.innerHTML = `Wallet (Balance: ₹${walletBalance.toFixed(2)})`;
-                    }
-                    if (walletInput.disabled && walletInput.checked) {
-                        walletInput.checked = false;
-                        updateButtonState();
-                    }
-                }
-
-                showToast(data.message, 'success');
-            } else {
-                showToast(data.message || 'Failed to apply coupon', 'error');
-            }
-        } catch (error) {
-            console.error('Error applying coupon:', error);
-            showToast('An error occurred while applying the coupon', 'error');
+            data = JSON.parse(rawText);
+        } catch (err) {
+            console.error("❌ Failed to parse JSON:", rawText);
+            throw new Error("Invalid server response (not JSON)");
         }
+
+        if (!response.ok || !data.success) {
+            showToast(data.message || 'Failed to apply coupon', 'error');
+            return;
+        }
+
+        // Update order summary
+        document.getElementById('subtotal').textContent = `₹${data.subtotal.toFixed(2)}`;
+        document.getElementById('shippingFee').textContent = `₹${data.shippingFee.toFixed(2)}`;
+        document.getElementById('tax').textContent = `₹${data.tax.toFixed(2)}`;
+        document.getElementById('totalAmount').textContent = `₹${data.total.toFixed(2)}`;
+
+        // Show coupon
+        const couponDiscountContainer = document.getElementById('couponDiscountContainer');
+        const couponLabel = document.getElementById('couponLabel');
+        const couponDiscountEl = document.getElementById('couponDiscount');
+
+        couponDiscountContainer.style.display = 'flex';
+        couponLabel.textContent = `Coupon (${data.couponCode})`;
+        couponDiscountEl.textContent = `-₹${data.couponDiscount.toFixed(2)}`;
+
+        // Remove button
+        let removeCouponEl = document.querySelector('.remove-coupon-btn');
+        if (!removeCouponEl) {
+            const removeCouponDiv = document.createElement('div');
+            removeCouponDiv.classList.add('text-right');
+            removeCouponDiv.innerHTML = `<span class="remove-coupon-btn" onclick="removeCoupon()">Remove Coupon</span>`;
+            couponDiscountContainer.parentElement.insertBefore(removeCouponDiv, couponDiscountContainer.nextSibling);
+        }
+
+        showToast(data.message, 'success');
+    } catch (error) {
+        console.error('❌ Error applying coupon:', error);
+        showToast('An error occurred while applying the coupon', 'error');
     }
+}
 
     async function removeCoupon() {
         Swal.fire({
