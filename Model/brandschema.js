@@ -4,11 +4,11 @@ const brandSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
-    unique: true,   
+    unique: true,
     trim: true
   },
   image: {
-    type: String,   
+    type: String,
     default: ''
   },
   isListed: {

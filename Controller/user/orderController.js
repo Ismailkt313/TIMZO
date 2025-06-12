@@ -32,14 +32,12 @@ const viewOrderDetail = async (req, res) => {
             return res.status(403).render("error404", { message: "Unauthorized access to order" });
         }
 
-        // ✅ Just ensure values are present — DO NOT RECALCULATE
         const shippingFee = order.shippingFee ?? 10;
         const subtotal = order.subtotal ?? 0;
         const tax = order.tax ?? 0;
         const discount = order.discount ?? 0;
         const totalAmount = order.totalAmount ?? (subtotal + shippingFee + tax - discount);
 
-        // ✅ Reviews
         const reviews = await Review.find({ user: userId });
         const reviewedProductOrderMap = {};
         reviews.forEach(review => {
@@ -50,7 +48,7 @@ const viewOrderDetail = async (req, res) => {
         res.render("user/orderDetails", {
             user: req.session.user,
             order: {
-                ...order.toObject(), // clone order
+                ...order.toObject(),
                 subtotal,
                 discount,
                 tax,
@@ -146,7 +144,7 @@ const cancelOrder = async (req, res) => {
                 await Product.findByIdAndUpdate(item.productId, {
                     $inc: { stock: item.quantity }
                 }, { new: true });
-                const refundAmount = item.finalPrice + (item.tax || 0); 
+                const refundAmount = item.finalPrice + (item.tax || 0);
                 totalRefund += refundAmount;
 
                 if (order.paymentMethod === 'Wallet' || order.paymentMethod === 'Online') {
@@ -168,11 +166,11 @@ const cancelOrder = async (req, res) => {
             order.totalAmount = 0;
         } else {
             order.subtotal = remainingItems.reduce((sum, item) => sum + item.itemTotal, 0);
-            
+
             const originalSubtotal = order.subtotal + order.items.filter(item => item.status === 'Cancelled').reduce((sum, item) => sum + item.itemTotal, 0);
             const remainingDiscount = (order.subtotal / originalSubtotal) * (order.coupon?.discount || 0);
-            
-            order.tax = order.subtotal * 0.10; 
+
+            order.tax = order.subtotal * 0.10;
             order.totalAmount = Math.max(0, order.subtotal - remainingDiscount + order.shippingFee + order.tax);
         }
 
@@ -215,10 +213,10 @@ const requestItemAction = async (req, res) => {
             return res.status(403).json({ success: false, message: 'Unauthorized access to order' });
         }
         const item = order.items.find(i => i.productId._id.toString() === productId.toString());
-if (!item) {
-    console.log('Item not found:', productId);
-    return res.status(404).json({ success: false, message: 'Item not found in order' });
-}
+        if (!item) {
+            console.log('Item not found:', productId);
+            return res.status(404).json({ success: false, message: 'Item not found in order' });
+        }
 
 
         const isCancel = action === 'cancel';
@@ -236,13 +234,13 @@ if (!item) {
         }
 
         if (isCancel) {
-           
+
             item.status = 'CancelRequested';
             item.cancelRequestDate = new Date();
             item.cancelReason = reason || '';
             item.requestStatus = 'Pending';
         } else {
-            
+
             const deliveredEntry = order.statusHistory.find(h => h.status === 'Delivered');
             const deliveryDate = deliveredEntry ? deliveredEntry.date : order.updatedAt;
             const daysSinceDelivery = (new Date() - new Date(deliveryDate)) / (1000 * 60 * 60 * 24);
@@ -349,36 +347,35 @@ const returnEntireOrder = async (req, res) => {
 };
 
 const downloadInvoice = async (req, res) => {
-  try {
-    const { orderId } = req.params;
+    try {
+        const { orderId } = req.params;
 
-    const order = await Order.findById(orderId)
-      .populate("user", "name email")
-      .populate("items.productId", "name");
+        const order = await Order.findById(orderId)
+            .populate("user", "name email")
+            .populate("items.productId", "name");
 
-    if (!order) {
-      return res.status(404).json({ message: "Order not found" });
+        if (!order) {
+            return res.status(404).json({ message: "Order not found" });
+        }
+
+        if (order.paymentStatus !== 'Completed') {
+            return res.status(403).json({ message: "Invoice not available for unpaid orders." });
+        }
+
+        const filePath = path.join(__dirname, `../pdfs/invoice-${orderId}.pdf`);
+        await generateInvoicePDF(order, filePath);
+
+        res.download(filePath, `invoice-${orderId}.pdf`, (err) => {
+            if (err) {
+                console.log("Download error:", err);
+            } else {
+                fs.unlinkSync(filePath); 
+            }
+        });
+    } catch (err) {
+        console.error("Invoice error:", err);
+        res.status(500).json({ message: "Failed to generate invoice" });
     }
-
-    // ❌ Block if payment not completed
-    if (order.paymentStatus !== 'Completed') {
-      return res.status(403).json({ message: "Invoice not available for unpaid orders." });
-    }
-
-    const filePath = path.join(__dirname, `../pdfs/invoice-${orderId}.pdf`);
-    await generateInvoicePDF(order, filePath);
-
-    res.download(filePath, `invoice-${orderId}.pdf`, (err) => {
-      if (err) {
-        console.log("Download error:", err);
-      } else {
-        fs.unlinkSync(filePath); // Delete after download
-      }
-    });
-  } catch (err) {
-    console.error("Invoice error:", err);
-    res.status(500).json({ message: "Failed to generate invoice" });
-  }
 };
 
 

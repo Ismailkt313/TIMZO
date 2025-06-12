@@ -146,7 +146,7 @@ const editAddress = async (req, res) => {
         await address.save();
         res.status(200).json({ success: true, message: 'Address updated successfully' });
     } catch (error) {
-        console.error('Error editing address:', error); 
+        console.error('Error editing address:', error);
         res.status(500).json({ success: false, message: 'Failed to update address' });
     }
 };
@@ -175,7 +175,7 @@ const deleteAddress = async (req, res) => {
 
 module.exports = {
     loadAddress,
-    createAddress, 
+    createAddress,
     getAddress,
     editAddress,
     deleteAddress

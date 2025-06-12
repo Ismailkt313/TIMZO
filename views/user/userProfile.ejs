@@ -1,395 +1,427 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>User Profile - TIMZO</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <link rel="icon" type="image/x-icon" href="/images/TIMZO.jpg">
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <link rel="icon" type="image/x-icon" href="/images/TIMZO.jpg" />
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
-        body {
-            background-color: #f4f4f4;
-            font-family: 'Arial', sans-serif;
-            margin: 0;
-        }
+      body {
+        background-color: #f4f4f4;
+        font-family: "Arial", sans-serif;
+        margin: 0;
+      }
 
-        .container-fluid {
-            padding: 0;
-        }
+      .container-fluid {
+        padding: 0;
+      }
 
+      .main-content {
+        padding: 20px;
+        min-height: 100vh;
+        background-color: #ffffff;
+      }
+
+      /* Profile Card */
+      .profile-card {
+        background-color: #ffffff;
+        border-radius: 16px;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        padding: 40px;
+        width: 100%;
+        max-width: 600px;
+        min-width: 400px;
+        margin: auto;
+      }
+
+      .profile-card h1 {
+        font-size: 24px;
+        color: #1a1a1a;
+        margin-bottom: 20px;
+        text-align: center;
+        font-weight: 600;
+      }
+
+      .profile-card .info-item {
+        margin-bottom: 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+      }
+
+      .profile-card .info-item strong {
+        color: #333;
+        font-weight: 500;
+      }
+
+      .profile-card .info-item span {
+        color: #666;
+      }
+
+      .profile-card .info-item input {
+        width: 60%;
+        padding: 5px;
+        border: 1px solid #ced4da;
+        border-radius: 6px;
+        font-size: 14px;
+        color: #333;
+      }
+
+      .profile-card .info-item input:focus {
+        outline: none;
+        border-color: #1a1a1a;
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+      }
+
+      .profile-card .btn-edit {
+        background-color: #1a1a1a;
+        color: #ffffff;
+        border: none;
+        padding: 10px;
+        border-radius: 8px;
+        text-align: center;
+        font-weight: 500;
+        transition: background-color 0.3s ease;
+      }
+
+      .profile-card .btn-edit:hover {
+        background-color: #ffd700;
+        color: #1a1a1a;
+      }
+
+      .profile-card .btn-update {
+        background-color: #28a745;
+        color: #ffffff;
+        border: none;
+        padding: 10px;
+        border-radius: 8px;
+        text-align: center;
+        font-weight: 500;
+        transition: background-color 0.3s ease;
+      }
+
+      .profile-card .btn-update:hover {
+        background-color: #218838;
+      }
+
+      .profile-card .btn-cancel {
+        background-color: #dc3545;
+        color: #ffffff;
+        border: none;
+        padding: 10px;
+        border-radius: 8px;
+        text-align: center;
+        font-weight: 500;
+        transition: background-color 0.3s ease;
+      }
+
+      .profile-card .btn-cancel:hover {
+        background-color: #c82333;
+      }
+
+      .button-group {
+        display: flex;
+        gap: 10px;
+        margin-top: 20px;
+      }
+      .row {
+        padding-left: 520px;
+      }
+
+      /* Responsive Adjustments */
+      @media (max-width: 767px) {
         .main-content {
-            padding: 20px;
-            min-height: 100vh;
-            background-color: #ffffff;
+          padding: 15px;
         }
 
-        /* Profile Card */
         .profile-card {
-            background-color: #ffffff;
-            border-radius: 16px;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-            padding: 40px;
-            width: 100%;
-            max-width: 600px;
-            min-width: 400px;
-            margin: auto;
+          padding: 20px;
         }
 
         .profile-card h1 {
-            font-size: 24px;
-            color: #1a1a1a;
-            margin-bottom: 20px;
-            text-align: center;
-            font-weight: 600;
-        }
-
-        .profile-card .info-item {
-            margin-bottom: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px;
-            background-color: #f8f9fa;
-            border-radius: 8px;
-        }
-
-        .profile-card .info-item strong {
-            color: #333;
-            font-weight: 500;
-        }
-
-        .profile-card .info-item span {
-            color: #666;
+          font-size: 20px;
         }
 
         .profile-card .info-item input {
-            width: 60%;
-            padding: 5px;
-            border: 1px solid #ced4da;
-            border-radius: 6px;
-            font-size: 14px;
-            color: #333;
+          width: 50%;
+          font-size: 12px;
         }
-
-        .profile-card .info-item input:focus {
-            outline: none;
-            border-color: #1a1a1a;
-            box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
-        }
-
-        .profile-card .btn-edit {
-            background-color: #1a1a1a;
-            color: #ffffff;
-            border: none;
-            padding: 10px;
-            border-radius: 8px;
-            text-align: center;
-            font-weight: 500;
-            transition: background-color 0.3s ease;
-        }
-
-        .profile-card .btn-edit:hover {
-            background-color: #ffd700;
-            color: #1a1a1a;
-        }
-
-        .profile-card .btn-update {
-            background-color: #28a745;
-            color: #ffffff;
-            border: none;
-            padding: 10px;
-            border-radius: 8px;
-            text-align: center;
-            font-weight: 500;
-            transition: background-color 0.3s ease;
-        }
-
-        .profile-card .btn-update:hover {
-            background-color: #218838;
-        }
-
-        .profile-card .btn-cancel {
-            background-color: #dc3545;
-            color: #ffffff;
-            border: none;
-            padding: 10px;
-            border-radius: 8px;
-            text-align: center;
-            font-weight: 500;
-            transition: background-color 0.3s ease;
-        }
-
-        .profile-card .btn-cancel:hover {
-            background-color: #c82333;
-        }
-
-        .button-group {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
-        }
-        .row{
-            padding-left: 520px;
-        }
-
-        /* Responsive Adjustments */
-        @media (max-width: 767px) {
-            .main-content {
-                padding: 15px;
-            }
-
-            .profile-card {
-                padding: 20px;
-            }
-
-            .profile-card h1 {
-                font-size: 20px;
-            }
-
-            .profile-card .info-item input {
-                width: 50%;
-                font-size: 12px;
-            }
-        }
+      }
     </style>
-</head>
+  </head>
 
-<body>
-    <%- include('.././Partials/user/userSidebar', { user: user, currentPage: 'profile' }) %>
+  <body>
+    <%- include('.././Partials/user/userSidebar', { user: user, currentPage:
+    'profile' }) %>
     <!-- Main Content with Sidebar -->
-    <div class="container-fluid vh-100 ">
-        <div class="row h-100">
-            <!-- Include User Sidebar --> 
-            
+    <div class="container-fluid vh-100">
+      <div class="row h-100">
+        <!-- Include User Sidebar -->
 
-            <!-- Main Content -->
-            <div class="col-md-9 d-flex align-items-center justify-content-center"> 
-                <div class="profile-card text-center">
-                    <h1>Welcome <%= user && user.fullname ? user.fullname : 'Guest' %>!</h1>
-                    <div class="info-item">
-                        <strong>Full Name</strong>
-                        <span class="view-field" id="fullname-view">
-                            <%= user && user.fullname ? user.fullname : 'Not provided' %>
-                        </span>
-                        <input type="text" class="edit-field d-none" id="fullname-edit" name="fullname" value="<%= user && user.fullname ? user.fullname : '' %>">
-                    </div>
-                    <div class="info-item">
-                        <strong>Email</strong>
-                        <span class="view-field" id="email-view">
-                            <%= user && user.email ? user.email : 'Not provided' %>
-                        </span>
-                        <input type="email" class="edit-field d-none" id="email-edit" name="email" value="<%= user && user.email ? user.email : '' %>">
-                    </div>
-                    <div class="info-item">
-                        <strong>Phone</strong>
-                        <span class="view-field" id="mobile-view">
-                            <%= user && user.mobile ? user.mobile : 'Not provided' %>
-                        </span>
-                        <input type="tel" class="edit-field d-none" id="mobile-edit" name="mobile" value="<%= user && user.mobile ? user.mobile : '' %>">
-                    </div>
-                    <div class="button-group" id="button-group">
-                        <button class="btn-edit w-100" id="edit-btn">Edit</button>
-                    </div>
-                </div>
+        <!-- Main Content -->
+        <div class="col-md-9 d-flex align-items-center justify-content-center">
+          <div class="profile-card text-center">
+            <h1>
+              Welcome <%= user && user.fullname ? user.fullname : 'Guest' %>!
+            </h1>
+            <div class="info-item">
+              <strong>Full Name</strong>
+              <span class="view-field" id="fullname-view">
+                <%= user && user.fullname ? user.fullname : 'Not provided' %>
+              </span>
+              <input
+                type="text"
+                class="edit-field d-none"
+                id="fullname-edit"
+                name="fullname"
+                value="<%= user && user.fullname ? user.fullname : '' %>"
+              />
             </div>
+            <div class="info-item">
+              <strong>Email</strong>
+              <span class="view-field" id="email-view">
+                <%= user && user.email ? user.email : 'Not provided' %>
+              </span>
+              <input
+                type="email"
+                class="edit-field d-none"
+                id="email-edit"
+                name="email"
+                value="<%= user && user.email ? user.email : '' %>"
+              />
+            </div>
+            <div class="info-item">
+              <strong>Phone</strong>
+              <span class="view-field" id="mobile-view">
+                <%= user && user.mobile ? user.mobile : 'Not provided' %>
+              </span>
+              <input
+                type="tel"
+                class="edit-field d-none"
+                id="mobile-edit"
+                name="mobile"
+                value="<%= user && user.mobile ? user.mobile : '' %>"
+              />
+            </div>
+            <div class="button-group" id="button-group">
+              <button class="btn-edit w-100" id="edit-btn">Edit</button>
+            </div>
+          </div>
         </div>
+      </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        const editBtn = document.getElementById('edit-btn');
-        const buttonGroup = document.getElementById('button-group');
-        let isEditing = false;
+      const editBtn = document.getElementById("edit-btn");
+      const buttonGroup = document.getElementById("button-group");
+      let isEditing = false;
 
-        const originalValues = {
-            fullname: document.getElementById('fullname-edit').value,
-            email: document.getElementById('email-edit').value,
-            mobile: document.getElementById('mobile-edit').value
-        };
+      const originalValues = {
+        fullname: document.getElementById("fullname-edit").value,
+        email: document.getElementById("email-edit").value,
+        mobile: document.getElementById("mobile-edit").value,
+      };
 
-        editBtn.addEventListener('click', () => {
-            if (isEditing) {
-                updateProfile();
-            } else {
-                toggleEditMode(true);
-            }
-        });
+      editBtn.addEventListener("click", () => {
+        if (isEditing) {
+          updateProfile();
+        } else {
+          toggleEditMode(true);
+        }
+      });
 
-        function toggleEditMode(edit) {
-            isEditing = edit;
-            const viewFields = document.querySelectorAll('.view-field');
-            const editFields = document.querySelectorAll('.edit-field');
+      function toggleEditMode(edit) {
+        isEditing = edit;
+        const viewFields = document.querySelectorAll(".view-field");
+        const editFields = document.querySelectorAll(".edit-field");
 
-            if (edit) {
-                viewFields.forEach(field => field.classList.add('d-none'));
-                editFields.forEach(field => field.classList.remove('d-none'));
+        if (edit) {
+          viewFields.forEach((field) => field.classList.add("d-none"));
+          editFields.forEach((field) => field.classList.remove("d-none"));
 
-                editBtn.textContent = 'Update';
-                editBtn.classList.remove('btn-edit');
-                editBtn.classList.add('btn-update');
+          editBtn.textContent = "Update";
+          editBtn.classList.remove("btn-edit");
+          editBtn.classList.add("btn-update");
 
-                const cancelBtn = document.createElement('button');
-                cancelBtn.className = 'btn-cancel w-100';
-                cancelBtn.textContent = 'Cancel';
-                cancelBtn.addEventListener('click', () => {
-                    document.getElementById('fullname-edit').value = originalValues.fullname;
-                    document.getElementById('email-edit').value = originalValues.email;
-                    document.getElementById('mobile-edit').value = originalValues.mobile;
-                    toggleEditMode(false);
-                });
-                buttonGroup.appendChild(cancelBtn);
-            } else {
-                viewFields.forEach(field => field.classList.remove('d-none'));
-                editFields.forEach(field => field.classList.add('d-none'));
+          const cancelBtn = document.createElement("button");
+          cancelBtn.className = "btn-cancel w-100";
+          cancelBtn.textContent = "Cancel";
+          cancelBtn.addEventListener("click", () => {
+            document.getElementById("fullname-edit").value =
+              originalValues.fullname;
+            document.getElementById("email-edit").value = originalValues.email;
+            document.getElementById("mobile-edit").value =
+              originalValues.mobile;
+            toggleEditMode(false);
+          });
+          buttonGroup.appendChild(cancelBtn);
+        } else {
+          viewFields.forEach((field) => field.classList.remove("d-none"));
+          editFields.forEach((field) => field.classList.add("d-none"));
 
-                document.getElementById('fullname-view').textContent = document.getElementById('fullname-edit').value || 'Not provided';
-                document.getElementById('email-view').textContent = document.getElementById('email-edit').value || 'Not provided';
-                document.getElementById('mobile-view').textContent = document.getElementById('mobile-edit').value || 'Not provided';
+          document.getElementById("fullname-view").textContent =
+            document.getElementById("fullname-edit").value || "Not provided";
+          document.getElementById("email-view").textContent =
+            document.getElementById("email-edit").value || "Not provided";
+          document.getElementById("mobile-view").textContent =
+            document.getElementById("mobile-edit").value || "Not provided";
 
-                editBtn.textContent = 'Edit';
-                editBtn.classList.remove('btn-update');
-                editBtn.classList.add('btn-edit');
+          editBtn.textContent = "Edit";
+          editBtn.classList.remove("btn-update");
+          editBtn.classList.add("btn-edit");
 
-                const cancelBtn = buttonGroup.querySelector('.btn-cancel');
-                if (cancelBtn) cancelBtn.remove();
-            }
+          const cancelBtn = buttonGroup.querySelector(".btn-cancel");
+          if (cancelBtn) cancelBtn.remove();
+        }
+      }
+
+      async function updateProfile() {
+        const fullname = document.getElementById("fullname-edit").value.trim();
+        const email = document.getElementById("email-edit").value.trim();
+        const mobile = document.getElementById("mobile-edit").value.trim();
+
+        const nameRegex = /^[A-Za-z ]{3,}$/;
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const mobileRegex = /^(?:\+91|0)?[6-9][0-9]{9}$/;
+
+        if (!nameRegex.test(fullname)) {
+          Swal.fire({
+            title: "Invalid Name",
+            text: "Name must be at least 3 characters long and contain only letters and spaces.",
+            icon: "error",
+            confirmButtonText: "OK",
+          });
+          return;
         }
 
- async function updateProfile() {
-    const fullname = document.getElementById('fullname-edit').value.trim();
-    const email = document.getElementById('email-edit').value.trim();
-    const mobile = document.getElementById('mobile-edit').value.trim();
+        if (!emailRegex.test(email)) {
+          Swal.fire({
+            title: "Invalid Email",
+            text: "Please enter a valid email address.",
+            icon: "error",
+            confirmButtonText: "OK",
+          });
+          return;
+        }
 
-    const nameRegex = /^[A-Za-z ]{3,}$/;
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    const mobileRegex = /^(?:\+91|0)?[6-9][0-9]{9}$/;
+        if (!mobileRegex.test(mobile)) {
+          Swal.fire({
+            title: "Invalid Mobile Number",
+            text: "Mobile number must be exactly 10 digits.",
+            icon: "error",
+            confirmButtonText: "OK",
+          });
+          return;
+        }
 
-    if (!nameRegex.test(fullname)) {
-        Swal.fire({
-            title: 'Invalid Name',
-            text: 'Name must be at least 3 characters long and contain only letters and spaces.',
-            icon: 'error',
-            confirmButtonText: 'OK'
-        });
-        return;
-    }
+        const data = { fullname, email, mobile };
 
-    if (!emailRegex.test(email)) {
-        Swal.fire({
-            title: 'Invalid Email',
-            text: 'Please enter a valid email address.',
-            icon: 'error',
-            confirmButtonText: 'OK'
-        });
-        return;
-    }
-
-    if (!mobileRegex.test(mobile)) {
-        Swal.fire({
-            title: 'Invalid Mobile Number',
-            text: 'Mobile number must be exactly 10 digits.',
-            icon: 'error',
-            confirmButtonText: 'OK'
-        });
-        return;
-    }
-
-    const data = { fullname, email, mobile };
-
-    try {
-        const response = await fetch('/user/edit-profile', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+        try {
+          const response = await fetch("/user/edit-profile", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify(data),
-            credentials: 'include'
-        });
+            credentials: "include",
+          });
 
-        if (!response.ok) {
+          if (!response.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
-        }
+          }
 
-        const result = await response.json();
+          const result = await response.json();
 
-        if (result.success) {
+          if (result.success) {
             Swal.fire({
-                title: 'Success',
-                text: 'Profile updated successfully',
-                icon: 'success',
-                timer: 1500,
-                showConfirmButton: false
+              title: "Success",
+              text: "Profile updated successfully",
+              icon: "success",
+              timer: 1500,
+              showConfirmButton: false,
             });
             originalValues.fullname = data.fullname;
             originalValues.email = data.email;
             originalValues.mobile = data.mobile;
             toggleEditMode(false);
-        } else if (result.requiresOtp) {
+          } else if (result.requiresOtp) {
             const { value: otp } = await Swal.fire({
-                title: 'Enter OTP',
-                text: 'An OTP has been sent to your new email address.',
-                input: 'text',
-                inputPlaceholder: 'Enter OTP',
-                showCancelButton: true,
-                confirmButtonText: 'Verify',
-                cancelButtonText: 'Cancel',
-                inputValidator: (value) => {
-                    if (!value) return 'Please enter the OTP';
-                }
+              title: "Enter OTP",
+              text: "An OTP has been sent to your new email address.",
+              input: "text",
+              inputPlaceholder: "Enter OTP",
+              showCancelButton: true,
+              confirmButtonText: "Verify",
+              cancelButtonText: "Cancel",
+              inputValidator: (value) => {
+                if (!value) return "Please enter the OTP";
+              },
             });
 
             if (otp) {
-                const otpResponse = await fetch('/user/verify-email-otp', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ otp }),
-                    credentials: 'include'
+              const otpResponse = await fetch("/user/verify-email-otp", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ otp }),
+                credentials: "include",
+              });
+
+              const otpResult = await otpResponse.json();
+
+              if (otpResult.success) {
+                Swal.fire({
+                  title: "Success",
+                  text: "Email and profile updated successfully",
+                  icon: "success",
+                  timer: 1500,
+                  showConfirmButton: false,
                 });
-
-                const otpResult = await otpResponse.json();
-
-                if (otpResult.success) {
-                    Swal.fire({
-                        title: 'Success',
-                        text: 'Email and profile updated successfully',
-                        icon: 'success',
-                        timer: 1500,
-                        showConfirmButton: false
-                    });
-                    originalValues.fullname = data.fullname;
-                    originalValues.email = data.email;
-                    originalValues.mobile = data.mobile;
-                    toggleEditMode(false);
-                } else {
-                    Swal.fire({
-                        title: 'Error',
-                        text: otpResult.message || 'Invalid OTP',
-                        icon: 'error',
-                        confirmButtonText: 'OK'
-                    });
-                }
+                originalValues.fullname = data.fullname;
+                originalValues.email = data.email;
+                originalValues.mobile = data.mobile;
+                toggleEditMode(false);
+              } else {
+                Swal.fire({
+                  title: "Error",
+                  text: otpResult.message || "Invalid OTP",
+                  icon: "error",
+                  confirmButtonText: "OK",
+                });
+              }
             }
-        } else {
+          } else {
             Swal.fire({
-                title: 'Error',
-                text: result.message || 'Failed to update profile',
-                icon: 'error',
-                confirmButtonText: 'OK'
+              title: "Error",
+              text: result.message || "Failed to update profile",
+              icon: "error",
+              confirmButtonText: "OK",
             });
+          }
+        } catch (error) {
+          console.error("Error updating profile:", error);
+          Swal.fire({
+            title: "Error",
+            text: "An error occurred while updating profile. Please try again.",
+            icon: "error",
+            confirmButtonText: "OK",
+          });
         }
-    } catch (error) {
-        console.error('Error updating profile:', error);
-        Swal.fire({
-            title: 'Error',
-            text: 'An error occurred while updating profile. Please try again.',
-            icon: 'error',
-            confirmButtonText: 'OK'
-        });
-    }
-}
-   </script>
-</body>
-
+      }
+    </script>
+  </body>
 </html>

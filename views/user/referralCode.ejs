@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,11 +15,13 @@
             margin: 0;
             overflow-x: hidden;
         }
+
         .referral-section {
             max-width: 1200px;
             margin: auto;
             padding: 20px;
         }
+
         .referral-card {
             background: #ffffff;
             border-radius: 20px;
@@ -27,6 +30,7 @@
             position: relative;
             overflow: hidden;
         }
+
         .referral-card::before {
             content: '';
             position: absolute;
@@ -36,6 +40,7 @@
             height: 4px;
             background: linear-gradient(90deg, #28a745, #34c759);
         }
+
         .referral-code-box {
             background: #f8f9fa;
             padding: 15px;
@@ -44,17 +49,20 @@
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
             margin-bottom: 20px;
         }
+
         .referral-code-box h3 {
             font-size: 1.1rem;
             color: #6c757d;
             margin-bottom: 10px;
         }
+
         .referral-code-box p {
             font-size: 1.5rem;
             font-weight: 600;
             color: #212529;
             letter-spacing: 2px;
         }
+
         .share-button {
             background: linear-gradient(90deg, #25D366, #128C7E);
             color: #ffffff;
@@ -67,16 +75,20 @@
             gap: 8px;
             text-decoration: none;
         }
+
         .share-button:hover {
             background: linear-gradient(90deg, #128C7E, #25D366);
         }
+
         @media (max-width: 767px) {
             .referral-section {
                 padding: 15px;
             }
+
             .referral-code-box p {
                 font-size: 1.2rem;
             }
+
             .share-button {
                 padding: 8px 16px;
                 font-size: 0.9rem;
@@ -84,31 +96,34 @@
         }
     </style>
 </head>
+
 <body>
     <div class="container-fluid min-h-screen flex">
         <%- include('.././partials/user/usersidebar', { user: user || {}, currentPage : 'referral' }) %>
-        <div class="flex-1 p-6 mt-16">
-            <div class="referral-section">
-                <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">Your Referral Code</h1>
-                <div class="referral-card">
-                    <div class="referral-code-box">
-                        <h3>Your Referral Code</h3>
-                        <p><%= referralCode %></p>
-                    </div>
-                    <div class="text-center">
-                        <a href="https://wa.me/?text=Join%20Timzo%20and%20get%20exclusive%20discounts%20using%20my%20referral%20code:%20<%= referralCode %>%20%F0%9F%8E%89%20Visit%20Timzo%20to%20shop%20now!" 
-                           target="_blank" 
-                           class="share-button">
-                            <i class="fab fa-whatsapp"></i> Share via WhatsApp
-                        </a>
+            <div class="flex-1 p-6 mt-16">
+                <div class="referral-section">
+                    <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">Your Referral Code</h1>
+                    <div class="referral-card">
+                        <div class="referral-code-box">
+                            <h3>Your Referral Code</h3>
+                            <p>
+                                <%= referralCode %>
+                            </p>
+                        </div>
+                        <div class="text-center">
+                            <a href="https://wa.me/?text=Join%20Timzo%20and%20get%20exclusive%20discounts%20using%20my%20referral%20code:%20<%= referralCode %>%20%F0%9F%8E%89%20Visit%20Timzo%20to%20shop%20now!"
+                                target="_blank" class="share-button">
+                                <i class="fab fa-whatsapp"></i> Share via WhatsApp
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
     </div>
 
     <footer class="bg-white p-4 text-center text-gray-600 text-sm shadow-inner mt-6">
         © <%= new Date().getFullYear() %> Timzo. All rights reserved.
     </footer>
 </body>
+
 </html>

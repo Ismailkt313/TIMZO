@@ -6,55 +6,55 @@ const Wallet = require("../../Model/walletSchema");
 
 
 const loadAdminOrder = async (req, res) => {
-  try {
-    const search = req.query.query ? req.query.query.trim() : '';
-    const page = parseInt(req.query.page) || 1;
-    const limit = 8;
+    try {
+        const search = req.query.query ? req.query.query.trim() : '';
+        const page = parseInt(req.query.page) || 1;
+        const limit = 8;
 
-    if (page < 1) {
-      return res.status(400).render('Admin/error404', { error: 'Invalid page number' });
+        if (page < 1) {
+            return res.status(400).render('Admin/error404', { error: 'Invalid page number' });
+        }
+
+        const baseFilter = {
+            $nor: [{ paymentMethod: 'Online', paymentStatus: 'Pending' }]
+        };
+
+        const userMatches = await User.find({
+            name: { $regex: new RegExp(search, 'i') }
+        }).select('_id');
+
+        const query = {
+            ...baseFilter,
+            ...(search && {
+                $or: [
+                    ...(mongoose.Types.ObjectId.isValid(search) ? [{ _id: search }] : []),
+                    ...(userMatches.length > 0 ? [{ user: { $in: userMatches.map(u => u._id) } }] : [])
+                ]
+            })
+        };
+
+        const orderData = await Order.find(query)
+            .populate('user')
+            .sort({ orderDate: -1 })
+            .skip((page - 1) * limit)
+            .limit(limit);
+
+        const count = await Order.countDocuments(query);
+
+        const admin = req.session.admin;
+
+        res.status(200).render('Admin/OrderManagement', {
+            admin,
+            orders: orderData,
+            currentPage: page,
+            totalPages: Math.ceil(count / limit),
+            activePage: 'orders',
+            search
+        });
+    } catch (error) {
+        console.error('Error loading admin orders:', error);
+        res.status(500).render('error404', { message: 'Internal Server Error' });
     }
-
-    const baseFilter = {
-      $nor: [{ paymentMethod: 'Online', paymentStatus: 'Pending' }]
-    };
-
-    const userMatches = await User.find({
-      name: { $regex: new RegExp(search, 'i') }
-    }).select('_id');
-
-    const query = {
-      ...baseFilter,
-      ...(search && {
-        $or: [
-          ...(mongoose.Types.ObjectId.isValid(search) ? [{ _id: search }] : []),
-          ...(userMatches.length > 0 ? [{ user: { $in: userMatches.map(u => u._id) } }] : [])
-        ]
-      })
-    };
-
-    const orderData = await Order.find(query)
-      .populate('user')
-      .sort({ orderDate: -1 })
-      .skip((page - 1) * limit)
-      .limit(limit);
-
-    const count = await Order.countDocuments(query);
-
-    const admin = req.session.admin;
-
-    res.status(200).render('Admin/OrderManagement', {
-      admin,
-      orders: orderData,
-      currentPage: page,
-      totalPages: Math.ceil(count / limit),
-      activePage: 'orders',
-      search
-    });
-  } catch (error) {
-    console.error('Error loading admin orders:', error);
-    res.status(500).render('error404', { message: 'Internal Server Error' });
-  }
 };
 
 
@@ -131,11 +131,11 @@ const updateOrder = async (req, res) => {
                     console.log('Restocked and cancelled item:', item.productId, 'Quantity:', item.quantity);
 
                     if (order.paymentMethod === 'Wallet' || order.paymentMethod === 'Online') {
-                        const refundAmount = item.finalPrice + (item.tax || 0); 
+                        const refundAmount = item.finalPrice + (item.tax || 0);
                         wallet.balance += refundAmount + 10;
                         wallet.transactions.push({
                             type: 'credit',
-                            amount: refundAmount+10,
+                            amount: refundAmount + 10,
                             description: `Refund for cancelled item: ${item.productName} (${item.quantity} pcs)`,
                             date: new Date()
                         });
@@ -205,13 +205,13 @@ const loadRequstManagement = async (req, res) => {
         const admin = req.session.admin
 
         console.log('Loaded requests:', requests.length);
-        res.render('Admin/adminRequests', { admin,requests, activePage: 'requests' });
+        res.render('Admin/adminRequests', { admin, requests, activePage: 'requests' });
     } catch (error) {
         console.error("Error loading request management:", error);
         res.status(500).render("error404", { message: 'Internal Server Error' });
     }
 };
- 
+
 const loadOrders = async (req, res) => {
     try {
         const { id } = req.params;
@@ -294,22 +294,18 @@ const adminHandleRequest = async (req, res) => {
             console.log('Created new wallet for user:', order.user._id);
         }
 
-// Calculate refund without over-discounting
-let refundAmount = (item.itemTotal || 0) + (item.tax || 0);
+        let refundAmount = (item.itemTotal || 0) + (item.tax || 0);
 
-// Optional: If you want to apply proportional discount, cap it so it doesn't go negative
-const orderDiscount = order.discount || 0;
-const totalItemValue = order.items.reduce((sum, i) => sum + i.itemTotal, 0);
-const itemDiscountShare = totalItemValue > 0
-  ? (item.itemTotal / totalItemValue) * orderDiscount
-  : 0;
+        const orderDiscount = order.discount || 0;
+        const totalItemValue = order.items.reduce((sum, i) => sum + i.itemTotal, 0);
+        const itemDiscountShare = totalItemValue > 0
+            ? (item.itemTotal / totalItemValue) * orderDiscount
+            : 0;
 
-// Apply capped discount
-refundAmount = refundAmount - itemDiscountShare;
+        refundAmount = refundAmount - itemDiscountShare;
 
-// Prevent negative refund
-refundAmount = Math.max(Math.round(refundAmount), 0);
-console.log('Refund amount calculated with proportional discount:', refundAmount);
+        refundAmount = Math.max(Math.round(refundAmount), 0);
+        console.log('Refund amount calculated with proportional discount:', refundAmount);
 
 
         if (approve) {
@@ -369,17 +365,16 @@ console.log('Refund amount calculated with proportional discount:', refundAmount
             console.log('Request rejected, reset item status:', { productId: item.productId, newStatus: item.status });
         }
 
-const activeItems = order.items.filter(i => i.status !== 'Returned' && i.status !== 'Cancelled');
-order.subtotal = activeItems.reduce((sum, i) => sum + i.itemTotal, 0);
-order.tax = Math.round(order.subtotal * 0.10);
+        const activeItems = order.items.filter(i => i.status !== 'Returned' && i.status !== 'Cancelled');
+        order.subtotal = activeItems.reduce((sum, i) => sum + i.itemTotal, 0);
+        order.tax = Math.round(order.subtotal * 0.10);
 
-// Recalculate proportional discount only for non-cancelled items
-const totalItemValueBeforeDiscount = order.items.reduce((sum, i) => sum + i.itemTotal, 0);
-const proportionalDiscount = totalItemValueBeforeDiscount > 0
-    ? (order.discount || 0) * (order.subtotal / totalItemValueBeforeDiscount)
-    : 0;
+        const totalItemValueBeforeDiscount = order.items.reduce((sum, i) => sum + i.itemTotal, 0);
+        const proportionalDiscount = totalItemValueBeforeDiscount > 0
+            ? (order.discount || 0) * (order.subtotal / totalItemValueBeforeDiscount)
+            : 0;
 
-order.totalAmount = Math.round(order.subtotal + order.tax + order.shippingFee - proportionalDiscount);
+        order.totalAmount = Math.round(order.subtotal + order.tax + order.shippingFee - proportionalDiscount);
 
         console.log('Recalculated order totals:', {
             subtotal: order.subtotal,

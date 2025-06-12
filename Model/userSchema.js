@@ -9,27 +9,27 @@ const userSchema = new Schema({
   email: {
     type: String,
     required: true,
-    unique: true,  
-  }, 
-  mobile: {  
-    type: Number, 
-    required: false, 
+    unique: true,
+  },
+  mobile: {
+    type: Number,
+    required: false,
     unique: false,
-    default: null, 
-    sparse:true,
+    default: null,
+    sparse: true,
   },
   password: {
     type: String,
-    required: false, 
+    required: false,
   },
   googleId: {
     type: String,
     unique: true,
-    sparse: true, 
+    sparse: true,
   },
   otp: {
     code: { type: String },
-    expiresAt: { type: Date }, 
+    expiresAt: { type: Date },
     verified: { type: Boolean, default: false },
   },
   isBlocked: {
@@ -37,7 +37,7 @@ const userSchema = new Schema({
     default: false,
   },
   referralCode: { type: String, unique: true },
-  referredBy: { type: String, default: null }, 
+  referredBy: { type: String, default: null },
   isAdmin: {
     type: Boolean,
     default: false,
@@ -45,4 +45,3 @@ const userSchema = new Schema({
 }, { timestamps: true })
 
 module.exports = mongoose.model('User', userSchema)
-  

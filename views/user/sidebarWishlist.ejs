@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,7 +8,8 @@
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="icon" type="image/x-icon" href="/images/TIMZO.jpg">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@600&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
@@ -16,17 +18,23 @@
             background-color: #f9fafb;
             margin: 0;
         }
-        h1, h2, h3 {
+
+        h1,
+        h2,
+        h3 {
             font-family: 'Poppins', sans-serif;
         }
+
         .sidebar {
             background: linear-gradient(180deg, #1f2937 0%, #111827 100%);
             z-index: 50;
         }
+
         .main-content {
             margin-left: 256px;
             padding: 2rem;
         }
+
         .section-title {
             font-size: 2.5rem;
             font-weight: 700;
@@ -35,6 +43,7 @@
             text-align: center;
             position: relative;
         }
+
         .section-title::after {
             content: '';
             width: 60px;
@@ -45,21 +54,25 @@
             left: 50%;
             transform: translateX(-50%);
         }
+
         .product-card {
             background: #fff;
             border-radius: 12px;
             overflow: hidden;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
+
         .product-card:hover {
             transform: scale(1.03);
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
         }
+
         .product-card img {
             height: 200px;
             object-fit: cover;
             width: 100%;
         }
+
         .product-card .badge {
             position: absolute;
             top: 10px;
@@ -67,10 +80,12 @@
             font-size: 0.75rem;
             padding: 0.5rem;
         }
+
         .product-card .product-title,
         .product-card .product-price {
             color: #1f2937;
         }
+
         .btn-custom {
             background-color: #1f2937;
             color: #ffffff;
@@ -78,10 +93,12 @@
             border-radius: 6px;
             transition: all 0.3s;
         }
+
         .btn-custom:hover {
             background-color: #facc15;
             color: #1f2937;
         }
+
         .btn-remove {
             background-color: #ef4444;
             color: #ffffff;
@@ -89,9 +106,11 @@
             border-radius: 6px;
             transition: all 0.3s;
         }
+
         .btn-remove:hover {
             background-color: #dc2626;
         }
+
         .empty-wishlist {
             text-align: center;
             padding: 3rem;
@@ -99,11 +118,13 @@
             border-radius: 12px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
+
         .empty-wishlist i {
             font-size: 3rem;
             color: #ef4444;
             margin-bottom: 1rem;
         }
+
         .btn-gold {
             background: linear-gradient(45deg, #facc15, #ffd700);
             color: #1f2937;
@@ -112,16 +133,19 @@
             font-weight: 600;
             transition: transform 0.3s ease, background 0.3s ease;
         }
+
         .btn-gold:hover {
             transform: scale(1.05);
             background: linear-gradient(45deg, #ffd700, #facc15);
         }
+
         .toast-container {
             position: fixed;
             top: 20px;
             right: 20px;
             z-index: 1050;
         }
+
         .toast {
             display: flex;
             align-items: center;
@@ -134,109 +158,141 @@
             transform: translateY(-20px);
             transition: opacity 0.3s ease, transform 0.3s ease;
         }
+
         .toast.show {
             opacity: 1;
             transform: translateY(0);
         }
+
         .toast.success {
             background-color: #10b981;
             color: white;
         }
+
         .toast.error {
             background-color: #ef4444;
             color: white;
         }
+
         .toast.warning {
             background-color: #f59e0b;
             color: white;
         }
+
         .toast .toast-icon {
             margin-right: 10px;
             font-size: 1.2rem;
         }
+
         .toast .toast-message {
             flex: 1;
             font-size: 0.9rem;
         }
+
         @media (max-width: 768px) {
             .main-content {
                 margin-left: 0;
                 padding: 1rem;
             }
+
             .product-card img {
                 height: 150px;
             }
+
             .section-title {
                 font-size: 2rem;
             }
+
             .empty-wishlist {
                 padding: 2rem;
             }
+
             .empty-wishlist i {
                 font-size: 2rem;
             }
+
             .toast-container {
                 top: 10px;
                 right: 10px;
                 left: 10px;
             }
+
             .toast {
                 min-width: 100%;
             }
         }
     </style>
 </head>
+
 <body>
     <div class="flex min-h-screen">
         <%- include('../Partials/user/userSidebar', { user: user, currentPage: 'Wishlist' }) %>
-        <div class="main-content flex-1 flex justify-center">
-            <div class="w-full max-w-5xl">
-                <h2 class="section-title">My Wishlist</h2>
-                <% if (wishlist && wishlist.length > 0) { %>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                        <% wishlist.forEach(item => { %>
-                            <% const product = item.productId; %>
-                            <% if (product) { %>
-                                <div class="product-card" data-product-id="<%= product._id %>" data-aos="fade-up">
-                                    <% if (product.createdAt && product.createdAt > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)) { %>
-                                        <span class="badge bg-green-500 text-white">New</span>
-                                    <% } else if (product.regularPrice && product.salePrice < product.regularPrice) { %>
-                                        <span class="badge bg-red-500 text-white">Sale</span>
-                                    <% } %>
-                                    <a href="/user/products/<%= product._id %>" aria-label="View <%= product.name || 'Product' %>">
-                                        <img src="<%= product.images && product.images[0] || '/images/placeholder.jpg' %>" alt="<%= product.name || 'Product' %>">
-                                        <div class="p-4 text-center">
-                                            <h5 class="product-title text-lg font-semibold"><%= product.name || 'Unnamed Product' %></h5>
-                                            <p class="text-gray-600 text-sm"><%= product.brand?.name || 'No Brand' %></p>
-                                            <div class="flex justify-center gap-1 my-2">
-                                                <% for(let i = 0; i < Math.floor(product.rating || 0); i++) { %>
-                                                    <i class="fas fa-star text-yellow-400"></i>
-                                                <% } %>
-                                                <% for(let i = Math.floor(product.rating || 0); i < 5; i++) { %>
-                                                    <i class="far fa-star text-gray-400"></i>
-                                                <% } %>
-                                            </div>
-                                            <p class="product-price font-bold text-lg">₹<%= product.salePrice?.toFixed(2) || '0.00' %></p>
+            <div class="main-content flex-1 flex justify-center">
+                <div class="w-full max-w-5xl">
+                    <h2 class="section-title">My Wishlist</h2>
+                    <% if (wishlist && wishlist.length> 0) { %>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                            <% wishlist.forEach(item=> { %>
+                                <% const product=item.productId; %>
+                                    <% if (product) { %>
+                                        <div class="product-card" data-product-id="<%= product._id %>"
+                                            data-aos="fade-up">
+                                            <% if (product.createdAt && product.createdAt> new Date(Date.now() - 7 * 24
+                                                * 60 * 60 * 1000)) { %>
+                                                <span class="badge bg-green-500 text-white">New</span>
+                                                <% } else if (product.regularPrice && product.salePrice <
+                                                    product.regularPrice) { %>
+                                                    <span class="badge bg-red-500 text-white">Sale</span>
+                                                    <% } %>
+                                                        <a href="/user/products/<%= product._id %>"
+                                                            aria-label="View <%= product.name || 'Product' %>">
+                                                            <img src="<%= product.images && product.images[0] || '/images/placeholder.jpg' %>"
+                                                                alt="<%= product.name || 'Product' %>">
+                                                            <div class="p-4 text-center">
+                                                                <h5 class="product-title text-lg font-semibold">
+                                                                    <%= product.name || 'Unnamed Product' %>
+                                                                </h5>
+                                                                <p class="text-gray-600 text-sm">
+                                                                    <%= product.brand?.name || 'No Brand' %>
+                                                                </p>
+                                                                <div class="flex justify-center gap-1 my-2">
+                                                                    <% for(let i=0; i < Math.floor(product.rating || 0);
+                                                                        i++) { %>
+                                                                        <i class="fas fa-star text-yellow-400"></i>
+                                                                        <% } %>
+                                                                            <% for(let i=Math.floor(product.rating ||
+                                                                                0); i < 5; i++) { %>
+                                                                                <i
+                                                                                    class="far fa-star text-gray-400"></i>
+                                                                                <% } %>
+                                                                </div>
+                                                                <p class="product-price font-bold text-lg">₹<%=
+                                                                        product.salePrice?.toFixed(2) || '0.00' %>
+                                                                </p>
+                                                            </div>
+                                                        </a>
+                                                        <div class="flex justify-center gap-3 px-4 pb-4">
+                                                            <button class="btn-custom btn-sm add-to-cart"
+                                                                data-product-id="<%= product._id %>">Add to
+                                                                Cart</button>
+                                                            <button class="btn-remove btn-sm remove-from-wishlist"
+                                                                data-product-id="<%= product._id %>">Remove</button>
+                                                        </div>
                                         </div>
-                                    </a>
-                                    <div class="flex justify-center gap-3 px-4 pb-4">
-                                        <button class="btn-custom btn-sm add-to-cart" data-product-id="<%= product._id %>">Add to Cart</button>
-                                        <button class="btn-remove btn-sm remove-from-wishlist" data-product-id="<%= product._id %>">Remove</button>
-                                    </div>
-                                </div>
+                                        <% } %>
+                                            <% }); %>
+                        </div>
+                        <% } else { %>
+                            <div class="empty-wishlist" data-aos="fade-up">
+                                <i class="fas fa-heart-broken"></i>
+                                <h3 class="text-2xl font-semibold text-gray-900 mb-2">Your Wishlist is Empty</h3>
+                                <p class="text-gray-600 mb-4">Looks like you haven't added any items to your wishlist
+                                    yet.</p>
+                                <a href="/user/products" class="btn-gold" aria-label="Shop Now">Start Shopping</a>
+                            </div>
                             <% } %>
-                        <% }); %>
-                    </div>
-                <% } else { %>
-                    <div class="empty-wishlist" data-aos="fade-up">
-                        <i class="fas fa-heart-broken"></i>
-                        <h3 class="text-2xl font-semibold text-gray-900 mb-2">Your Wishlist is Empty</h3>
-                        <p class="text-gray-600 mb-4">Looks like you haven't added any items to your wishlist yet.</p>
-                        <a href="/user/products" class="btn-gold" aria-label="Shop Now">Start Shopping</a>
-                    </div>
-                <% } %>
+                </div>
             </div>
-        </div>
     </div>
 
     <footer class="bg-white p-6 text-center text-gray-600 text-sm shadow-inner mt-12">
@@ -264,8 +320,8 @@
             const icon = document.createElement('span');
             icon.className = 'toast-icon';
             icon.innerHTML = type === 'success' ? '<i class="fas fa-check-circle"></i>' :
-                            type === 'error' ? '<i class="fas fa-exclamation-circle"></i>' :
-                            '<i class="fas fa-exclamation-triangle"></i>';
+                type === 'error' ? '<i class="fas fa-exclamation-circle"></i>' :
+                    '<i class="fas fa-exclamation-triangle"></i>';
             toast.appendChild(icon);
 
             const messageSpan = document.createElement('span');
@@ -419,4 +475,5 @@
         });
     </script>
 </body>
+
 </html>

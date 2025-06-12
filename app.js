@@ -10,7 +10,7 @@ const morgan = require('morgan');
 const db = require('./Config/db');
 const adminRouter = require('./Routes/adminRoute/adminRouter');
 const userRouter = require('./Routes/userRoute/userRouter');
-const errorHandler = require('./MiddleWares/errorHandler'); 
+const errorHandler = require('./MiddleWares/errorHandler');
 const cartCountMiddleware = require('./MiddleWares/cartCount')
 
 const app = express();
@@ -19,7 +19,7 @@ dotenv.config();
 if (process.env.NODE_ENV !== 'production') {
     app.use(morgan('dev'));
 }
- 
+
 const PORT = process.env.PORT || 3000;
 
 db();
@@ -40,11 +40,11 @@ app.use(session({
     cookie: {
         secure: false,
         httpOnly: true,
-        maxAge: 7 * 24 * 60 * 60 * 1000, 
+        maxAge: 7 * 24 * 60 * 60 * 1000,
     },
 }));
 
-app.use(passport.initialize()); 
+app.use(passport.initialize());
 app.use(passport.session());
 
 app.use((req, res, next) => {

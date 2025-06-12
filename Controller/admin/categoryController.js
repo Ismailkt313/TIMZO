@@ -79,8 +79,7 @@ const addcategory = async (req, res) => {
     let { name, description } = req.body;
 
     try {
-        name = name.trim(); // Trim name before using
-
+        name = name.trim();
         const existingCategory = await Category.find({
             name: { $regex: `^${name}$`, $options: 'i' },
             isDeleted: false
@@ -110,30 +109,30 @@ const addcategoryOffer = async (req, res) => {
         console.log(req.body)
         const categoryId = req.body.categoryId;
 
- const category = await Category.findById(categoryId);
-if (!category || category.isDeleted) {
-    return res.status(404).json({ status: false, message: "Category not found or has been deleted" });
-}
+        const category = await Category.findById(categoryId);
+        if (!category || category.isDeleted) {
+            return res.status(404).json({ status: false, message: "Category not found or has been deleted" });
+        }
 
-const products = await Product.find({ category: category._id });
+        const products = await Product.find({ category: category._id });
 
-await Category.updateOne({ _id: categoryId }, { $set: { categoryOffer: percentage } });
+        await Category.updateOne({ _id: categoryId }, { $set: { categoryOffer: percentage } });
 
-let updatedCount = 0;
+        let updatedCount = 0;
 
-for (const product of products) {
-    if (product.ProductOffer === 0 || product.ProductOffer < percentage) {
-        product.ProductOffer = percentage;
-        product.salePrice = Math.floor(product.regularPrice * (1 - (percentage / 100)));
-        await product.save();
-        updatedCount++;
-    }
-}
+        for (const product of products) {
+            if (product.ProductOffer === 0 || product.ProductOffer < percentage) {
+                product.ProductOffer = percentage;
+                product.salePrice = Math.floor(product.regularPrice * (1 - (percentage / 100)));
+                await product.save();
+                updatedCount++;
+            }
+        }
 
-res.json({
-    status: true,
-    message: `Category offer applied to ${updatedCount} product(s). Skipped products with higher existing offers.`,
-});
+        res.json({
+            status: true,
+            message: `Category offer applied to ${updatedCount} product(s). Skipped products with higher existing offers.`,
+        });
     } catch (error) {
         console.error(error);
         res.status(500).json({ status: false, message: 'Internal server error' });
@@ -265,30 +264,30 @@ const undoDeleteCategory = async (req, res) => {
 };
 
 const permanentlyDeleteCategory = async (req, res) => {
-        try {
-            const categoryId = req.query.id;
-            const category = await Category.findById(categoryId);
-            if (!category) {
-                return res.status(404).json({ success: false, message: 'Category not found' });
-            }
-
-            if (!category.isDeleted) {
-                return res.status(400).json({ success: false, message: 'Category must be soft-deleted before permanent deletion' });
-            }
-
-            const products = await Product.find({ category: category._id });
-            if (products.length > 0) {
-                return res.status(400).json({ success: false, message: 'Cannot delete category with associated products' });
-            }
-
-            await Category.findByIdAndDelete(categoryId);
-
-            res.status(200).json({ success: true, message: 'Category permanently deleted' });
-        } catch (error) {
-            console.error('Error permanently deleting category:', error);
-            res.status(500).json({ success: false, message: 'Failed to permanently delete category' });
+    try {
+        const categoryId = req.query.id;
+        const category = await Category.findById(categoryId);
+        if (!category) {
+            return res.status(404).json({ success: false, message: 'Category not found' });
         }
-    };
+
+        if (!category.isDeleted) {
+            return res.status(400).json({ success: false, message: 'Category must be soft-deleted before permanent deletion' });
+        }
+
+        const products = await Product.find({ category: category._id });
+        if (products.length > 0) {
+            return res.status(400).json({ success: false, message: 'Cannot delete category with associated products' });
+        }
+
+        await Category.findByIdAndDelete(categoryId);
+
+        res.status(200).json({ success: true, message: 'Category permanently deleted' });
+    } catch (error) {
+        console.error('Error permanently deleting category:', error);
+        res.status(500).json({ success: false, message: 'Failed to permanently delete category' });
+    }
+};
 
 const loadeditcategory = async (req, res) => {
     try {
@@ -309,59 +308,55 @@ const loadeditcategory = async (req, res) => {
     }
 };
 const editcategory = async (req, res) => {
-  try {
-    const id = req.params.id;
-    const { categoryName, description } = req.body;
+    try {
+        const id = req.params.id;
+        const { categoryName, description } = req.body;
 
-    // Validate ObjectId
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).render('Admin/editcategory', {
-        category: { _id: id, name: categoryName, description },
-        error: "Invalid category ID"
-      });
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).render('Admin/editcategory', {
+                category: { _id: id, name: categoryName, description },
+                error: "Invalid category ID"
+            });
+        }
+
+        const category = await Category.findById(id);
+        if (!category || category.isDeleted) {
+            return res.status(404).render('Admin/editcategory', {
+                category: { _id: id, name: categoryName, description },
+                error: "Category not found or has been deleted"
+            });
+        }
+
+        const existingCategory = await Category.findOne({
+            name: { $regex: new RegExp(`^${categoryName.trim()}$`, 'i') },
+            isDeleted: false,
+            _id: { $ne: category._id }
+        });
+
+        if (existingCategory) {
+            return res.status(400).render('Admin/editcategory', {
+                category: { _id: id, name: categoryName, description },
+                error: "Category name already exists, please choose another one"
+            });
+        }
+
+        category.name = categoryName.trim();
+        category.description = description?.trim() || "";
+        await category.save();
+
+        return res.redirect('/admin/categories');
+
+    } catch (error) {
+        console.error('🔴 Internal Server Error:', error);
+        return res.status(500).render('Admin/editcategory', {
+            category: {
+                _id: req.params.id,
+                name: req.body.categoryName,
+                description: req.body.description
+            },
+            error: "Internal server error"
+        });
     }
-
-    // Fetch the category
-    const category = await Category.findById(id);
-    if (!category || category.isDeleted) {
-      return res.status(404).render('Admin/editcategory', {
-        category: { _id: id, name: categoryName, description },
-        error: "Category not found or has been deleted"
-      });
-    }
-
-    // Check if the name already exists (case-insensitive) and not the same category
-    const existingCategory = await Category.findOne({
-      name: { $regex: new RegExp(`^${categoryName.trim()}$`, 'i') },
-      isDeleted: false,
-      _id: { $ne: category._id }
-    });
-
-    if (existingCategory) {
-      return res.status(400).render('Admin/editcategory', {
-        category: { _id: id, name: categoryName, description },
-        error: "Category name already exists, please choose another one"
-      });
-    }
-
-    // Update the category
-    category.name = categoryName.trim();
-    category.description = description?.trim() || "";
-    await category.save();
-
-    return res.redirect('/admin/categories');
-
-  } catch (error) {
-    console.error('🔴 Internal Server Error:', error);
-    return res.status(500).render('Admin/editcategory', {
-      category: {
-        _id: req.params.id,
-        name: req.body.categoryName,
-        description: req.body.description
-      },
-      error: "Internal server error"
-    });
-  }
 };
 
 module.exports = {

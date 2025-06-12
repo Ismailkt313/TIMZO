@@ -1,79 +1,94 @@
-<nav class="fixed top-0 right-0 left-0 z-20 bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 shadow-sm transition-all duration-300 lg:left-72" id="navbar">
+<nav
+  class="fixed top-0 right-0 left-0 z-20 bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 shadow-sm transition-all duration-300 lg:left-72"
+  id="navbar">
   <div class="px-4 md:px-6 py-3 flex justify-between items-center">
-    <!-- Left section with search -->
     <div class="flex items-center">
-      <!-- Mobile menu button - only visible on mobile and tablet -->
-      <button id="mobileMenuBtn" class="lg:hidden mr-3 p-1.5 rounded-lg text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700">
+      <button id="mobileMenuBtn"
+        class="lg:hidden mr-3 p-1.5 rounded-lg text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
         </svg>
       </button>
-      
-      <!-- Search - collapsible on mobile -->
+
       <div class="relative hidden md:block">
-        <input type="text" placeholder="Search..." class="bg-slate-100 dark:bg-slate-700 text-slate-800 dark:text-slate-200 rounded-lg pl-10 pr-4 py-2 text-sm w-64 focus:outline-none focus:ring-2 focus:ring-amber-500 dark:focus:ring-amber-400 transition-all">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-slate-400 absolute left-3 top-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        <input type="text" placeholder="Search..."
+          class="bg-slate-100 dark:bg-slate-700 text-slate-800 dark:text-slate-200 rounded-lg pl-10 pr-4 py-2 text-sm w-64 focus:outline-none focus:ring-2 focus:ring-amber-500 dark:focus:ring-amber-400 transition-all">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-slate-400 absolute left-3 top-2" fill="none"
+          viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
         </svg>
       </div>
-      
-      <!-- Mobile search button -->
-      <button id="mobileSearchBtn" class="md:hidden p-1.5 rounded-lg text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700">
+
+      <button id="mobileSearchBtn"
+        class="md:hidden p-1.5 rounded-lg text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
         </svg>
       </button>
     </div>
-    
-    <!-- Right section with actions -->
+
     <div class="flex items-center gap-2 md:gap-4">
-      <!-- Theme Toggle -->
-      <button id="themeToggle" class="p-1.5 rounded-lg text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
-        <!-- Sun icon (for dark mode) -->
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 hidden dark:block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+      <button id="themeToggle"
+        class="p-1.5 rounded-lg text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 hidden dark:block" fill="none" viewBox="0 0 24 24"
+          stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
         </svg>
-        <!-- Moon icon (for light mode) -->
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 block dark:hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 block dark:hidden" fill="none" viewBox="0 0 24 24"
+          stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
         </svg>
       </button>
-      
-     
+
+
       <div class="relative" id="profileDropdown">
-        <button class="flex items-center gap-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg p-1.5 transition-colors">
+        <button
+          class="flex items-center gap-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg p-1.5 transition-colors">
           <div class="w-8 h-8 rounded-full bg-amber-500 flex items-center justify-center text-slate-900 font-bold">
             <%= admin && admin.name ? admin.name.charAt(0).toUpperCase() : 'A' %>
           </div>
           <span class="text-sm font-medium text-slate-700 dark:text-slate-200 hidden sm:block">
             <%= admin && admin.name ? admin.name : 'Admin' %>
           </span>
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-400 hidden sm:block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-400 hidden sm:block" fill="none"
+            viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
           </svg>
         </button>
-        
-        <div class="absolute right-0 mt-2 w-48 bg-white dark:bg-slate-800 rounded-lg shadow-lg border border-slate-200 dark:border-slate-700 py-1 hidden" id="profileMenu">
-          <a href="/admin/profile" class="block px-4 py-2 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700">
+
+        <div
+          class="absolute right-0 mt-2 w-48 bg-white dark:bg-slate-800 rounded-lg shadow-lg border border-slate-200 dark:border-slate-700 py-1 hidden"
+          id="profileMenu">
+          <a href="/admin/profile"
+            class="block px-4 py-2 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700">
             Profile
           </a>
-          <a href="/admin/settings" class="block px-4 py-2 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700">
+          <a href="/admin/settings"
+            class="block px-4 py-2 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700">
             Settings
           </a>
           <div class="border-t border-slate-200 dark:border-slate-700 my-1"></div>
-          <a href="/admin/logout" class="block px-4 py-2 text-sm text-red-500 hover:bg-slate-100 dark:hover:bg-slate-700">
+          <a href="/admin/logout"
+            class="block px-4 py-2 text-sm text-red-500 hover:bg-slate-100 dark:hover:bg-slate-700">
             Logout
           </a>
         </div>
       </div>
     </div>
   </div>
-  
+
   <div id="mobileSearchBar" class="px-4 py-2 border-t border-slate-200 dark:border-slate-700 hidden md:hidden">
     <div class="relative">
-      <input type="text" placeholder="Search..." class="bg-slate-100 dark:bg-slate-700 text-slate-800 dark:text-slate-200 rounded-lg pl-10 pr-4 py-2 text-sm w-full focus:outline-none focus:ring-2 focus:ring-amber-500 dark:focus:ring-amber-400 transition-all">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-slate-400 absolute left-3 top-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+      <input type="text" placeholder="Search..."
+        class="bg-slate-100 dark:bg-slate-700 text-slate-800 dark:text-slate-200 rounded-lg pl-10 pr-4 py-2 text-sm w-full focus:outline-none focus:ring-2 focus:ring-amber-500 dark:focus:ring-amber-400 transition-all">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-slate-400 absolute left-3 top-2" fill="none"
+        viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
       </svg>
     </div>
   </div>
@@ -82,22 +97,22 @@
 <script>
   const profileDropdown = document.getElementById('profileDropdown');
   const profileMenu = document.getElementById('profileMenu');
-  
+
   profileDropdown.addEventListener('click', (e) => {
     e.stopPropagation();
     profileMenu.classList.toggle('hidden');
   });
-  
+
   document.addEventListener('click', () => {
     profileMenu.classList.add('hidden');
   });
-  
+
   const mobileMenuBtn = document.getElementById('mobileMenuBtn');
   const sidebar = document.getElementById('sidebar');
   const sidebarBackdrop = document.getElementById('sidebarBackdrop');
   const menuIcon = document.getElementById('menuIcon');
   const closeIcon = document.getElementById('closeIcon');
-  
+
   mobileMenuBtn.addEventListener('click', () => {
     if (sidebar.classList.contains('-translate-x-full')) {
       sidebar.classList.remove('-translate-x-full');
@@ -113,26 +128,26 @@
       document.body.classList.remove('overflow-hidden');
     }
   });
-  
+
   const mobileSearchBtn = document.getElementById('mobileSearchBtn');
   const mobileSearchBar = document.getElementById('mobileSearchBar');
-  
+
   mobileSearchBtn.addEventListener('click', () => {
     mobileSearchBar.classList.toggle('hidden');
   });
-  
+
   const themeToggle = document.getElementById('themeToggle');
   const html = document.documentElement;
-  
+
   if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
     html.classList.add('dark');
   } else {
     html.classList.remove('dark');
   }
-  
+
   themeToggle.addEventListener('click', () => {
     html.classList.toggle('dark');
-    
+
     if (html.classList.contains('dark')) {
       localStorage.theme = 'dark';
     } else {

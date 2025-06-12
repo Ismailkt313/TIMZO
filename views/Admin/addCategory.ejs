@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -15,13 +16,15 @@
       font-weight: bold;
       color: #333;
       margin-bottom: 20px;
-      padding-top: 10px; 
+      padding-top: 10px;
     }
+
     body {
       display: flex;
       min-height: 100vh;
       overflow-x: hidden;
     }
+
     .sidebar {
       width: 250px;
       background-color: #343a40;
@@ -32,30 +35,32 @@
       left: 0;
       color: white;
     }
-    .footr{
+
+    .footr {
       padding-top: 250px;
     }
+
     .main-content {
       margin-left: 350px;
       padding: 20px;
       width: 100%;
-      padding-top: 90px; 
+      padding-top: 90px;
     }
+
     .error-message {
       color: red;
       font-size: 0.9rem;
     }
-    
   </style>
 </head>
 
 <body>
 
   <aside class="sidebar">
-      <%- include('.././partials/admin/adminsidebar', { activePage: 'categories', admin: admin || {} }) %>
+    <%- include('.././partials/admin/adminsidebar', { activePage: 'categories' , admin: admin || {} }) %>
 
   </aside>
-  
+
 
 
   <div class="main-content">
@@ -68,7 +73,8 @@
       <header class="mb-4 text-center">
         <form action="/admin/category/" method="get" class="d-inline">
           <div class="input-group input-group-sm rounded-pill" style="width: 500px; margin: 0 auto;">
-            <input type="text" class="form-control border-0 rounded-pill" placeholder="Search categories" name="search" />
+            <input type="text" class="form-control border-0 rounded-pill" placeholder="Search categories"
+              name="search" />
             <button class="btn btn-primary rounded-pill ms-2" type="submit">Search</button>
           </div>
         </form>
@@ -81,12 +87,13 @@
               <form method="post" action="/admin/addCategory" onsubmit="return handleFormSubmit(event)">
                 <div class="mb-4">
                   <label for="name" class="form-label">Name</label>
-                  <input type="text" name="name" placeholder="Type here" class="form-control" id="name"     />
+                  <input type="text" name="name" placeholder="Type here" class="form-control" id="name" />
                   <div id="name-error" class="error-message"></div>
                 </div>
                 <div class="mb-4">
                   <label for="descriptionId" class="form-label">Description</label>
-                  <textarea name="description" placeholder="Type here" class="form-control" id="descriptionId"    ></textarea>
+                  <textarea name="description" placeholder="Type here" class="form-control"
+                    id="descriptionId"></textarea>
                   <div id="description-error" class="error-message"></div>
                 </div>
                 <div class="d-grid">
@@ -105,47 +112,55 @@
                     </tr>
                   </thead>
                   <tbody>
-                    <% categories.reverse().forEach((category, index) => { %>
+                    <% categories.reverse().forEach((category, index)=> { %>
                       <tr class="align-middle">
-                        <td><%= category.name %></td>
-                        <td><%= category.description || '-' %></td>
-                       
-                          </div>
+                        <td>
+                          <%= category.name %>
                         </td>
-                      </tr>
-                    <% }); %>                    
-                  </tbody>
-                  
-                </table>
-              </div>
-            </div>
+                        <td>
+                          <%= category.description || '-' %>
+                        </td>
 
+              </div>
+              </td>
+              </tr>
+              <% }); %>
+                </tbody>
+
+                </table>
+            </div>
           </div>
+
         </div>
       </div>
+  </div>
 
-      <div class="pagination-container mt-4 text-center">
-        <% if (currentPage > 1) { %>
-          <a href="?page=<%= currentPage - 1 %>" class="btn btn-outline-primary btn-sm mx-1">&laquo; Previous</a>
-        <% } %>
-        <% for (let i = 1; i <= totalPages; i++) { %>
-          <% if (i === currentPage) { %>
-            <span class="btn btn-primary btn-sm mx-1"><%= i %></span>
-          <% } else { %>
-            <a href="?page=<%= i %>" class="btn btn-outline-primary btn-sm mx-1"><%= i %></a>
-          <% } %>
-        <% } %>
-        <% if (currentPage < totalPages) { %>
-          <a href="?page=<%= currentPage + 1 %>" class="btn btn-outline-primary btn-sm mx-1">Next &raquo;</a>
-        <% } %>
-      </div>
+  <div class="pagination-container mt-4 text-center">
+    <% if (currentPage> 1) { %>
+      <a href="?page=<%= currentPage - 1 %>" class="btn btn-outline-primary btn-sm mx-1">&laquo; Previous</a>
+      <% } %>
+        <% for (let i=1; i <=totalPages; i++) { %>
+          <% if (i===currentPage) { %>
+            <span class="btn btn-primary btn-sm mx-1">
+              <%= i %>
+            </span>
+            <% } else { %>
+              <a href="?page=<%= i %>" class="btn btn-outline-primary btn-sm mx-1">
+                <%= i %>
+              </a>
+              <% } %>
+                <% } %>
+                  <% if (currentPage < totalPages) { %>
+                    <a href="?page=<%= currentPage + 1 %>" class="btn btn-outline-primary btn-sm mx-1">Next &raquo;</a>
+                    <% } %>
+  </div>
 
-    </section>
+  </section>
 
-    <div class="footr">
-          <%- include('.././Partials/admin/footer') %>
+  <div class="footr">
+    <%- include('.././Partials/admin/footer') %>
 
-    </div>
+  </div>
 
   </div>
 
@@ -155,44 +170,44 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
   <script>
-function handleFormSubmit(event) {
-  event.preventDefault();
-  if (!validateForm()) return;
+    function handleFormSubmit(event) {
+      event.preventDefault();
+      if (!validateForm()) return;
 
-  const name = document.getElementById('name').value.trim();
-  const description = document.getElementById('descriptionId').value.trim();
+      const name = document.getElementById('name').value.trim();
+      const description = document.getElementById('descriptionId').value.trim();
 
-  fetch('/admin/addCategory', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({ name, description })
-  })
-  .then(response => {
-    if (!response.ok) {
-      return response.json().then(err => { throw new Error(err.error) });
+      fetch('/admin/addCategory', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ name, description })
+      })
+        .then(response => {
+          if (!response.ok) {
+            return response.json().then(err => { throw new Error(err.error) });
+          }
+          return response.json();
+        })
+        .then(data => {
+          Swal.fire({
+            icon: 'success',
+            title: 'Category Created',
+            text: data.message || 'Category added successfully',
+            confirmButtonText: 'OK'
+          }).then(() => {
+            location.reload();
+          });
+        })
+        .catch(err => {
+          Swal.fire({
+            icon: 'error',
+            title: 'Oops!',
+            text: err.message || 'An error occurred while adding the category'
+          });
+        });
     }
-    return response.json();
-  })
-  .then(data => {
-    Swal.fire({
-      icon: 'success',
-      title: 'Category Created',
-      text: data.message || 'Category added successfully',
-      confirmButtonText: 'OK'
-    }).then(() => {
-      location.reload();
-    });
-  })
-  .catch(err => {
-    Swal.fire({
-      icon: 'error',
-      title: 'Oops!',
-      text: err.message || 'An error occurred while adding the category'
-    });
-  });
-}
 
     function validateForm() {
       clearErrorMessages();
@@ -233,91 +248,92 @@ function handleFormSubmit(event) {
     }
 
     async function addOffer(categoryId) {
-      const {value : amount} = await Swal.fire({
-        title:"offer in percentage",
-        input:'number',
-        inputLabel:"percentage",
-        inputPlaceholder:"%"
+      const { value: amount } = await Swal.fire({
+        title: "offer in percentage",
+        input: 'number',
+        inputLabel: "percentage",
+        inputPlaceholder: "%"
       })
 
-      if(amount){
+      if (amount) {
         try {
-          const response = await fetch('/admin/addCategoryOffer',{
-            method:"post",
-            headers:{
-              'content-type':'application/json',
+          const response = await fetch('/admin/addCategoryOffer', {
+            method: "post",
+            headers: {
+              'content-type': 'application/json',
             },
-            body:JSON.stringify({
-              percentage:amount,
-              categoryId:categoryId,
+            body: JSON.stringify({
+              percentage: amount,
+              categoryId: categoryId,
 
             }),
 
 
           });
 
-          const data =  await response.json()
-          if(response.ok && data.status === true ){
+          const data = await response.json()
+          if (response.ok && data.status === true) {
             Swal.fire(
               'offer added',
               'the offer has been added',
               'success'
-            ).then(()=>{
+            ).then(() => {
               location.reload();
             })
-          } else{
-            Swal.fire("failed",data.message || "adding offer failed", 'errrorr')
+          } else {
+            Swal.fire("failed", data.message || "adding offer failed", 'errrorr')
           }
 
         } catch (error) {
           Swal.fire(
-          "Error",
-          "error occured while adding the offer",
-          "error"
-          )     
-          console.log("error adding offer",error);
-               
+            "Error",
+            "error occured while adding the offer",
+            "error"
+          )
+          console.log("error adding offer", error);
+
         }
       }
       Swal.fire('Add Offer clicked: ' + categoryId);
     }
 
     async function removeOffer(categoryId) {
-  try {
-    const response = await fetch('/admin/removeCategoryOffer', {
-      method: "POST",
-      headers: {
-        'content-type': 'application/json',
-      },
-      body: JSON.stringify({
-        categoryId: categoryId,
-      })
-    });
+      try {
+        const response = await fetch('/admin/removeCategoryOffer', {
+          method: "POST",
+          headers: {
+            'content-type': 'application/json',
+          },
+          body: JSON.stringify({
+            categoryId: categoryId,
+          })
+        });
 
-    const data = await response.json(); 
-    if (response.ok && data.status === true) {
-      Swal.fire(
-        "Offer Removed",
-        "Offer has been removed",
-        "success"
-      ).then(() => {
-        location.reload();
-      });
-    } else {
-      Swal.fire("Failed", data.message || "Removing offer failed", "error");
+        const data = await response.json();
+        if (response.ok && data.status === true) {
+          Swal.fire(
+            "Offer Removed",
+            "Offer has been removed",
+            "success"
+          ).then(() => {
+            location.reload();
+          });
+        } else {
+          Swal.fire("Failed", data.message || "Removing offer failed", "error");
+        }
+
+      } catch (error) {
+        Swal.fire(
+          "Error",
+          "An error occurred while removing the offer",
+          "error"
+        );
+        console.error("Error removing offer", error);
+      }
     }
-
-  } catch (error) {
-    Swal.fire(
-      "Error",
-      "An error occurred while removing the offer",
-      "error"
-    );
-    console.error("Error removing offer", error);
-  }
-}
 
   </script>
 
 </body>
+
 </html>

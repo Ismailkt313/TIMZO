@@ -16,7 +16,7 @@ const { adminAuth } = require('../../MiddleWares/auth');
 router.get('/login', adminControllerauth.loadsign);
 router.post('/login', adminControllerauth.login);
 router.get('/dashboard', adminAuth, dashboardController.loadAdminDashboard);
-router.post('/generate-ledger',adminAuth,dashboardController.generateLedger)
+router.post('/generate-ledger', adminAuth, dashboardController.generateLedger)
 router.get('/logout', adminAuth, adminControllerauth.logout);
 router.get('/users', adminAuth, costomerController.loadUsers);
 router.get('/search-users', adminAuth, costomerController.searchUsers);
@@ -66,8 +66,8 @@ router.get('/coupons/edit/:id', adminAuth, couponController.loadEditCouponForm);
 router.post('/coupons/edit/:id', adminAuth, couponController.editCoupon);
 router.put('/coupons/toggle-status/:id', adminAuth, couponController.toggleStatus);
 
-router.get('/sales-report',adminAuth,saleController.generateAdminSalesReport )
-router.get('/sales-report/pdf',adminAuth,saleController.generateSalesReportPDF)
-router.get('/sales-report/excel',adminAuth,saleController.generateSalesReportExcel)
+router.get('/sales-report', adminAuth, saleController.generateAdminSalesReport)
+router.get('/sales-report/pdf', adminAuth, saleController.generateSalesReportPDF)
+router.get('/sales-report/excel', adminAuth, saleController.generateSalesReportExcel)
 
 module.exports = router;

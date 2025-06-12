@@ -23,7 +23,7 @@ const couponSchema = new mongoose.Schema({
     min: 0
   },
   maxDiscount: {
-    type: Number, 
+    type: Number,
     default: null
   },
   minPurchase: {
@@ -40,7 +40,7 @@ const couponSchema = new mongoose.Schema({
   },
   perUserLimit: {
     type: Number,
-    default: 1 
+    default: 1
   },
   validFrom: {
     type: Date,
@@ -69,4 +69,3 @@ const couponSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 module.exports = mongoose.model('Coupon', couponSchema);
- 

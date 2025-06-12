@@ -8,7 +8,8 @@
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <link rel="icon" type="image/x-icon" href="/images/TIMZO.jpg" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@600&display=swap"
+    rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
   <style>
@@ -148,74 +149,77 @@
 <body class="bg-gray-50">
   <div class="flex min-h-screen">
     <%- include('../Partials/user/userSidebar', { user: user, currentPage: 'orders' }) %>
-    <div class="main-content flex-1 flex justify-center">
-      <div class="w-full max-w-5xl">
-        <h1 class="text-4xl font-bold text-gray-900 mb-10 text-center">My Orders</h1>
+      <div class="main-content flex-1 flex justify-center">
+        <div class="w-full max-w-5xl">
+          <h1 class="text-4xl font-bold text-gray-900 mb-10 text-center">My Orders</h1>
 
-        <% if (orders.length === 0) { %>
-        <div class="text-center py-16 bg-white rounded-xl shadow-md">
-          <i class="fas fa-shopping-bag text-gray-400 text-5xl mb-4"></i>
-          <p class="text-gray-600 text-lg mb-6">No orders found.</p>
-          <a href="/products" class="btn-primary inline-block px-6 py-3 text-lg">Start Shopping</a>
-        </div>
-        <% } else { %>
-        <div class="order-grid grid grid-cols-2 md:grid-cols-2 sm:grid-cols-1 gap-8">
-          <% orders.forEach(order => { %>
-          <div class="order-card">
-            <div class="flex justify-end mb-2">
-              <button class="text-sm text-blue-600 hover:underline" onclick="downloadInvoice('<%= order._id %>')">
-                <i class="fas fa-download mr-1"></i> Download Invoice
-              </button>
+          <% if (orders.length===0) { %>
+            <div class="text-center py-16 bg-white rounded-xl shadow-md">
+              <i class="fas fa-shopping-bag text-gray-400 text-5xl mb-4"></i>
+              <p class="text-gray-600 text-lg mb-6">No orders found.</p>
+              <a href="/products" class="btn-primary inline-block px-6 py-3 text-lg">Start Shopping</a>
             </div>
-            <div class="flex justify-between items-center mb-4">
-              <p class="font-semibold text-xl text-gray-900">Order #<%= order.orderId %></p>
-              <span class="status-badge status-<%= order.orderStatus.toLowerCase() %>">
-                <i class="fas fa-circle text-xs mr-2"></i>
-                <%= order.orderStatus %>
-              </span>
-            </div>
-            <p class="text-gray-600 text-sm mb-2">
-              <i class="fas fa-calendar-alt mr-2"></i> Placed on:
-              <%= new Date(order.orderDate).toLocaleDateString() %>
-            </p>
-<p class="text-gray-600 text-sm mb-1">
-  Subtotal: ₹<%= order.calculated.subtotal.toFixed(2) %>
-</p>
-<p class="text-gray-600 text-sm mb-1">
-  Discount: -₹<%= order.calculated.totalDiscount.toFixed(2) %>
-</p>
-<p class="text-gray-600 text-sm mb-1">
-  Tax (10%): ₹<%= order.calculated.tax.toFixed(2) %>
-</p>
-<p class="text-gray-600 text-sm mb-1">
-  Shipping Fee: ₹<%= order.calculated.shippingFee.toFixed(2) %>
-</p>
+            <% } else { %>
+              <div class="order-grid grid grid-cols-2 md:grid-cols-2 sm:grid-cols-1 gap-8">
+                <% orders.forEach(order=> { %>
+                  <div class="order-card">
+                    <div class="flex justify-end mb-2">
+                      <button class="text-sm text-blue-600 hover:underline"
+                        onclick="downloadInvoice('<%= order._id %>')">
+                        <i class="fas fa-download mr-1"></i> Download Invoice
+                      </button>
+                    </div>
+                    <div class="flex justify-between items-center mb-4">
+                      <p class="font-semibold text-xl text-gray-900">Order #<%= order.orderId %>
+                      </p>
+                      <span class="status-badge status-<%= order.orderStatus.toLowerCase() %>">
+                        <i class="fas fa-circle text-xs mr-2"></i>
+                        <%= order.orderStatus %>
+                      </span>
+                    </div>
+                    <p class="text-gray-600 text-sm mb-2">
+                      <i class="fas fa-calendar-alt mr-2"></i> Placed on:
+                      <%= new Date(order.orderDate).toLocaleDateString() %>
+                    </p>
+                    <p class="text-gray-600 text-sm mb-1">
+                      Subtotal: ₹<%= order.calculated.subtotal.toFixed(2) %>
+                    </p>
+                    <p class="text-gray-600 text-sm mb-1">
+                      Discount: -₹<%= order.calculated.totalDiscount.toFixed(2) %>
+                    </p>
+                    <p class="text-gray-600 text-sm mb-1">
+                      Tax (10%): ₹<%= order.calculated.tax.toFixed(2) %>
+                    </p>
+                    <p class="text-gray-600 text-sm mb-1">
+                      Shipping Fee: ₹<%= order.calculated.shippingFee.toFixed(2) %>
+                    </p>
 
-<!-- This is the original amount from the database -->
-<p class="text-gray-800 font-semibold text-sm mt-1">
-  Total: ₹<%= order.totalAmount.toFixed(2) %>
-</p>
+                    <p class="text-gray-800 font-semibold text-sm mt-1">
+                      Total: ₹<%= order.totalAmount.toFixed(2) %>
+                    </p>
 
-            <div class="progress-bar mb-6">
-              <div class="progress-fill"
-                style="width: <%= order.orderStatus === 'Delivered' ? '100%' : order.orderStatus === 'Processing' ? '50%' : order.orderStatus === 'Cancelled' ? '0%' : '25%' %>">
+                    <div class="progress-bar mb-6">
+                      <div class="progress-fill"
+                        style="width: <%= order.orderStatus === 'Delivered' ? '100%' : order.orderStatus === 'Processing' ? '50%' : order.orderStatus === 'Cancelled' ? '0%' : '25%' %>">
+                      </div>
+                    </div>
+                    <div class="flex flex-wrap gap-2">
+                      <a href="/orders/<%= order._id %>" class="btn-primary flex-1 text-center">View Details</a>
+                      <% if (order.orderStatus==='Processing' ) { %>
+                        <button class="btn-danger flex-1 cancel-order" data-order-id="<%= order._id %>">Cancel
+                          Order</button>
+                        <% } %>
+                          <% if (order.paymentMethod==='Online' && order.paymentStatus==='Pending' ) { %>
+                            <button class="btn-retry flex-1 retry-payment" data-order-id="<%= order._id %>">Retry
+                              Payment</button>
+                            <% } %>
+                    </div>
+                  </div>
+                  <% }) %>
               </div>
-            </div>
-            <div class="flex flex-wrap gap-2">
-              <a href="/orders/<%= order._id %>" class="btn-primary flex-1 text-center">View Details</a>
-              <% if (order.orderStatus === 'Processing') { %>
-              <button class="btn-danger flex-1 cancel-order" data-order-id="<%= order._id %>">Cancel Order</button>
               <% } %>
-              <% if (order.paymentMethod === 'Online' && order.paymentStatus === 'Pending') { %>
-              <button class="btn-retry flex-1 retry-payment" data-order-id="<%= order._id %>">Retry Payment</button>
-              <% } %>
-            </div>
-          </div>
-          <% }) %>
         </div>
-        <% } %>
       </div>
-    </div>
   </div>
 
   <footer class="bg-white p-6 text-center text-gray-600 text-sm shadow-inner mt-12">
@@ -223,234 +227,234 @@
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script>
-        function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            sidebar.classList.toggle('sidebar-active');
-        }
+  <script>
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      sidebar.classList.toggle('sidebar-active');
+    }
 
-        document.querySelectorAll('.cancel-order').forEach(button => {
-            button.addEventListener('click', async () => {
-                const orderId = button.getAttribute('data-order-id');
-                Swal.fire({
-                    title: 'Are you sure?',
-                    text: 'This order will be cancelled.',
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonText: 'Cancel Order',
-                    cancelButtonText: 'Keep Order',
-                    buttonsStyling: false,
-                    customClass: {
-                        confirmButton: 'btn-danger px-4 py-2 rounded mr-2',
-                        cancelButton: 'btn-primary px-4 py-2 rounded'
-                    }
-                }).then(async (result) => {
-                    if (result.isConfirmed) {
-                        try {
-                            const response = await fetch(`/user/orders/cancel/${orderId}`, {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                credentials: 'include'
-                            });
-                            const data = await response.json();
-                            Swal.fire({
-                                toast: true,
-                                position: 'bottom-end',
-                                icon: data.success ? 'success' : 'error',
-                                title: data.message,
-                                showConfirmButton: false,
-                                timer: 3000
-                            });
-                            if (data.success) {
-                                setTimeout(() => window.location.reload(), 1500);
-                            }
-                        } catch (error) {
-                            console.error('Error cancelling order:', error);
-                            Swal.fire('Error', 'Failed to cancel order', 'error');
-                        }
-                    }
-                });
-            });
-        });
-
-        document.querySelectorAll('.retry-payment').forEach(button => {
-            button.addEventListener('click', async () => {
-                const orderId = button.getAttribute('data-order-id');
-                retryPayment(orderId);
-            });
-        });
-
-        async function retryPayment(orderId) {
-            const result = await Swal.fire({
-                title: 'Retry Payment',
-                text: 'Do you want to retry the payment for this order?',
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonText: 'Yes, Retry',
-                cancelButtonText: 'Cancel',
-                buttonsStyling: false,
-                customClass: {
-                    confirmButton: 'btn-retry px-4 py-2 rounded mr-2',
-                    cancelButton: 'btn-primary px-4 py-2 rounded',
-                },
-            });
-
-            if (result.isConfirmed) {
-                try {
-                    console.log('Sending retry payment request for order:', orderId);
-                    Swal.fire({
-                        title: 'Processing Payment...',
-                        allowOutsideClick: false,
-                        didOpen: () => Swal.showLoading(),
-                    });
-
-                    const response = await fetch(`/orders/retry-payment/${orderId}`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        credentials: 'include',
-                    });
-
-                    console.log('Retry payment response status:', response.status);
-                    if (!response.ok) {
-                        if (response.status === 401) {
-                            Swal.fire({
-                                toast: true,
-                                position: 'bottom-end',
-                                icon: 'error',
-                                title: 'Please log in to retry payment',
-                                showConfirmButton: false,
-                                timer: 3000,
-                            });
-                            setTimeout(() => window.location.href = '/login', 1500);
-                            return;
-                        }
-                        throw new Error(`HTTP error: ${response.status}`);
-                    }
-
-                    const data = await response.json();
-                    console.log('Retry payment response data:', data);
-
-                    if (data.success) {
-                        Swal.close();
-
-                        const options = {
-                            key: data.razorpayKey,
-                            amount: data.razorpayOrder.amount,
-                            currency: data.razorpayOrder.currency,
-                            order_id: data.razorpayOrder.id,
-                            name: 'Timzo',
-                            description: `Retry Payment for Order ${data.orderDetails.orderId}`,
-                            handler: async function (response) {
-                                console.log('Razorpay payment response:', response);
-                                const verifyResponse = await fetch('/order/verify-payment', {
-                                    method: 'POST',
-                                    headers: { 'Content-Type': 'application/json' },
-                                    body: JSON.stringify({
-                                        razorpay_payment_id: response.razorpay_payment_id,
-                                        razorpay_order_id: response.razorpay_order_id,
-                                        razorpay_signature: response.razorpay_signature,
-                                        orderId: data.orderDetails.orderId,
-                                    }),
-                                    credentials: 'include',
-                                });
-
-                                console.log('Verify payment response status:', verifyResponse.status);
-                                const verifyData = await verifyResponse.json();
-                                console.log('Verify payment response data:', verifyData);
-                                if (verifyData.success) {
-                                    Swal.fire({
-                                        toast: true,
-                                        position: 'bottom-end',
-                                        icon: 'success',
-                                        title: 'Payment successful!',
-                                        showConfirmButton: false,
-                                        timer: 3000,
-                                    });
-                                    console.log('Redirecting to:', `/order-success?orderId=${data.orderDetails.orderId}`);
-                                    setTimeout(() => window.location.href = `/order/success?orderId=${data.orderDetails.orderId}`, 1500);
-                                } else {
-                                    Swal.fire({
-                                        toast: true,
-                                        position: 'bottom-end',
-                                        icon: 'error',
-                                        title: verifyData.message || 'Payment verification failed',
-                                        showConfirmButton: false,
-                                        timer: 3000,
-                                    });
-                                    console.log('Redirecting to:', `/order-failed?message=${encodeURIComponent(verifyData.message)}`);
-                                    setTimeout(() => window.location.href = `/order-failed?message=${encodeURIComponent(verifyData.message)}`, 1500);
-                                }
-                            },
-                            prefill: {
-                                name: '<%= user.name || '' %>',
-                                email: '<%= user.email || '' %>',
-                                contact: '<%= user.phone || '' %>',
-                            },
-                            theme: {
-                                color: '#3399cc',
-                            },
-                        };
-
-                        console.log('Opening Razorpay modal with options:', options);
-                        const rzp = new Razorpay(options);
-                        rzp.open();
-                    } else {
-                        Swal.fire({
-                            toast: true,
-                            position: 'bottom-end',
-                            icon: 'error',
-                            title: data.message || 'Failed to retry payment',
-                            showConfirmButton: false,
-                            timer: 3000,
-                        });
-                    }
-                } catch (error) {
-                    console.error('Error retrying:', error.message, error.stack);
-                    Swal.fire({
-                        toast: true,
-                        position: 'bottom-end',
-                        icon: 'error',
-                        title: 'Failed to retry payment. Try again.',
-                        showConfirmButton: false,
-                        timer: 3000,
-                    });
-                }
-            }
-        }
-        async function downloadInvoice(orderId) {
+    document.querySelectorAll('.cancel-order').forEach(button => {
+      button.addEventListener('click', async () => {
+        const orderId = button.getAttribute('data-order-id');
+        Swal.fire({
+          title: 'Are you sure?',
+          text: 'This order will be cancelled.',
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonText: 'Cancel Order',
+          cancelButtonText: 'Keep Order',
+          buttonsStyling: false,
+          customClass: {
+            confirmButton: 'btn-danger px-4 py-2 rounded mr-2',
+            cancelButton: 'btn-primary px-4 py-2 rounded'
+          }
+        }).then(async (result) => {
+          if (result.isConfirmed) {
             try {
-                Swal.fire({
-                    title: 'Generating Invoice...',
-                    allowOutsideClick: false,
-                    didOpen: () => Swal.showLoading()
-                });
-
-                const response = await fetch(`/user/orders/invoice/${orderId}`, {
-                    method: 'GET',
-                    credentials: 'include'
-                });
-
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
-
-                const blob = await response.blob();
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `Invoice_${orderId}.pdf`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                window.URL.revokeObjectURL(url);
-
-                Swal.close();
+              const response = await fetch(`/user/orders/cancel/${orderId}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include'
+              });
+              const data = await response.json();
+              Swal.fire({
+                toast: true,
+                position: 'bottom-end',
+                icon: data.success ? 'success' : 'error',
+                title: data.message,
+                showConfirmButton: false,
+                timer: 3000
+              });
+              if (data.success) {
+                setTimeout(() => window.location.reload(), 1500);
+              }
             } catch (error) {
-                console.error('Error downloading invoice:', error);
-                Swal.fire('Error', 'Failed to download invoice. Please try again.', 'error');
+              console.error('Error cancelling order:', error);
+              Swal.fire('Error', 'Failed to cancel order', 'error');
             }
+          }
+        });
+      });
+    });
+
+    document.querySelectorAll('.retry-payment').forEach(button => {
+      button.addEventListener('click', async () => {
+        const orderId = button.getAttribute('data-order-id');
+        retryPayment(orderId);
+      });
+    });
+
+    async function retryPayment(orderId) {
+      const result = await Swal.fire({
+        title: 'Retry Payment',
+        text: 'Do you want to retry the payment for this order?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, Retry',
+        cancelButtonText: 'Cancel',
+        buttonsStyling: false,
+        customClass: {
+          confirmButton: 'btn-retry px-4 py-2 rounded mr-2',
+          cancelButton: 'btn-primary px-4 py-2 rounded',
+        },
+      });
+
+      if (result.isConfirmed) {
+        try {
+          console.log('Sending retry payment request for order:', orderId);
+          Swal.fire({
+            title: 'Processing Payment...',
+            allowOutsideClick: false,
+            didOpen: () => Swal.showLoading(),
+          });
+
+          const response = await fetch(`/orders/retry-payment/${orderId}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+          });
+
+          console.log('Retry payment response status:', response.status);
+          if (!response.ok) {
+            if (response.status === 401) {
+              Swal.fire({
+                toast: true,
+                position: 'bottom-end',
+                icon: 'error',
+                title: 'Please log in to retry payment',
+                showConfirmButton: false,
+                timer: 3000,
+              });
+              setTimeout(() => window.location.href = '/login', 1500);
+              return;
+            }
+            throw new Error(`HTTP error: ${response.status}`);
+          }
+
+          const data = await response.json();
+          console.log('Retry payment response data:', data);
+
+          if (data.success) {
+            Swal.close();
+
+            const options = {
+              key: data.razorpayKey,
+              amount: data.razorpayOrder.amount,
+              currency: data.razorpayOrder.currency,
+              order_id: data.razorpayOrder.id,
+              name: 'Timzo',
+              description: `Retry Payment for Order ${data.orderDetails.orderId}`,
+              handler: async function (response) {
+                console.log('Razorpay payment response:', response);
+                const verifyResponse = await fetch('/order/verify-payment', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    razorpay_payment_id: response.razorpay_payment_id,
+                    razorpay_order_id: response.razorpay_order_id,
+                    razorpay_signature: response.razorpay_signature,
+                    orderId: data.orderDetails.orderId,
+                  }),
+                  credentials: 'include',
+                });
+
+                console.log('Verify payment response status:', verifyResponse.status);
+                const verifyData = await verifyResponse.json();
+                console.log('Verify payment response data:', verifyData);
+                if (verifyData.success) {
+                  Swal.fire({
+                    toast: true,
+                    position: 'bottom-end',
+                    icon: 'success',
+                    title: 'Payment successful!',
+                    showConfirmButton: false,
+                    timer: 3000,
+                  });
+                  console.log('Redirecting to:', `/order-success?orderId=${data.orderDetails.orderId}`);
+                  setTimeout(() => window.location.href = `/order/success?orderId=${data.orderDetails.orderId}`, 1500);
+                } else {
+                  Swal.fire({
+                    toast: true,
+                    position: 'bottom-end',
+                    icon: 'error',
+                    title: verifyData.message || 'Payment verification failed',
+                    showConfirmButton: false,
+                    timer: 3000,
+                  });
+                  console.log('Redirecting to:', `/order-failed?message=${encodeURIComponent(verifyData.message)}`);
+                  setTimeout(() => window.location.href = `/order-failed?message=${encodeURIComponent(verifyData.message)}`, 1500);
+                }
+              },
+              prefill: {
+                name: '<%= user.name || '' %>',
+                email: '<%= user.email || '' %>',
+                contact: '<%= user.phone || '' %>',
+              },
+              theme: {
+                color: '#3399cc',
+              },
+            };
+
+            console.log('Opening Razorpay modal with options:', options);
+            const rzp = new Razorpay(options);
+            rzp.open();
+          } else {
+            Swal.fire({
+              toast: true,
+              position: 'bottom-end',
+              icon: 'error',
+              title: data.message || 'Failed to retry payment',
+              showConfirmButton: false,
+              timer: 3000,
+            });
+          }
+        } catch (error) {
+          console.error('Error retrying:', error.message, error.stack);
+          Swal.fire({
+            toast: true,
+            position: 'bottom-end',
+            icon: 'error',
+            title: 'Failed to retry payment. Try again.',
+            showConfirmButton: false,
+            timer: 3000,
+          });
         }
-    </script>
+      }
+    }
+    async function downloadInvoice(orderId) {
+      try {
+        Swal.fire({
+          title: 'Generating Invoice...',
+          allowOutsideClick: false,
+          didOpen: () => Swal.showLoading()
+        });
+
+        const response = await fetch(`/user/orders/invoice/${orderId}`, {
+          method: 'GET',
+          credentials: 'include'
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `Invoice_${orderId}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+
+        Swal.close();
+      } catch (error) {
+        console.error('Error downloading invoice:', error);
+        Swal.fire('Error', 'Failed to download invoice. Please try again.', 'error');
+      }
+    }
+  </script>
 </body>
 
 </html>

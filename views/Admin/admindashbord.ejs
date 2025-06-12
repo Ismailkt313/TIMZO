@@ -1,540 +1,580 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Admin Dashboard | Timzo Watches</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            min-height: 100vh;
-        }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
 
-        /* Sidebar Styles */
+      body {
+        font-family: "Inter", sans-serif;
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        min-height: 100vh;
+      }
+
+      /* Sidebar Styles */
+      .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        width: 280px;
+        background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+        z-index: 1000;
+        transition: transform 0.3s ease;
+        overflow-y: auto;
+        box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
+      }
+
+      .sidebar::-webkit-scrollbar {
+        width: 4px;
+      }
+
+      .sidebar::-webkit-scrollbar-track {
+        background: transparent;
+      }
+
+      .sidebar::-webkit-scrollbar-thumb {
+        background: rgba(148, 163, 184, 0.3);
+        border-radius: 2px;
+      }
+
+      .sidebar-header {
+        padding: 1.5rem;
+        border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+        background: rgba(0, 0, 0, 0.1);
+      }
+
+      .sidebar-brand {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+      }
+
+      .sidebar-brand img {
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        object-fit: cover;
+      }
+
+      .sidebar-brand-text {
+        font-size: 1.25rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .sidebar-user {
+        padding: 1.5rem;
+        border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+      }
+
+      .sidebar-user-info {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+      }
+
+      .sidebar-user-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #0f172a;
+        font-weight: 600;
+        font-size: 1rem;
+      }
+
+      .sidebar-user-details h4 {
+        color: #f8fafc;
+        font-size: 0.875rem;
+        font-weight: 500;
+        margin-bottom: 0.125rem;
+      }
+
+      .sidebar-user-details p {
+        color: #94a3b8;
+        font-size: 0.75rem;
+      }
+
+      .sidebar-nav {
+        padding: 1rem;
+        flex: 1;
+      }
+
+      .nav-section {
+        margin-bottom: 2rem;
+      }
+
+      .nav-section-title {
+        font-size: 0.6875rem;
+        font-weight: 600;
+        color: #64748b;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 0.75rem;
+        padding: 0 0.75rem;
+      }
+
+      .nav-link {
+        display: flex;
+        align-items: center;
+        padding: 0.75rem;
+        margin-bottom: 0.25rem;
+        border-radius: 8px;
+        color: #cbd5e1;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        font-size: 0.875rem;
+        font-weight: 500;
+      }
+
+      .nav-link:hover {
+        background: rgba(148, 163, 184, 0.1);
+        color: #f8fafc;
+        transform: translateX(4px);
+      }
+
+      .nav-link.active {
+        background: linear-gradient(
+          135deg,
+          rgba(251, 191, 36, 0.1) 0%,
+          rgba(245, 158, 11, 0.1) 100%
+        );
+        color: #fbbf24;
+        border-left: 3px solid #fbbf24;
+      }
+
+      .nav-link i {
+        width: 20px;
+        margin-right: 0.75rem;
+        font-size: 1rem;
+      }
+
+      .sidebar-footer {
+        padding: 1rem;
+        border-top: 1px solid rgba(148, 163, 184, 0.1);
+      }
+
+      .logout-link {
+        display: flex;
+        align-items: center;
+        padding: 0.75rem;
+        border-radius: 8px;
+        color: #f87171;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        font-size: 0.875rem;
+        font-weight: 500;
+      }
+
+      .logout-link:hover {
+        background: rgba(239, 68, 68, 0.1);
+        color: #ef4444;
+      }
+
+      .logout-link i {
+        width: 20px;
+        margin-right: 0.75rem;
+      }
+
+      /* Main Content */
+      .main-content {
+        margin-left: 280px;
+        padding: 2rem;
+        min-height: 100vh;
+        transition: margin-left 0.3s ease;
+      }
+
+      .dashboard-header {
+        margin-bottom: 2rem;
+      }
+
+      .dashboard-title {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 0.5rem;
+      }
+
+      .dashboard-subtitle {
+        color: #64748b;
+        font-size: 1rem;
+      }
+
+      /* Cards */
+      .dashboard-card {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+          0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        border: 1px solid rgba(226, 232, 240, 0.8);
+        overflow: hidden;
+        transition: all 0.3s ease;
+        margin-bottom: 2rem;
+      }
+
+      .dashboard-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+          0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      }
+
+      .card-header {
+        padding: 1.5rem;
+        border-bottom: 1px solid #e2e8f0;
+        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+      }
+
+      .card-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #1e293b;
+        text-align: center;
+      }
+
+      .card-body {
+        padding: 1.5rem;
+      }
+
+      /* Filter Buttons */
+      .filter-container {
+        display: flex;
+        justify-content: center;
+        gap: 0.5rem;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+      }
+
+      .filter-btn {
+        padding: 0.5rem 1rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 8px;
+        background: white;
+        color: #64748b;
+        font-size: 0.875rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      .filter-btn:hover {
+        border-color: #fbbf24;
+        color: #f59e0b;
+      }
+
+      .filter-btn.active {
+        background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+        border-color: #f59e0b;
+        color: white;
+      }
+
+      /* Chart Container */
+      .chart-container {
+        position: relative;
+        height: 400px;
+        width: 100%;
+      }
+
+      /* Top Lists */
+      .top-list {
+        list-style: none;
+      }
+
+      .top-list li {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 0;
+        border-bottom: 1px solid #f1f5f9;
+      }
+
+      .top-list li:last-child {
+        border-bottom: none;
+      }
+
+      .item-name {
+        font-weight: 500;
+        color: #334155;
+      }
+
+      .item-count {
+        background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+        color: white;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+      }
+
+      /* Ledger Section */
+      .ledger-section {
+        text-align: center;
+        padding: 2rem;
+      }
+
+      .ledger-btn {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+        padding: 1rem 2rem;
+        border: none;
+        border-radius: 12px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 14px 0 rgba(16, 185, 129, 0.3);
+      }
+
+      .ledger-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px 0 rgba(16, 185, 129, 0.4);
+      }
+
+      .no-data {
+        text-align: center;
+        padding: 2rem;
+        color: #64748b;
+      }
+
+      .no-data i {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+      }
+
+      /* Mobile Sidebar */
+      .mobile-toggle {
+        position: fixed;
+        bottom: […];
+      }
+      .mobile-toggle {
+        position: fixed;
+        bottom: 2rem;
+        right: 2rem;
+        width: 56px;
+        height: 56px;
+        background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+        border-radius: 50%;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        color: #0f172a;
+        font-size: 1.25rem;
+        cursor: pointer;
+        box-shadow: 0 4px 20px rgba(251, 191, 36, 0.3);
+        z-index: 1001;
+        transition: all 0.3s ease;
+      }
+
+      .mobile-toggle:hover {
+        transform: scale(1.1);
+      }
+
+      .overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 999;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+      }
+
+      .overlay.active {
+        opacity: 1;
+        visibility: visible;
+      }
+
+      /* Responsive */
+      @media (max-width: 1024px) {
         .sidebar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            height: 100vh;
-            width: 280px;
-            background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
-            z-index: 1000;
-            transition: transform 0.3s ease;
-            overflow-y: auto;
-            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
+          transform: translateX(-100%);
         }
 
-        .sidebar::-webkit-scrollbar {
-            width: 4px;
+        .sidebar.active {
+          transform: translateX(0);
         }
 
-        .sidebar::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        .sidebar::-webkit-scrollbar-thumb {
-            background: rgba(148, 163, 184, 0.3);
-            border-radius: 2px;
-        }
-
-        .sidebar-header {
-            padding: 1.5rem;
-            border-bottom: 1px solid rgba(148, 163, 184, 0.1);
-            background: rgba(0, 0, 0, 0.1);
-        }
-
-        .sidebar-brand {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        .sidebar-brand img {
-            width: 40px;
-            height: 40px;
-            border-radius: 8px;
-            object-fit: cover;
-        }
-
-        .sidebar-brand-text {
-            font-size: 1.25rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .sidebar-user {
-            padding: 1.5rem;
-            border-bottom: 1px solid rgba(148, 163, 184, 0.1);
-        }
-
-        .sidebar-user-info {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        .sidebar-user-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #0f172a;
-            font-weight: 600;
-            font-size: 1rem;
-        }
-
-        .sidebar-user-details h4 {
-            color: #f8fafc;
-            font-size: 0.875rem;
-            font-weight: 500;
-            margin-bottom: 0.125rem;
-        }
-
-        .sidebar-user-details p {
-            color: #94a3b8;
-            font-size: 0.75rem;
-        }
-
-        .sidebar-nav {
-            padding: 1rem;
-            flex: 1;
-        }
-
-        .nav-section {
-            margin-bottom: 2rem;
-        }
-
-        .nav-section-title {
-            font-size: 0.6875rem;
-            font-weight: 600;
-            color: #64748b;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin-bottom: 0.75rem;
-            padding: 0 0.75rem;
-        }
-
-        .nav-link {
-            display: flex;
-            align-items: center;
-            padding: 0.75rem;
-            margin-bottom: 0.25rem;
-            border-radius: 8px;
-            color: #cbd5e1;
-            text-decoration: none;
-            transition: all 0.2s ease;
-            font-size: 0.875rem;
-            font-weight: 500;
-        }
-
-        .nav-link:hover {
-            background: rgba(148, 163, 184, 0.1);
-            color: #f8fafc;
-            transform: translateX(4px);
-        }
-
-        .nav-link.active {
-            background: linear-gradient(135deg, rgba(251, 191, 36, 0.1) 0%, rgba(245, 158, 11, 0.1) 100%);
-            color: #fbbf24;
-            border-left: 3px solid #fbbf24;
-        }
-
-        .nav-link i {
-            width: 20px;
-            margin-right: 0.75rem;
-            font-size: 1rem;
-        }
-
-        .sidebar-footer {
-            padding: 1rem;
-            border-top: 1px solid rgba(148, 163, 184, 0.1);
-        }
-
-        .logout-link {
-            display: flex;
-            align-items: center;
-            padding: 0.75rem;
-            border-radius: 8px;
-            color: #f87171;
-            text-decoration: none;
-            transition: all 0.2s ease;
-            font-size: 0.875rem;
-            font-weight: 500;
-        }
-
-        .logout-link:hover {
-            background: rgba(239, 68, 68, 0.1);
-            color: #ef4444;
-        }
-
-        .logout-link i {
-            width: 20px;
-            margin-right: 0.75rem;
-        }
-
-        /* Main Content */
         .main-content {
-            margin-left: 280px;
-            padding: 2rem;
-            min-height: 100vh;
-            transition: margin-left 0.3s ease;
+          margin-left: 0;
+          padding: 1rem;
         }
 
-        .dashboard-header {
-            margin-bottom: 2rem;
+        .mobile-toggle {
+          display: flex;
         }
 
         .dashboard-title {
-            font-size: 2rem;
-            font-weight: 700;
-            color: #1e293b;
-            margin-bottom: 0.5rem;
+          font-size: 1.5rem;
         }
 
-        .dashboard-subtitle {
-            color: #64748b;
-            font-size: 1rem;
+        .chart-container {
+          height: 300px;
         }
 
-        /* Cards */
-        .dashboard-card {
-            background: white;
-            border-radius: 16px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            border: 1px solid rgba(226, 232, 240, 0.8);
-            overflow: hidden;
-            transition: all 0.3s ease;
-            margin-bottom: 2rem;
-        }
-
-        .dashboard-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-        }
-
-        .card-header {
-            padding: 1.5rem;
-            border-bottom: 1px solid #e2e8f0;
-            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-        }
-
-        .card-title {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: #1e293b;
-            text-align: center;
-        }
-
-        .card-body {
-            padding: 1.5rem;
-        }
-
-        /* Filter Buttons */
         .filter-container {
-            display: flex;
-            justify-content: center;
-            gap: 0.5rem;
-            margin-bottom: 2rem;
-            flex-wrap: wrap;
+          flex-direction: column;
         }
 
         .filter-btn {
-            padding: 0.5rem 1rem;
-            border: 2px solid #e2e8f0;
-            border-radius: 8px;
-            background: white;
-            color: #64748b;
-            font-size: 0.875rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s ease;
+          width: 100%;
+          text-align: center;
+        }
+      }
+
+      @media (max-width: 640px) {
+        .main-content {
+          padding: 0.75rem;
         }
 
-        .filter-btn:hover {
-            border-color: #fbbf24;
-            color: #f59e0b;
+        .dashboard-card {
+          margin-bottom: 1rem;
         }
 
-        .filter-btn.active {
-            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
-            border-color: #f59e0b;
-            color: white;
-        }
-
-        /* Chart Container */
-        .chart-container {
-            position: relative;
-            height: 400px;
-            width: 100%;
-        }
-
-        /* Top Lists */
-        .top-list {
-            list-style: none;
+        .card-body {
+          padding: 1rem;
         }
 
         .top-list li {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1rem 0;
-            border-bottom: 1px solid #f1f5f9;
-        }
-
-        .top-list li:last-child {
-            border-bottom: none;
-        }
-
-        .item-name {
-            font-weight: 500;
-            color: #334155;
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 0.5rem;
         }
 
         .item-count {
-            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
-            color:  white;
-            padding: 0.25rem 0.75rem;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 600;
+          align-self: flex-end;
         }
-
-        /* Ledger Section */
-        .ledger-section {
-            text-align: center;
-            padding: 2rem;
-        }
-
-        .ledger-btn {
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            color: white;
-            padding: 1rem 2rem;
-            border: none;
-            border-radius: 12px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 14px 0 rgba(16, 185, 129, 0.3);
-        }
-
-        .ledger-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px 0 rgba(16, 185, 129, 0.4);
-        }
-
-        .no-data {
-            text-align: center;
-            padding: 2rem;
-            color: #64748b;
-        }
-
-        .no-data i {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-            opacity: 0.5;
-        }
-
-        /* Mobile Sidebar */
-        .mobile-toggle {
-            position: fixed;
-            bottom:  […]
-        }
-        .mobile-toggle {
-            position: fixed;
-            bottom: 2rem;
-            right: 2rem;
-            width: 56px;
-            height: 56px;
-            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
-            border-radius: 50%;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            color: #0f172a;
-            font-size: 1.25rem;
-            cursor: pointer;
-            box-shadow: 0 4px 20px rgba(251, 191, 36, 0.3);
-            z-index: 1001;
-            transition: all 0.3s ease;
-        }
-
-        .mobile-toggle:hover {
-            transform: scale(1.1);
-        }
-
-        .overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 999;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s ease;
-        }
-
-        .overlay.active {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        /* Responsive */
-        @media (max-width: 1024px) {
-            .sidebar {
-                transform: translateX(-100%);
-            }
-
-            .sidebar.active {
-                transform: translateX(0);
-            }
-
-            .main-content {
-                margin-left: 0;
-                padding: 1rem;
-            }
-
-            .mobile-toggle {
-                display: flex;
-            }
-
-            .dashboard-title {
-                font-size: 1.5rem;
-            }
-
-            .chart-container {
-                height: 300px;
-            }
-
-            .filter-container {
-                flex-direction: column;
-            }
-
-            .filter-btn {
-                width: 100%;
-                text-align: center;
-            }
-        }
-
-        @media (max-width: 640px) {
-            .main-content {
-                padding: 0.75rem;
-            }
-
-            .dashboard-card {
-                margin-bottom: 1rem;
-            }
-
-            .card-body {
-                padding: 1rem;
-            }
-
-            .top-list li {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 0.5rem;
-            }
-
-            .item-count {
-                align-self: flex-end;
-            }
-        }
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <!-- Sidebar -->
     <div class="sidebar" id="sidebar">
-        <div class="sidebar-header">
-            <div class="sidebar-brand">
-                <img src="/images/TIMZO.jpg" alt="Timzo Logo">
-                <div class="sidebar-brand-text">Timzo Admin</div>
-            </div>
+      <div class="sidebar-header">
+        <div class="sidebar-brand">
+          <img src="/images/TIMZO.jpg" alt="Timzo Logo" />
+          <div class="sidebar-brand-text">Timzo Admin</div>
+        </div>
+      </div>
+
+      <div class="sidebar-user">
+        <div class="sidebar-user-info">
+          <div class="sidebar-user-avatar">
+            <%- admin && admin.name ? admin.name.charAt(0).toUpperCase() : 'A'
+            %>
+          </div>
+          <div class="sidebar-user-details">
+            <h4><%- admin && admin.name ? admin.name : 'Admin User' %></h4>
+            <p><%- admin && admin.email ? admin.email : 'admin@timzo.com' %></p>
+          </div>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-section">
+          <div class="nav-section-title">Dashboard</div>
+          <a
+            href="/admin/dashboard"
+            class="nav-link <%= activePage === 'dashboard' ? 'active' : '' %>"
+          >
+            <i class="fas fa-home"></i>
+            <span>Dashboard</span>
+          </a>
         </div>
 
-        <div class="sidebar-user">
-            <div class="sidebar-user-info">
-                <div class="sidebar-user-avatar">
-                    <%- admin && admin.name ? admin.name.charAt(0).toUpperCase() : 'A' %>
-                </div>
-                <div class="sidebar-user-details">
-                    <h4><%- admin && admin.name ? admin.name : 'Admin User' %></h4>
-                    <p><%- admin && admin.email ? admin.email : 'admin@timzo.com' %></p>
-                </div>
-            </div>
+        <div class="nav-section">
+          <div class="nav-section-title">Store Management</div>
+          <a
+            href="/admin/getProduct"
+            class="nav-link <%= activePage === 'product' ? 'active' : '' %>"
+          >
+            <i class="fas fa-box"></i>
+            <span>Products</span>
+          </a>
+          <a
+            href="/admin/brand"
+            class="nav-link <%= activePage === 'brand' ? 'active' : '' %>"
+          >
+            <i class="fas fa-tags"></i>
+            <span>Brands</span>
+          </a>
+          <a
+            href="/admin/categories"
+            class="nav-link <%= activePage === 'categories' ? 'active' : '' %>"
+          >
+            <i class="fas fa-list"></i>
+            <span>Categories</span>
+          </a>
+          <a
+            href="/admin/orders"
+            class="nav-link <%= activePage === 'orders' ? 'active' : '' %>"
+          >
+            <i class="fas fa-shopping-cart"></i>
+            <span>Orders</span>
+          </a>
+          <a
+            href="/admin/coupons"
+            class="nav-link <%= activePage === 'coupons' ? 'active' : '' %>"
+          >
+            <i class="fas fa-ticket-alt"></i>
+            <span>Coupons</span>
+          </a>
+          <a
+            href="/admin/sales-report"
+            class="nav-link <%= activePage === 'sales-report' ? 'active' : '' %>"
+          >
+            <i class="fas fa-chart-line"></i>
+            <span>Sales Report</span>
+          </a>
         </div>
 
-        <nav class="sidebar-nav">
-            <div class="nav-section">
-                <div class="nav-section-title">Dashboard</div>
-                <a href="/admin/dashboard" class="nav-link <%= activePage === 'dashboard' ? 'active' : '' %>">
-                    <i class="fas fa-home"></i>
-                    <span>Dashboard</span>
-                </a>
-            </div>
-
-            <div class="nav-section">
-                <div class="nav-section-title">Store Management</div>
-                <a href="/admin/getProduct" class="nav-link <%= activePage === 'product' ? 'active' : '' %>">
-                    <i class="fas fa-box"></i>
-                    <span>Products</span>
-                </a>
-                <a href="/admin/brand" class="nav-link <%= activePage === 'brand' ? 'active' : '' %>">
-                    <i class="fas fa-tags"></i>
-                    <span>Brands</span>
-                </a>
-                <a href="/admin/categories" class="nav-link <%= activePage === 'categories' ? 'active' : '' %>">
-                    <i class="fas fa-list"></i>
-                    <span>Categories</span>
-                </a>
-                <a href="/admin/orders" class="nav-link <%= activePage === 'orders' ? 'active' : '' %>">
-                    <i class="fas fa-shopping-cart"></i>
-                    <span>Orders</span>
-                </a>
-                <a href="/admin/coupons" class="nav-link <%= activePage === 'coupons' ? 'active' : '' %>">
-                    <i class="fas fa-ticket-alt"></i>
-                    <span>Coupons</span>
-                </a>
-                <a href="/admin/sales-report" class="nav-link <%= activePage === 'sales-report' ? 'active' : '' %>">
-                    <i class="fas fa-chart-line"></i>
-                    <span>Sales Report</span>
-                </a>
-            </div>
-
-            <div class="nav-section">
-                <div class="nav-section-title">User Management</div>
-                <a href="/admin/users" class="nav-link <%= activePage === 'users' ? 'active' : '' %>">
-                    <i class="fas fa-users"></i>
-                    <span>Users</span>
-                </a>
-            </div>
-        </nav>
-
-        <div class="sidebar-footer">
-            <a href="/admin/logout" class="logout-link">
-                <i class="fas fa-sign-out-alt"></i>
-                <span>Logout</span>
-            </a>
+        <div class="nav-section">
+          <div class="nav-section-title">User Management</div>
+          <a
+            href="/admin/users"
+            class="nav-link <%= activePage === 'users' ? 'active' : '' %>"
+          >
+            <i class="fas fa-users"></i>
+            <span>Users</span>
+          </a>
         </div>
+      </nav>
+
+      <div class="sidebar-footer">
+        <a href="/admin/logout" class="logout-link">
+          <i class="fas fa-sign-out-alt"></i>
+          <span>Logout</span>
+        </a>
+      </div>
     </div>
 
     <!-- Overlay -->
@@ -542,297 +582,309 @@
 
     <!-- Mobile Toggle -->
     <div class="mobile-toggle" id="mobileToggle">
-        <i class="fas fa-bars" id="menuIcon"></i>
-        <i class="fas fa-times" id="closeIcon" style="display: none;"></i>
+      <i class="fas fa-bars" id="menuIcon"></i>
+      <i class="fas fa-times" id="closeIcon" style="display: none"></i>
     </div>
 
     <!-- Main Content -->
     <div class="main-content">
-        <div class="dashboard-header">
-            <h1 class="dashboard-title">Dashboard Overview</h1>
-            <p class="dashboard-subtitle">Welcome to your admin dashboard</p>
-        </div>
+      <div class="dashboard-header">
+        <h1 class="dashboard-title">Dashboard Overview</h1>
+        <p class="dashboard-subtitle">Welcome to your admin dashboard</p>
+      </div>
 
-        <!-- Sales Chart -->
+      <!-- Sales Chart -->
+      <div class="dashboard-card">
+        <div class="card-header">
+          <h2 class="card-title">Sales Overview</h2>
+        </div>
+        <div class="card-body">
+          <div class="filter-container">
+            <button class="filter-btn active" onclick="updateChart('daily')">
+              Daily
+            </button>
+            <button class="filter-btn" onclick="updateChart('weekly')">
+              Weekly
+            </button>
+            <button class="filter-btn" onclick="updateChart('monthly')">
+              Monthly
+            </button>
+            <button class="filter-btn" onclick="updateChart('yearly')">
+              Yearly
+            </button>
+          </div>
+          <div class="chart-container">
+            <canvas id="salesChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Top Lists -->
+      <div
+        style="
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+          gap: 2rem;
+        "
+      >
+        <!-- Best Selling Products -->
         <div class="dashboard-card">
-            <div class="card-header">
-                <h2 class="card-title">Sales Overview</h2>
+          <div class="card-header">
+            <h3 class="card-title">Top 10 Best-Selling Products</h3>
+          </div>
+          <div class="card-body">
+            <% if (bestSellingProducts && bestSellingProducts.length > 0) { %>
+            <ul class="top-list">
+              <% bestSellingProducts.forEach(product => { %>
+              <li>
+                <span class="item-name"><%- product.name %></span>
+                <span class="item-count"><%- product.totalSold %> units</span>
+              </li>
+              <% }); %>
+            </ul>
+            <% } else { %>
+            <div class="no-data">
+              <i class="fas fa-box-open"></i>
+              <p>No products sold yet.</p>
             </div>
-            <div class="card-body">
-                <div class="filter-container">
-                    <button class="filter-btn active" onclick="updateChart('daily')">Daily</button>
-                    <button class="filter-btn" onclick="updateChart('weekly')">Weekly</button>
-                    <button class="filter-btn" onclick="updateChart('monthly')">Monthly</button>
-                    <button class="filter-btn" onclick="updateChart('yearly')">Yearly</button>
-                </div>
-                <div class="chart-container">
-                    <canvas id="salesChart"></canvas>
-                </div>
-            </div>
+            <% } %>
+          </div>
         </div>
 
-        <!-- Top Lists -->
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 2rem;">
-            <!-- Best Selling Products -->
-            <div class="dashboard-card">
-                <div class="card-header">
-                    <h3 class="card-title">Top 10 Best-Selling Products</h3>
-                </div>
-                <div class="card-body">
-                    <% if (bestSellingProducts && bestSellingProducts.length > 0) { %>
-                        <ul class="top-list">
-                            <% bestSellingProducts.forEach(product => { %>
-                                <li>
-                                    <span class="item-name"><%- product.name %></span>
-                                    <span class="item-count"><%- product.totalSold %> units</span>
-                                </li>
-                            <% }); %>
-                        </ul>
-                    <% } else { %>
-                        <div class="no-data">
-                            <i class="fas fa-box-open"></i>
-                            <p>No products sold yet.</p>
-                        </div>
-                    <% } %>
-                </div>
-            </div>
-
-            <!-- Best Selling Categories -->
-            <div class="dashboard-card">
-                <div class="card-header">
-                    <h3 class="card-title">Top 10 Best-Selling Categories</h3>
-                </div>
-                <div class="card-body">
-                    <% if (bestSellingCategories && bestSellingCategories.length > 0) { %>
-                        <ul class="top-list">
-                            <% bestSellingCategories.forEach(category => { %>
-                                <li>
-                                    <span class="item-name"><%- category.name %></span>
-                                    <span class="item-count"><%- category.totalSold %> units</span>
-                                </li>
-                            <% }); %>
-                        </ul>
-                    <% } else { %>
-                        <div class="no-data">
-                            <i class="fas fa-tags"></i>
-                            <p>No categories sold yet.</p>
-                        </div>
-                    <% } %>
-                </div>
-            </div>
-
-            <!-- Best Selling Brands -->
-            <div class="dashboard-card">
-                <div class="card-header">
-                    <h3 class="card-title">Top 10 Best-Selling Brands</h3>
-                </div>
-                <div class="card-body">
-                    <% if (bestSellingBrands && bestSellingBrands.length > 0) { %>
-                        <ul class="top-list">
-                            <% bestSellingBrands.forEach(brand => { %>
-                                <li>
-                                    <span class="item-name"><%- brand.name %></span>
-                                    <span class="item-count"><%- brand.totalSold %> units</span>
-                                </li>
-                            <% }); %>
-                        </ul>
-                    <% } else { %>
-                        <div class="no-data">
-                            <i class="fas fa-certificate"></i>
-                            <p>No brands sold yet.</p>
-                        </div>
-                    <% } %>
-                </div>
-            </div>
-        </div>
-
-        <!-- Ledger Section -->
+        <!-- Best Selling Categories -->
         <div class="dashboard-card">
-            <div class="card-body ledger-section">
-                <h2 class="card-title" style="margin-bottom: 1rem;">Ledger Book</h2>
-                <p style="color: #64748b; margin-bottom: 2rem;">Generate a comprehensive ledger book report in PDF format</p>
-                <button class="ledger-btn" onclick="generateLedger()">
-                    <i class="fas fa-file-pdf" style="margin-right: 0.5rem;"></i>
-                    Generate Ledger Book (PDF)
-                </button>
+          <div class="card-header">
+            <h3 class="card-title">Top 10 Best-Selling Categories</h3>
+          </div>
+          <div class="card-body">
+            <% if (bestSellingCategories && bestSellingCategories.length > 0) {
+            %>
+            <ul class="top-list">
+              <% bestSellingCategories.forEach(category => { %>
+              <li>
+                <span class="item-name"><%- category.name %></span>
+                <span class="item-count"><%- category.totalSold %> units</span>
+              </li>
+              <% }); %>
+            </ul>
+            <% } else { %>
+            <div class="no-data">
+              <i class="fas fa-tags"></i>
+              <p>No categories sold yet.</p>
             </div>
+            <% } %>
+          </div>
         </div>
+
+        <!-- Best Selling Brands -->
+        <div class="dashboard-card">
+          <div class="card-header">
+            <h3 class="card-title">Top 10 Best-Selling Brands</h3>
+          </div>
+          <div class="card-body">
+            <% if (bestSellingBrands && bestSellingBrands.length > 0) { %>
+            <ul class="top-list">
+              <% bestSellingBrands.forEach(brand => { %>
+              <li>
+                <span class="item-name"><%- brand.name %></span>
+                <span class="item-count"><%- brand.totalSold %> units</span>
+              </li>
+              <% }); %>
+            </ul>
+            <% } else { %>
+            <div class="no-data">
+              <i class="fas fa-certificate"></i>
+              <p>No brands sold yet.</p>
+            </div>
+            <% } %>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ledger Section -->
+      <div class="dashboard-card">
+        <div class="card-body ledger-section">
+          <h2 class="card-title" style="margin-bottom: 1rem">Ledger Book</h2>
+          <p style="color: #64748b; margin-bottom: 2rem">
+            Generate a comprehensive ledger book report in PDF format
+          </p>
+          <button class="ledger-btn" onclick="generateLedger()">
+            <i class="fas fa-file-pdf" style="margin-right: 0.5rem"></i>
+            Generate Ledger Book (PDF)
+          </button>
+        </div>
+      </div>
     </div>
 
     <script>
-        let salesChart;
-        const chartData = <%- JSON.stringify(chartData) %>;
+      let salesChart;
+      const chartData = <%- JSON.stringify(chartData) %>;
 
-        function initializeChart(filter = 'daily') {
-            const ctx = document.getElementById('salesChart').getContext('2d');
-            const data = chartData[filter];
+      function initializeChart(filter = 'daily') {
+          const ctx = document.getElementById('salesChart').getContext('2d');
+          const data = chartData[filter];
 
-            if (salesChart) {
-                salesChart.destroy();
-            }
+          if (salesChart) {
+              salesChart.destroy();
+          }
 
-            salesChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: data.labels,
-                    datasets: [{
-                        label: `Sales (${filter.charAt(0).toUpperCase() + filter.slice(1)})`,
+          salesChart = new Chart(ctx, {
+              type: 'line',
+              data: {
+                  labels: data.labels,
+                  datasets: [{
+                      label: `Sales (${filter.charAt(0).toUpperCase() + filter.slice(1)})`,
 
-                        data: data.values,
-                        borderColor: '#f59e0b',
-                        backgroundColor: 'rgba(245, 158, 11, 0.1)',
-                        fill: true,
-                        tension: 0.4,
-                        borderWidth: 3,
-                        pointBackgroundColor: '#f59e0b',
-                        pointBorderColor: '#ffffff',
-                        pointBorderWidth: 2,
-                        pointRadius: 6,
-                        pointHoverRadius: 8
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: true,
-                            position: 'top',
-                            labels: {
-                                font: {
-                                    size: 14,
-                                    weight: '500'
-                                }
-                            }
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: 'Total Sales (₹)',
-                                font: {
-                                    weight: 'bold',
-                                    size: 14
-                                }
-                            },
-                            grid: {
-                                color: 'rgba(0,0,0,0.05)'
-                            }
-                        },
-                        x: {
-                            title: {
-                                display: true,
-                                text: filter.charAt(0).toUpperCase() + filter.slice(1),
-                                font: {
-                                    weight: 'bold',
-                                    size: 14
-                                }
-                            },
-                            grid: {
-                                color: 'rgba(0,0,0,0.05)'
-                            }
-                        }
-                    },
-                    interaction: {
-                        intersect: false,
-                        mode: 'index'
-                    }
-                }
-            });
+                      data: data.values,
+                      borderColor: '#f59e0b',
+                      backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                      fill: true,
+                      tension: 0.4,
+                      borderWidth: 3,
+                      pointBackgroundColor: '#f59e0b',
+                      pointBorderColor: '#ffffff',
+                      pointBorderWidth: 2,
+                      pointRadius: 6,
+                      pointHoverRadius: 8
+                  }]
+              },
+              options: {
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  plugins: {
+                      legend: {
+                          display: true,
+                          position: 'top',
+                          labels: {
+                              font: {
+                                  size: 14,
+                                  weight: '500'
+                              }
+                          }
+                      }
+                  },
+                  scales: {
+                      y: {
+                          beginAtZero: true,
+                          title: {
+                              display: true,
+                              text: 'Total Sales (₹)',
+                              font: {
+                                  weight: 'bold',
+                                  size: 14
+                              }
+                          },
+                          grid: {
+                              color: 'rgba(0,0,0,0.05)'
+                          }
+                      },
+                      x: {
+                          title: {
+                              display: true,
+                              text: filter.charAt(0).toUpperCase() + filter.slice(1),
+                              font: {
+                                  weight: 'bold',
+                                  size: 14
+                              }
+                          },
+                          grid: {
+                              color: 'rgba(0,0,0,0.05)'
+                          }
+                      }
+                  },
+                  interaction: {
+                      intersect: false,
+                      mode: 'index'
+                  }
+              }
+          });
 
-            // Update filter buttons
-            document.querySelectorAll('.filter-btn').forEach(btn => {
-                btn.classList.remove('active');
-                if (btn.textContent.toLowerCase() === filter) {
-                    btn.classList.add('active');
-                }
-            });
-        }
+          document.querySelectorAll('.filter-btn').forEach(btn => {
+              btn.classList.remove('active');
+              if (btn.textContent.toLowerCase() === filter) {
+                  btn.classList.add('active');
+              }
+          });
+      }
 
-        function updateChart(filter) {
-            initializeChart(filter);
-        }
+      function updateChart(filter) {
+          initializeChart(filter);
+      }
 
-        async function generateLedger() {
-            try {
-                const response = await fetch('/admin/generate-ledger', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' }
-                });
-                const data = await response.json();
-                if (data.success) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Ledger Generated',
-                        text: 'Your ledger book has been generated and will download shortly.',
-                        showConfirmButton: false,
-                        timer: 1500
-                    });
-                    const link = document.createElement('a');
-                    link.href = data.pdfUrl;
-                    link.download = 'ledger-book.pdf';
-                    link.click();
-                } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: data.message || 'Failed to generate ledger book.',
-                    });
-                }
-            } catch (error) {
-                console.error('Error generating ledger:', error);
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: 'An error occurred while generating the ledger book.',
-                });
-            }
-        }
+      async function generateLedger() {
+          try {
+              const response = await fetch('/admin/generate-ledger', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' }
+              });
+              const data = await response.json();
+              if (data.success) {
+                  Swal.fire({
+                      icon: 'success',
+                      title: 'Ledger Generated',
+                      text: 'Your ledger book has been generated and will download shortly.',
+                      showConfirmButton: false,
+                      timer: 1500
+                  });
+                  const link = document.createElement('a');
+                  link.href = data.pdfUrl;
+                  link.download = 'ledger-book.pdf';
+                  link.click();
+              } else {
+                  Swal.fire({
+                      icon: 'error',
+                      title: 'Error',
+                      text: data.message || 'Failed to generate ledger book.',
+                  });
+              }
+          } catch (error) {
+              console.error('Error generating ledger:', error);
+              Swal.fire({
+                  icon: 'error',
+                  title: 'Error',
+                  text: 'An error occurred while generating the ledger book.',
+              });
+          }
+      }
 
-        // Mobile sidebar functionality
-        const sidebar = document.getElementById('sidebar');
-        const overlay = document.getElementById('overlay');
-        const mobileToggle = document.getElementById('mobileToggle');
-        const menuIcon = document.getElementById('menuIcon');
-        const closeIcon = document.getElementById('closeIcon');
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('overlay');
+      const mobileToggle = document.getElementById('mobileToggle');
+      const menuIcon = document.getElementById('menuIcon');
+      const closeIcon = document.getElementById('closeIcon');
 
-        function toggleSidebar() {
-            sidebar.classList.toggle('active');
-            overlay.classList.toggle('active');
-            
-            if (sidebar.classList.contains('active')) {
-                menuIcon.style.display = 'none';
-                closeIcon.style.display = 'block';
-            } else {
-                menuIcon.style.display = 'block';
-                closeIcon.style.display = 'none';
-            }
-        }
+      function toggleSidebar() {
+          sidebar.classList.toggle('active');
+          overlay.classList.toggle('active');
 
-        mobileToggle.addEventListener('click', toggleSidebar);
-        overlay.addEventListener('click', toggleSidebar);
+          if (sidebar.classList.contains('active')) {
+              menuIcon.style.display = 'none';
+              closeIcon.style.display = 'block';
+          } else {
+              menuIcon.style.display = 'block';
+              closeIcon.style.display = 'none';
+          }
+      }
 
-        // Initialize chart on page load
-        window.addEventListener('load', () => {
-            initializeChart('daily');
-        });
+      mobileToggle.addEventListener('click', toggleSidebar);
+      overlay.addEventListener('click', toggleSidebar);
 
-        // Handle window resize
-        window.addEventListener('resize', () => {
-            if (salesChart) {
-                salesChart.resize();
-            }
-            
-            // Close sidebar on desktop
-            if (window.innerWidth >= 1024) {
-                sidebar.classList.remove('active');
-                overlay.classList.remove('active');
-                menuIcon.style.display = 'block';
-                closeIcon.style.display = 'none';
-            }
-        });
+      window.addEventListener('load', () => {
+          initializeChart('daily');
+      });
+
+      window.addEventListener('resize', () => {
+          if (salesChart) {
+              salesChart.resize();
+          }
+
+          if (window.innerWidth >= 1024) {
+              sidebar.classList.remove('active');
+              overlay.classList.remove('active');
+              menuIcon.style.display = 'block';
+              closeIcon.style.display = 'none';
+          }
+      });
     </script>
-</body>
+  </body>
 </html>

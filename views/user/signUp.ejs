@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -11,111 +12,89 @@
         opacity: 0;
         transform: translateY(20px);
       }
+
       100% {
         opacity: 1;
         transform: translateY(0);
       }
     }
+
     .fade-slide {
       animation: fadeSlide 0.8s ease-out;
     }
   </style>
 </head>
-<body class="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 min-h-screen flex items-center justify-center px-4">
+
+<body
+  class="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 min-h-screen flex items-center justify-center px-4">
   <div class="bg-white rounded-2xl shadow-2xl p-10 w-full max-w-md fade-slide">
-    <h2 class="text-3xl font-bold text-center text-gray-800 mb-6">Sign Up to <span class="text-indigo-600">Timzo</span></h2>
+    <h2 class="text-3xl font-bold text-center text-gray-800 mb-6">Sign Up to <span class="text-indigo-600">Timzo</span>
+    </h2>
 
     <% if (error) { %>
       <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded relative text-center animate-pulse">
         <%= error %>
       </div>
-    <% } %>
+      <% } %>
 
-    <form action="/sign-up" method="POST" class="space-y-4">
-      <div>
-        <label class="block text-gray-700">Full Name</label>
-        <input
-          type="text"
-          id="name"
-          name="fullname"
-          placeholder="Full Name"
-          value="<%= formData && formData.fullname ? formData.fullname : '' %>"
-          class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-        />
-      </div>
-      <div>
-        <label class="block text-gray-700">Email</label>
-        <input
-          type="email"
-          id="email"
-          name="email"
-          placeholder="Email"
-          value="<%= formData && formData.email ? formData.email : '' %>"
-          class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-        />
-      </div>
-      <div>
-        <label class="block text-gray-700">Mobile Number</label>
-        <input
-          type="tel"
-          id="mobile"
-          name="mobile"
-          placeholder="Mobile Number"
-          value="<%= formData && formData.mobile ? formData.mobile : '' %>"
-          class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-        />
-      </div>
-      <div>
-        <label class="block text-gray-700">Password</label>
-        <input
-          type="password"
-          id="password"
-          name="password"
-          placeholder="Password"
-          class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-        />
-      </div>
-      <div>
-        <label class="block text-gray-700">Confirm Password</label>
-        <input
-          type="password"
-          id="confirmPassword"
-          name="conformPassword"
-          placeholder="Confirm Password"
-          class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-        />
-      </div>
-      <div>
-        <label class="block text-gray-700">Referral Code (Optional)</label>
-        <input
-          type="text"
-          id="referralCode"
-          name="referralCode"
-          placeholder="Referral Code"
-          maxlength="6"
-          style="text-transform: uppercase;"
-          value="<%= formData && formData.referralCode ? formData.referralCode : '' %>"
-          class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-        />
-      </div>
-      <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 rounded-lg transition">Create Account</button>
-    </form>
+        <form action="/sign-up" method="POST" class="space-y-4">
+          <div>
+            <label class="block text-gray-700">Full Name</label>
+            <input type="text" id="name" name="fullname" placeholder="Full Name"
+              value="<%= formData && formData.fullname ? formData.fullname : '' %>"
+              class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+          </div>
+          <div>
+            <label class="block text-gray-700">Email</label>
+            <input type="email" id="email" name="email" placeholder="Email"
+              value="<%= formData && formData.email ? formData.email : '' %>"
+              class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+          </div>
+          <div>
+            <label class="block text-gray-700">Mobile Number</label>
+            <input type="tel" id="mobile" name="mobile" placeholder="Mobile Number"
+              value="<%= formData && formData.mobile ? formData.mobile : '' %>"
+              class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+          </div>
+          <div>
+            <label class="block text-gray-700">Password</label>
+            <input type="password" id="password" name="password" placeholder="Password"
+              class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+          </div>
+          <div>
+            <label class="block text-gray-700">Confirm Password</label>
+            <input type="password" id="confirmPassword" name="conformPassword" placeholder="Confirm Password"
+              class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+          </div>
+          <div>
+            <label class="block text-gray-700">Referral Code (Optional)</label>
+            <input type="text" id="referralCode" name="referralCode" placeholder="Referral Code" maxlength="6"
+              style="text-transform: uppercase;"
+              value="<%= formData && formData.referralCode ? formData.referralCode : '' %>"
+              class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+          </div>
+          <button type="submit"
+            class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 rounded-lg transition">Create
+            Account</button>
+        </form>
 
-    <div class="flex items-center justify-between my-6">
-      <hr class="w-full border-gray-300" />
-      <span class="px-3 text-gray-500">or</span>
-      <hr class="w-full border-gray-300" />
-    </div>
+        <div class="flex items-center justify-between my-6">
+          <hr class="w-full border-gray-300" />
+          <span class="px-3 text-gray-500">or</span>
+          <hr class="w-full border-gray-300" />
+        </div>
 
-    <a href="/auth/google" class="w-full bg-white border border-gray-300 hover:shadow-md text-gray-700 font-medium py-2 px-4 rounded-lg flex items-center justify-center transition">
-      <img src="https://img.icons8.com/color/16/000000/google-logo.png" alt="Google" class="mr-2" />
-      Sign up with Google
-    </a>
+        <a href="/auth/google"
+          class="w-full bg-white border border-gray-300 hover:shadow-md text-gray-700 font-medium py-2 px-4 rounded-lg flex items-center justify-center transition">
+          <img src="https://img.icons8.com/color/16/000000/google-logo.png" alt="Google" class="mr-2" />
+          Sign up with Google
+        </a>
 
-    <p class="text-sm text-gray-600 text-center mt-6">
-      Already have an account?
-      <a href="/login" class="text-indigo-600 hover:underline font-medium">Login here</a>
-    </p>
+        <p class="text-sm text-gray-600 text-center mt-6">
+          Already have an account?
+          <a href="/login" class="text-indigo-600 hover:underline font-medium">Login here</a>
+        </p>
   </div>
 </body>
+
 </html>

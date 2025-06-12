@@ -197,7 +197,7 @@ const newPassword = async (req, res) => {
         }
 
         const { newPassword, confirmPassword } = req.body;
-        console.log('puthiya passwordukal',req.body)
+        console.log('puthiya passwordukal', req.body)
         if (!newPassword || typeof newPassword !== 'string' || newPassword.length < 6) {
             return res.status(400).json({ success: false, message: "New password must be at least 6 characters" });
         }

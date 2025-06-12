@@ -1,185 +1,224 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
-  
+
 </head>
+
 <body>
   <div class="fixed inset-y-0 left-0 z-40 transition-all duration-300 transform lg:translate-x-0" id="sidebar">
-  <div class="flex flex-col h-full w-72 bg-gradient-to-b from-slate-800 to-slate-900 text-white shadow-xl rounded-r-xl overflow-hidden">
-    <div class="p-5 flex items-center gap-3 border-b border-slate-700/50">
-      <img src="/images/TIMZO.jpg" alt="Timzo Logo" class="w-10 h-10 rounded-md">
-      <div class="text-xl font-bold tracking-wide bg-gradient-to-r from-amber-300 to-amber-500 bg-clip-text text-transparent">
-        Timzo Admin
-      </div>
-    </div>
-
-    <div class="px-4 py-5">
-      <div class="flex items-center gap-3 mb-2 px-2">
-        <div class="w-10 h-10 rounded-full bg-amber-500 flex items-center justify-center text-slate-900 font-bold">
-          <%= admin && admin.name ? admin.name.charAt(0).toUpperCase() : 'A' %>
-        </div>
-        <div>
-          <div class="font-medium"><%= admin && admin.name ? admin.name : 'Admin User' %></div>
-          <div class="text-xs text-slate-400"><%= admin && admin.email ? admin.email : 'admin@timzo.com' %></div>
+    <div
+      class="flex flex-col h-full w-72 bg-gradient-to-b from-slate-800 to-slate-900 text-white shadow-xl rounded-r-xl overflow-hidden">
+      <div class="p-5 flex items-center gap-3 border-b border-slate-700/50">
+        <img src="/images/TIMZO.jpg" alt="Timzo Logo" class="w-10 h-10 rounded-md">
+        <div
+          class="text-xl font-bold tracking-wide bg-gradient-to-r from-amber-300 to-amber-500 bg-clip-text text-transparent">
+          Timzo Admin
         </div>
       </div>
-    </div>
 
-    <nav class="flex-1 px-4 space-y-1 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
-      <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider px-3 mb-2">Dashboard</div>
-      <a href="/admin/dashboard"
-        class="flex items-center px-3 py-2.5 rounded-lg transition-all duration-200 group
+      <div class="px-4 py-5">
+        <div class="flex items-center gap-3 mb-2 px-2">
+          <div class="w-10 h-10 rounded-full bg-amber-500 flex items-center justify-center text-slate-900 font-bold">
+            <%= admin && admin.name ? admin.name.charAt(0).toUpperCase() : 'A' %>
+          </div>
+          <div>
+            <div class="font-medium">
+              <%= admin && admin.name ? admin.name : 'Admin User' %>
+            </div>
+            <div class="text-xs text-slate-400">
+              <%= admin && admin.email ? admin.email : 'admin@timzo.com' %>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <nav
+        class="flex-1 px-4 space-y-1 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
+        <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider px-3 mb-2">Dashboard</div>
+        <a href="/admin/dashboard"
+          class="flex items-center px-3 py-2.5 rounded-lg transition-all duration-200 group
                <%= activePage === 'dashboard' ? 'bg-amber-500/10 text-amber-400' : 'text-slate-300 hover:bg-slate-700/50 hover:text-white' %>">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 <%= activePage === 'dashboard' ? 'text-amber-400' : 'text-slate-400 group-hover:text-white' %>" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-        </svg>
-        <span>Dashboard</span>
-      </a>
+          <svg xmlns="http://www.w3.org/2000/svg"
+            class="h-5 w-5 mr-3 <%= activePage === 'dashboard' ? 'text-amber-400' : 'text-slate-400 group-hover:text-white' %>"
+            fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+          </svg>
+          <span>Dashboard</span>
+        </a>
 
-      <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider px-3 mt-6 mb-2">Store Management</div>
-      <a href="/admin/getProduct"
-        class="flex items-center px-3 py-2.5 rounded-lg transition-all duration-200 group
+        <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider px-3 mt-6 mb-2">Store Management</div>
+        <a href="/admin/getProduct"
+          class="flex items-center px-3 py-2.5 rounded-lg transition-all duration-200 group
                <%= activePage === 'product' ? 'bg-amber-500/10 text-amber-400' : 'text-slate-300 hover:bg-slate-700/50 hover:text-white' %>">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 <%= activePage === 'product' ? 'text-amber-400' : 'text-slate-400 group-hover:text-white' %>" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-        </svg>
-        <span>Products</span>
-      </a>
-      <a href="/admin/brand"
-        class="flex items-center px-3 py-2.5 rounded-lg transition-all duration-200 group
+          <svg xmlns="http://www.w3.org/2000/svg"
+            class="h-5 w-5 mr-3 <%= activePage === 'product' ? 'text-amber-400' : 'text-slate-400 group-hover:text-white' %>"
+            fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+          </svg>
+          <span>Products</span>
+        </a>
+        <a href="/admin/brand"
+          class="flex items-center px-3 py-2.5 rounded-lg transition-all duration-200 group
                <%= activePage === 'brand' ? 'bg-amber-500/10 text-amber-400' : 'text-slate-300 hover:bg-slate-700/50 hover:text-white' %>">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 <%= activePage === 'brand' ? 'text-amber-400' : 'text-slate-400 group-hover:text-white' %>" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-        </svg>
-        <span>Brands</span>
-      </a>
-      <a href="/admin/categories"
-        class="flex items-center px-3 py-2.5 rounded-lg transition-all duration-200 group
+          <svg xmlns="http://www.w3.org/2000/svg"
+            class="h-5 w-5 mr-3 <%= activePage === 'brand' ? 'text-amber-400' : 'text-slate-400 group-hover:text-white' %>"
+            fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+          </svg>
+          <span>Brands</span>
+        </a>
+        <a href="/admin/categories"
+          class="flex items-center px-3 py-2.5 rounded-lg transition-all duration-200 group
                <%= activePage === 'categories' ? 'bg-amber-500/10 text-amber-400' : 'text-slate-300 hover:bg-slate-700/50 hover:text-white' %>">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 <%= activePage === 'categories' ? 'text-amber-400' : 'text-slate-400 group-hover:text-white' %>" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-        </svg>
-        <span>Categories</span>
-      </a>
-      <a href="/admin/orders"
-        class="flex items-center px-3 py-2.5 rounded-lg transition-all duration-200 group
+          <svg xmlns="http://www.w3.org/2000/svg"
+            class="h-5 w-5 mr-3 <%= activePage === 'categories' ? 'text-amber-400' : 'text-slate-400 group-hover:text-white' %>"
+            fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+          </svg>
+          <span>Categories</span>
+        </a>
+        <a href="/admin/orders"
+          class="flex items-center px-3 py-2.5 rounded-lg transition-all duration-200 group
                <%= activePage === 'orders' ? 'bg-amber-500/10 text-amber-400' : 'text-slate-300 hover:bg-slate-700/50 hover:text-white' %>">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 <%= activePage === 'orders' ? 'text-amber-400' : 'text-slate-400 group-hover:text-white' %>" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-        </svg>
-        <span>Orders</span>
-      </a>
-      <a href="/admin/coupons"
-        class="flex items-center px-3 py-2.5 rounded-lg transition-all duration-200 group
+          <svg xmlns="http://www.w3.org/2000/svg"
+            class="h-5 w-5 mr-3 <%= activePage === 'orders' ? 'text-amber-400' : 'text-slate-400 group-hover:text-white' %>"
+            fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+          </svg>
+          <span>Orders</span>
+        </a>
+        <a href="/admin/coupons"
+          class="flex items-center px-3 py-2.5 rounded-lg transition-all duration-200 group
                <%= activePage === 'coupons' ? 'bg-amber-500/10 text-amber-400' : 'text-slate-300 hover:bg-slate-700/50 hover:text-white' %>">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 <%= activePage === 'coupons' ? 'text-amber-400' : 'text-slate-400 group-hover:text-white' %>" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
-        </svg>
-        <span>Coupons</span>
-      </a>
-<a href="/admin/sales-report"
-  class="flex items-center px-3 py-2.5 rounded-lg transition-all duration-200 group
+          <svg xmlns="http://www.w3.org/2000/svg"
+            class="h-5 w-5 mr-3 <%= activePage === 'coupons' ? 'text-amber-400' : 'text-slate-400 group-hover:text-white' %>"
+            fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
+          </svg>
+          <span>Coupons</span>
+        </a>
+        <a href="/admin/sales-report"
+          class="flex items-center px-3 py-2.5 rounded-lg transition-all duration-200 group
          <%= activePage === 'sales-report' ? 'bg-amber-500/10 text-amber-400' : 'text-slate-300 hover:bg-slate-700/50 hover:text-white' %>">
-  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 <%= activePage === 'sales-report' ? 'text-amber-400' : 'text-slate-400 group-hover:text-white' %>" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-  </svg>
-  <span>Sales report</span>
-</a>
+          <svg xmlns="http://www.w3.org/2000/svg"
+            class="h-5 w-5 mr-3 <%= activePage === 'sales-report' ? 'text-amber-400' : 'text-slate-400 group-hover:text-white' %>"
+            fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+          <span>Sales report</span>
+        </a>
 
 
-      <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider px-3 mt-6 mb-2">User Management</div>
-      <a href="/admin/users"
-        class="flex items-center px-3 py-2.5 rounded-lg transition-all duration-200 group
+        <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider px-3 mt-6 mb-2">User Management</div>
+        <a href="/admin/users"
+          class="flex items-center px-3 py-2.5 rounded-lg transition-all duration-200 group
                <%= activePage === 'users' ? 'bg-amber-500/10 text-amber-400' : 'text-slate-300 hover:bg-slate-700/50 hover:text-white' %>">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 <%= activePage === 'users' ? 'text-amber-400' : 'text-slate-400 group-hover:text-white' %>" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-        </svg>
-        <span>Users</span>
-      </a>
-      
-      <div class="py-10"></div>
-    </nav>
+          <svg xmlns="http://www.w3.org/2000/svg"
+            class="h-5 w-5 mr-3 <%= activePage === 'users' ? 'text-amber-400' : 'text-slate-400 group-hover:text-white' %>"
+            fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+          </svg>
+          <span>Users</span>
+        </a>
 
-    <div class="p-4 mt-auto border-t border-slate-700/50">
-      <a href="/admin/logout"
-        class="flex items-center px-3 py-2.5 rounded-lg text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-all duration-200">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-        </svg>
-        <span>Logout</span>
-      </a>
+        <div class="py-10"></div>
+      </nav>
+
+      <div class="p-4 mt-auto border-t border-slate-700/50">
+        <a href="/admin/logout"
+          class="flex items-center px-3 py-2.5 rounded-lg text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-all duration-200">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+          </svg>
+          <span>Logout</span>
+        </a>
+      </div>
     </div>
   </div>
-</div>
 
-<div class="fixed inset-0 bg-black/50 z-30 lg:hidden transition-opacity duration-300 opacity-0 pointer-events-none" id="sidebarBackdrop"></div>
+  <div class="fixed inset-0 bg-black/50 z-30 lg:hidden transition-opacity duration-300 opacity-0 pointer-events-none"
+    id="sidebarBackdrop"></div>
 
-<div class="fixed bottom-4 right-4 z-50 lg:hidden">
-  <button id="sidebarToggle" class="bg-amber-500 text-slate-900 rounded-full p-3 shadow-lg flex items-center justify-center">
-    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" id="menuIcon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-    </svg>
-    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 hidden" id="closeIcon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-    </svg>
-  </button>
-</div>
+  <div class="fixed bottom-4 right-4 z-50 lg:hidden">
+    <button id="sidebarToggle"
+      class="bg-amber-500 text-slate-900 rounded-full p-3 shadow-lg flex items-center justify-center">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" id="menuIcon" fill="none" viewBox="0 0 24 24"
+        stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+      </svg>
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 hidden" id="closeIcon" fill="none" viewBox="0 0 24 24"
+        stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+  </div>
 
-<script>
-  const sidebar = document.getElementById('sidebar');
-  const sidebarBackdrop = document.getElementById('sidebarBackdrop');
-  const sidebarToggle = document.getElementById('sidebarToggle');
-  const menuIcon = document.getElementById('menuIcon');
-  const closeIcon = document.getElementById('closeIcon');
-  
-  function openSidebar() {
-    sidebar.classList.remove('-translate-x-full');
-    sidebarBackdrop.classList.remove('opacity-0', 'pointer-events-none');
-    menuIcon.classList.add('hidden');
-    closeIcon.classList.remove('hidden');
-    document.body.classList.add('overflow-hidden', 'lg:overflow-auto');
-  }
-  
-  function closeSidebar() {
-    sidebar.classList.add('-translate-x-full');
-    sidebarBackdrop.classList.add('opacity-0', 'pointer-events-none');
-    menuIcon.classList.remove('hidden');
-    closeIcon.classList.add('hidden');
-    document.body.classList.remove('overflow-hidden');
-  }
-  
-  sidebarToggle.addEventListener('click', () => {
-    if (sidebar.classList.contains('-translate-x-full')) {
-      openSidebar();
-    } else {
-      closeSidebar();
-    }
-  });
-  
-  sidebarBackdrop.addEventListener('click', closeSidebar);
-  
-  function initSidebar() {
-    if (window.innerWidth < 1024) { // lg breakpoint
-      sidebar.classList.add('-translate-x-full');
-    } else {
+  <script>
+    const sidebar = document.getElementById('sidebar');
+    const sidebarBackdrop = document.getElementById('sidebarBackdrop');
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    const menuIcon = document.getElementById('menuIcon');
+    const closeIcon = document.getElementById('closeIcon');
+
+    function openSidebar() {
       sidebar.classList.remove('-translate-x-full');
+      sidebarBackdrop.classList.remove('opacity-0', 'pointer-events-none');
+      menuIcon.classList.add('hidden');
+      closeIcon.classList.remove('hidden');
+      document.body.classList.add('overflow-hidden', 'lg:overflow-auto');
     }
-  }
-  
-  initSidebar();
-  
-  window.addEventListener('resize', () => {
-    initSidebar();
-    
-    if (window.innerWidth >= 1024) {
-      document.body.classList.remove('overflow-hidden');
+
+    function closeSidebar() {
+      sidebar.classList.add('-translate-x-full');
       sidebarBackdrop.classList.add('opacity-0', 'pointer-events-none');
+      menuIcon.classList.remove('hidden');
+      closeIcon.classList.add('hidden');
+      document.body.classList.remove('overflow-hidden');
     }
-  });
-</script>
+
+    sidebarToggle.addEventListener('click', () => {
+      if (sidebar.classList.contains('-translate-x-full')) {
+        openSidebar();
+      } else {
+        closeSidebar();
+      }
+    });
+
+    sidebarBackdrop.addEventListener('click', closeSidebar);
+
+    function initSidebar() {
+      if (window.innerWidth < 1024) {
+        sidebar.classList.add('-translate-x-full');
+      } else {
+        sidebar.classList.remove('-translate-x-full');
+      }
+    }
+
+    initSidebar();
+
+    window.addEventListener('resize', () => {
+      initSidebar();
+
+      if (window.innerWidth >= 1024) {
+        document.body.classList.remove('overflow-hidden');
+        sidebarBackdrop.classList.add('opacity-0', 'pointer-events-none');
+      }
+    });
+  </script>
 
 </body>
+
 </html>

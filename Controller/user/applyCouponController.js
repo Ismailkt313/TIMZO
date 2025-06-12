@@ -184,7 +184,7 @@ const loadAvailableCoupons = async (req, res) => {
     }
 };
 
-module.exports={
+module.exports = {
     applyCoupon,
     removeCoupon,
     loadAvailableCoupons

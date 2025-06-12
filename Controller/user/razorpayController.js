@@ -48,29 +48,29 @@ const createRazorpayOrder = async (req, res) => {
         console.log(`Razorpay order created: ${razorpayOrder.id}`);
 
         res.status(200).json({
-            success: true, 
+            success: true,
             razorpayOrder,
-            razorpayKey:  process.env.RAZORPAY_KEY_ID,
+            razorpayKey: process.env.RAZORPAY_KEY_ID,
             orderDetails: {
                 orderId: order._id,
                 totalAmount
             }
         });
-        
+
     } catch (error) {
-    console.error('Error creating Razorpay order:', error);
+        console.error('Error creating Razorpay order:', error);
 
-    if (error && typeof error === 'object') {
-        console.error('Full error object:', JSON.stringify(error, null, 2));
-    } else {
-        console.error('Error is not an object:', error);
+        if (error && typeof error === 'object') {
+            console.error('Full error object:', JSON.stringify(error, null, 2));
+        } else {
+            console.error('Error is not an object:', error);
+        }
+
+        res.status(500).json({
+            success: false,
+            message: `Failed to create payment order: ${error?.message || 'Unknown error'}`
+        });
     }
-
-    res.status(500).json({
-        success: false,
-        message: `Failed to create payment order: ${error?.message || 'Unknown error'}`
-    });
-}
 }
 
 const verifyPayment = async (req, res) => {
@@ -218,7 +218,7 @@ const retryPayment = async (req, res) => {
         if (!userId) {
             console.log('No user ID in session');
             return res.status(401).json({ success: false, message: 'Please log in to retry payment' });
-        } 
+        }
 
         console.log('Fetching order:', orderId);
         const order = await Order.findById(orderId).populate('items.productId');

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -20,15 +21,22 @@
       background: white;
       padding: 30px;
       border-radius: 12px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
       text-align: center;
       animation: fadeIn 0.8s ease;
       width: 300px;
     }
 
     @keyframes fadeIn {
-      from { opacity: 0; transform: scale(0.9); }
-      to { opacity: 1; transform: scale(1); }
+      from {
+        opacity: 0;
+        transform: scale(0.9);
+      }
+
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
     }
 
     h2 {
@@ -107,25 +115,28 @@
     }
   </style>
 </head>
+
 <body>
   <div class="otp-container">
     <h2>Verify OTP</h2>
 
     <!-- Display server-side error if passed from backend -->
-    <% if (typeof error !== 'undefined' && error) { %>
-      <div class="error"><%= error %></div>
-    <% } %>
+    <% if (typeof error !=='undefined' && error) { %>
+      <div class="error">
+        <%= error %>
+      </div>
+      <% } %>
 
-    <!-- Client-side error display area -->
-    <div id="client-error" class="error" style="display: none;"></div>
+        <!-- Client-side error display area -->
+        <div id="client-error" class="error" style="display: none;"></div>
 
-    <form id="otp-form" action="/user/verify-otp" method="POST">
-      <input type="text" id="otp" name="otp" placeholder="Enter OTP" />
-      <button type="submit">Verify OTP</button>
-    </form>
+        <form id="otp-form" action="/user/verify-otp" method="POST">
+          <input type="text" id="otp" name="otp" placeholder="Enter OTP" />
+          <button type="submit">Verify OTP</button>
+        </form>
 
-    <div class="timer" id="timer">00:30</div>
-    <button id="resend-btn" disabled>Resend OTP</button>
+        <div class="timer" id="timer">00:30</div>
+        <button id="resend-btn" disabled>Resend OTP</button>
   </div>
 
   <div id="toast" class="toast">OTP Resent Successfully!</div>
@@ -178,33 +189,33 @@
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ otp })
       })
-      .then(res => {
-        const contentType = res.headers.get("content-type");
-        if (!contentType || !contentType.includes("application/json")) {
-          throw new Error("Expected JSON response");
-        }
-        return res.json();
-      })
-      .then(response => {
-        if (response.success) {
-          Swal.fire({
-            icon: "success",
-            title: "OTP Verified!",
-            timer: 1500,
-            showConfirmButton: false
-          }).then(() => {
-            window.location.href = response.redirect || "/user/";
-          });
-        } else {
-          clientErrorDisplay.textContent = response.error || "Invalid OTP.";
+        .then(res => {
+          const contentType = res.headers.get("content-type");
+          if (!contentType || !contentType.includes("application/json")) {
+            throw new Error("Expected JSON response");
+          }
+          return res.json();
+        })
+        .then(response => {
+          if (response.success) {
+            Swal.fire({
+              icon: "success",
+              title: "OTP Verified!",
+              timer: 1500,
+              showConfirmButton: false
+            }).then(() => {
+              window.location.href = response.redirect || "/user/";
+            });
+          } else {
+            clientErrorDisplay.textContent = response.error || "Invalid OTP.";
+            clientErrorDisplay.style.display = "block";
+          }
+        })
+        .catch(error => {
+          console.error("Fetch error:", error);
+          clientErrorDisplay.textContent = "An error occurred. Please try again.";
           clientErrorDisplay.style.display = "block";
-        }
-      })
-      .catch(error => {
-        console.error("Fetch error:", error);
-        clientErrorDisplay.textContent = "An error occurred. Please try again.";
-        clientErrorDisplay.style.display = "block";
-      });
+        });
     });
 
     resendBtn.addEventListener("click", () => {
@@ -220,30 +231,32 @@
         method: "POST",
         headers: { "Content-Type": "application/json" }
       })
-      .then(res => res.json())
-      .then(response => {
-        Swal.close();
-        if (response.success) {
-          timer = 30;
-          startTimer();
-          showToast("OTP Resent Successfully!");
-        } else {
+        .then(res => res.json())
+        .then(response => {
+          Swal.close();
+          if (response.success) {
+            timer = 30;
+            startTimer();
+            showToast("OTP Resent Successfully!");
+          } else {
+            Swal.fire({
+              icon: "error",
+              title: "Error",
+              text: response.error || "Failed to resend OTP."
+            });
+          }
+          
+        })
+        .catch(() => {
+          Swal.close();
           Swal.fire({
             icon: "error",
-            title: "Error",
-            text: response.error || "Failed to resend OTP."
+            title: "Network Error",
+            text: "Please try again later."
           });
-        }
-      })
-      .catch(() => {
-        Swal.close();
-        Swal.fire({
-          icon: "error",
-          title: "Network Error",
-          text: "Please try again later."
         });
-      });
     });
   </script>
 </body>
+
 </html>

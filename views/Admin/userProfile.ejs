@@ -1,35 +1,40 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <title>User Profile - Timzo Admin</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="icon" type="image/x-icon" href="/images/TIMZO.jpg">
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="icon" type="image/x-icon" href="/images/TIMZO.jpg">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
 
-    
+
 </head>
-<style>        .sidebar {
-      width: 250px;
-      position: fixed;
-      top: 0;
-      left: 0;
-      height: 100%;
-      background-color: #1f2937;
-      color: white;
-      padding-top: 20px;
-      transition: transform 0.3s ease;
-    }
-    .sidebar.collapsed {
-      transform: translateX(-250px);
-    }</style>
-  <aside class="sidebar">
-      <%- include('.././partials/admin/adminsidebar', { activePage: 'orders', admin: admin || {} }) %>
+<style>
+  .sidebar {
+    width: 250px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background-color: #1f2937;
+    color: white;
+    padding-top: 20px;
+    transition: transform 0.3s ease;
+  }
 
-  </aside>  
+  .sidebar.collapsed {
+    transform: translateX(-250px);
+  }
+</style>
+<aside class="sidebar">
+  <%- include('.././partials/admin/adminsidebar', { activePage: 'orders' , admin: admin || {} }) %>
+
+</aside>
+
 <body class="bg-gray-100 pt-20">
 
 
@@ -53,27 +58,37 @@
 
               <div>
                 <h5 class="font-semibold text-gray-700">Name</h5>
-                <p class="text-gray-600"><%= user.fullname %></p>
+                <p class="text-gray-600">
+                  <%= user.fullname %>
+                </p>
               </div>
 
               <div>
                 <h5 class="font-semibold text-gray-700">Email</h5>
-                <p class="text-gray-600"><%= user.email %></p>
+                <p class="text-gray-600">
+                  <%= user.email %>
+                </p>
               </div>
 
               <div>
                 <h5 class="font-semibold text-gray-700">Phone Number</h5>
-                <p class="text-gray-600"><%= user.mobile %></p>
+                <p class="text-gray-600">
+                  <%= user.mobile %>
+                </p>
               </div>
 
               <div>
                 <h5 class="font-semibold text-gray-700">User ID</h5>
-                <p class="text-gray-600"><%= user._id %></p>
+                <p class="text-gray-600">
+                  <%= user._id %>
+                </p>
               </div>
 
               <div class="md:col-span-2">
                 <h5 class="font-semibold text-gray-700">Address</h5>
-                <p class="text-gray-600"><%= user.address %></p>
+                <p class="text-gray-600">
+                  <%= user.address %>
+                </p>
               </div>
 
             </div>
@@ -81,11 +96,10 @@
             <div class="flex gap-4 mt-8">
               <a href="/admin/update-user/<%= user._id %>" class="btn btn-primary flex-1">Update Profile</a>
 
-              <button 
-                        class="btn btn-sm toggle-status-btn <%= user.isBlocked ? 'btn-danger' : 'btn-success' %>" 
-                        data-user-id="<%= user._id %>">
-                        <%= user.isBlocked ? 'Blocked' : 'Active' %>
-                      </button>
+              <button class="btn btn-sm toggle-status-btn <%= user.isBlocked ? 'btn-danger' : 'btn-success' %>"
+                data-user-id="<%= user._id %>">
+                <%= user.isBlocked ? 'Blocked' : 'Active' %>
+              </button>
             </div>
 
           </div>
@@ -98,6 +112,7 @@
   <%- include('.././Partials/admin/footer') %>
 
 </body>
+
 </html>
 
 <script>
@@ -115,7 +130,7 @@
 
         if (data.success) {
           const statusCell = btn.closest('tr').querySelector('td:nth-child(4)');
-          
+
           if (data.isBlocked) {
             btn.classList.remove('btn-success');
             btn.classList.add('btn-danger');

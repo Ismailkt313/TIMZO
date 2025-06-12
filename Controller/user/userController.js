@@ -13,125 +13,125 @@ const env = require('dotenv').config()
 const bcrypt = require("bcrypt")
 
 const pageNotFound = async (req, res) => {
-    try {
-        res.render('error404')
-    } catch (error) {
-        res.redirect('/error404')
-    }
+  try {
+    res.render('error404')
+  } catch (error) {
+    res.redirect('/error404')
+  }
 }
 
 const loadlanding = async (req, res) => {
-    try {
-        const categories = await Category.find({ isListed: true });
-        const brands = await Brand.find({ isListed: true });
-        const user =  req.session.user || null
+  try {
+    const categories = await Category.find({ isListed: true });
+    const brands = await Brand.find({ isListed: true });
+    const user = req.session.user || null
 
-        console.log('Session userId in loadlanding:', req.session.user?._id);
+    console.log('Session userId in loadlanding:', req.session.user?._id);
 
-        let wishlist = [];
-        if (user) {
-            const wishlistDoc = await Wishlist.findOne({ userId: user._id }).populate({
-                path: 'products.productId',
-                match: { isListed: true }
-            });
-            wishlist = wishlistDoc
-                ? wishlistDoc.products
-                      .filter(item => item.productId)
-                      .map(item => item.productId._id.toString())
-                : [];
-            console.log('Wishlist product IDs in loadlanding:', wishlist);
-        }
-
-        let newArrivals = await Product.find({ isListed: true })
-            .sort({ createdAt: -1 })
-            .limit(10)
-            .populate('brand')
-            .populate('category');
-        newArrivals = newArrivals.filter(p => p.brand?.isListed && p.category?.isListed && p.isListed && !p.isBlocked && p.status === 'available');
-
-        let trendingProducts = await Product.find({ isListed: true })
-            .sort({ createdAt: 1 })
-            .limit(10)
-            .populate('brand')
-            .populate('category');
-        trendingProducts = trendingProducts.filter(p => p.brand?.isListed && p.category?.isListed && p.isListed && !p.isBlocked && p.status === 'available');
-
-        let exploreProducts = await Product.find({ isListed: true })
-            .populate('brand')
-            .populate('category')
-            .limit(12);
-        exploreProducts = exploreProducts.filter(p => p.brand?.isListed && p.category?.isListed && p.isListed && !p.isBlocked && p.status === 'available');
-
-        let cartCount  
-        if (user) {
-            const cart = await Cart.findOne({ user: user._id }).populate('items.product');
-            if (cart) {
-                cartCount = cart.items.reduce((sum, item) => {
-                    if (item.product && item.product.isListed && item.product.status === 'available') {
-                        return sum + item.quantity;
-                    }
-                    return sum;
-                }, 0);
-            }
-        }
-        
-
-
-        return res.render('user/landingPage', {
-            user,
-            cartCount,
-            newArrivals,
-            trendingProducts,
-            exploreProducts,
-            categories,
-            brands,
-            wishlist,
-            search: req.query.search || ''
-        });
-    } catch (error) {
-        console.error('Error loading user homepage:', error);
-        res.status(500).render('user/error', {
-            message: 'Server error',
-            user: req.session.user || null,
-            cartCount: 0,
-            search: req.query.search || ''
-        });
+    let wishlist = [];
+    if (user) {
+      const wishlistDoc = await Wishlist.findOne({ userId: user._id }).populate({
+        path: 'products.productId',
+        match: { isListed: true }
+      });
+      wishlist = wishlistDoc
+        ? wishlistDoc.products
+          .filter(item => item.productId)
+          .map(item => item.productId._id.toString())
+        : [];
+      console.log('Wishlist product IDs in loadlanding:', wishlist);
     }
+
+    let newArrivals = await Product.find({ isListed: true })
+      .sort({ createdAt: -1 })
+      .limit(10)
+      .populate('brand')
+      .populate('category');
+    newArrivals = newArrivals.filter(p => p.brand?.isListed && p.category?.isListed && p.isListed && !p.isBlocked && p.status === 'available');
+
+    let trendingProducts = await Product.find({ isListed: true })
+      .sort({ createdAt: 1 })
+      .limit(10)
+      .populate('brand')
+      .populate('category');
+    trendingProducts = trendingProducts.filter(p => p.brand?.isListed && p.category?.isListed && p.isListed && !p.isBlocked && p.status === 'available');
+
+    let exploreProducts = await Product.find({ isListed: true })
+      .populate('brand')
+      .populate('category')
+      .limit(12);
+    exploreProducts = exploreProducts.filter(p => p.brand?.isListed && p.category?.isListed && p.isListed && !p.isBlocked && p.status === 'available');
+
+    let cartCount
+    if (user) {
+      const cart = await Cart.findOne({ user: user._id }).populate('items.product');
+      if (cart) {
+        cartCount = cart.items.reduce((sum, item) => {
+          if (item.product && item.product.isListed && item.product.status === 'available') {
+            return sum + item.quantity;
+          }
+          return sum;
+        }, 0);
+      }
+    }
+
+
+
+    return res.render('user/landingPage', {
+      user,
+      cartCount,
+      newArrivals,
+      trendingProducts,
+      exploreProducts,
+      categories,
+      brands,
+      wishlist,
+      search: req.query.search || ''
+    });
+  } catch (error) {
+    console.error('Error loading user homepage:', error);
+    res.status(500).render('user/error', {
+      message: 'Server error',
+      user: req.session.user || null,
+      cartCount: 0,
+      search: req.query.search || ''
+    });
+  }
 };
 
 
 const loadSignUp = async (req, res) => {
-    try {
-        return res.render('user/signUp', { error: null, formData: {} });
-    } catch (error) {
-        res.redirect('/user/error404');
-    }
+  try {
+    return res.render('user/signUp', { error: null, formData: {} });
+  } catch (error) {
+    res.redirect('/user/error404');
+  }
 };
 
 
 function generateOtp() {
-    return Math.floor(100000 + Math.random() * 900000);
+  return Math.floor(100000 + Math.random() * 900000);
 }
 
 async function sendVerificationEmail(email, otp) {
-    try {
-        const transporter = nodemailer.createTransport({
-            service: 'gmail',
-            port: 587,
-            secure: false,
-            requireTLS: true,
-            auth: {
-                user: process.env.NODEMAILER_EMAIL,
-                pass: process.env.NODEMAILER_PASSWORD
-            }
-        })
+  try {
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      port: 587,
+      secure: false,
+      requireTLS: true,
+      auth: {
+        user: process.env.NODEMAILER_EMAIL,
+        pass: process.env.NODEMAILER_PASSWORD
+      }
+    })
 
-        const info = await transporter.sendMail({
-            from: `"Timzo Support" <${process.env.NODEMAILER_EMAIL}>.com`,
-            to: email,
-            subject: "Verify Your Timzo Account ✔",
-            text: `Your OTP is: ${otp}`,
-            html: `
+    const info = await transporter.sendMail({
+      from: `"Timzo Support" <${process.env.NODEMAILER_EMAIL}>.com`,
+      to: email,
+      subject: "Verify Your Timzo Account ✔",
+      text: `Your OTP is: ${otp}`,
+      html: `
               <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border-radius: 10px; background: #f4f4f4;">
                 <h2 style="color: #333;">Welcome to <span style="color: #27ae60;">Timzo</span>!</h2>
                 <p>Thanks for signing up! Use the OTP below to verify your account:</p>
@@ -144,23 +144,23 @@ async function sendVerificationEmail(email, otp) {
                 </p>
               </div>
             `,
-            headers: {
-                'X-Priority': '3',
-                'X-Mailer': 'Timzo Mailer'
-            }
-        }
-        )
-
-
-
-        return info.accepted.length > 0
-
-
-    } catch (error) {
-        console.error("ERROR SENDING EMAIL", error);
-        return false
-
+      headers: {
+        'X-Priority': '3',
+        'X-Mailer': 'Timzo Mailer'
+      }
     }
+    )
+
+
+
+    return info.accepted.length > 0
+
+
+  } catch (error) {
+    console.error("ERROR SENDING EMAIL", error);
+    return false
+
+  }
 }
 
 
@@ -245,8 +245,8 @@ const signup = async (req, res) => {
       email,
       mobile,
       password,
-      referralCode,       
-      userReferralCode   
+      referralCode,
+      userReferralCode
     };
 
     res.render('user/verifyOtp', { error: null });
@@ -258,16 +258,16 @@ const signup = async (req, res) => {
   }
 };
 const securePassword = async (password) => {
-    try {
-        const passwordHash = await bcrypt.hash(password, 10)
+  try {
+    const passwordHash = await bcrypt.hash(password, 10)
 
-        return passwordHash
+    return passwordHash
 
-    } catch (error) {
-        console.error("Password hash error:", error);
-        throw error;
+  } catch (error) {
+    console.error("Password hash error:", error);
+    throw error;
 
-    }
+  }
 }
 
 const verifyOtp = async (req, res) => {
@@ -281,10 +281,10 @@ const verifyOtp = async (req, res) => {
     const now = Date.now();
 
     if (
-  req.session.userOtp &&
-  otp == req.session.userOtp.code && 
-  now <= req.session.userOtp.expiresAt
-) {
+      req.session.userOtp &&
+      otp == req.session.userOtp.code &&
+      now <= req.session.userOtp.expiresAt
+    ) {
       const user = req.session.userData;
       const passwordHash = await securePassword(user.password);
 
@@ -360,7 +360,7 @@ const resendOtp = async (req, res) => {
 
     const newOtp = generateOtp();
     req.session.userOtp = {
-      code : newOtp ,
+      code: newOtp,
       expiresAt: Date.now() + 30 * 1000
     }
 
@@ -381,49 +381,49 @@ const resendOtp = async (req, res) => {
 
 
 const loadlogin = async (req, res) => {
-    try {
+  try {
 
 
-        if (!req.session.user) {
-            return res.render('user/login', { error: null })
-        } else {
-        }
-
-    } catch (error) {
-
-        res.redirect('/error404')
-
+    if (!req.session.user) {
+      return res.render('user/login', { error: null })
+    } else {
     }
+
+  } catch (error) {
+
+    res.redirect('/error404')
+
+  }
 }
 
 const login = async (req, res) => {
-    try {
+  try {
 
-        const { email, password } = req.body;
-        const finduser = await User.findOne({ email: email })
-        if(!email || !password){
-          return res.render("user/login", { error: "all feilds are required" })
-        }
-        if (!finduser) {
-            return res.render("user/login", { error: "user not found" })
-        } if (finduser.isBlocked) {
-            return res.render('user/login', { error: "user is blocked by admin" })
-        }
-
-        const passwordmatch = await bcrypt.compare(password, finduser.password)
-        if (!passwordmatch) {
-            return res.render('user/login', { error: "incorrect password" })
-        }
-
-        req.session.user = finduser
-        res.redirect('/user/')
-
-    } catch (error) {
-
-        console.log('loggin error', error);
-        res.render('user/login', { error: "login failed , please try again later" })
-
+    const { email, password } = req.body;
+    const finduser = await User.findOne({ email: email })
+    if (!email || !password) {
+      return res.render("user/login", { error: "all feilds are required" })
     }
+    if (!finduser) {
+      return res.render("user/login", { error: "user not found" })
+    } if (finduser.isBlocked) {
+      return res.render('user/login', { error: "user is blocked by admin" })
+    }
+
+    const passwordmatch = await bcrypt.compare(password, finduser.password)
+    if (!passwordmatch) {
+      return res.render('user/login', { error: "incorrect password" })
+    }
+
+    req.session.user = finduser
+    res.redirect('/user/')
+
+  } catch (error) {
+
+    console.log('loggin error', error);
+    res.render('user/login', { error: "login failed , please try again later" })
+
+  }
 }
 
 const forgotPasswordPage = async (req, res) => {
@@ -520,7 +520,7 @@ const resendForgotOtp = async (req, res) => {
     }
 
     req.session.secondOtp = newOtp;
-    req.session.otpGeneratedAt = Date.now(); 
+    req.session.otpGeneratedAt = Date.now();
 
     console.log('Resent forgot password OTP:', newOtp);
     return res.status(200).json({ success: true });
@@ -583,104 +583,104 @@ const changePassword = async (req, res) => {
 
 
 const loadProducts = async (req, res) => {
-    try {
-        const { search, category, brand, minPrice, maxPrice, sort, page = 1 } = req.query;
-        const limit = 12; 
+  try {
+    const { search, category, brand, minPrice, maxPrice, sort, page = 1 } = req.query;
+    const limit = 12;
 
-        let query = { isListed: true };
-        if (search) {
-            query.name = { $regex: search, $options: 'i' };
-        }
-        if (category) {
-            query.category = category;
-        }
-        if (brand) {
-            query.brand = brand;
-        }
-        if (minPrice || maxPrice) {
-            query.salePrice = {};
-            if (minPrice) query.salePrice.$gte = parseFloat(minPrice);
-            if (maxPrice) query.salePrice.$lte = parseFloat(maxPrice);
-        }
-
-        let sortOption = {};
-        if (sort === 'latest') sortOption.createdAt = -1;
-        else if (sort === 'price-asc') sortOption.salePrice = 1;
-        else if (sort === 'price-desc') sortOption.salePrice = -1;
-        else if (sort === 'rating') sortOption.rating = -1;
-
-        const categories = await Category.find({ isListed: true });
-        const brands = await Brand.find({ isListed: true });
-        let user = null;
-        if (req.session.user && req.session.user._id) {
-            user = await User.findById(req.session.user._id);
-            console.log('Session userId in loadProducts:', req.session.user._id);
-        } else {
-            console.log('No valid session userId in loadProducts');
-        }
-
-        let wishlist = [];
-        if (user) {
-            const wishlistDoc = await Wishlist.findOne({ userId: user._id }).populate({
-                path: 'products.productId',
-                match: { isListed: true, status: 'available' }
-            });
-            wishlist = wishlistDoc
-                ? wishlistDoc.products
-                      .filter(item => item.productId)
-                      .map(item => item.productId._id.toString())
-                : [];
-            console.log('Wishlist product IDs in loadProducts:', wishlist);
-        }
-
-        const totalProducts = await Product.countDocuments(query);
-        let products = await Product.find(query)
-            .sort(sortOption)
-            .skip((page - 1) * limit)
-            .limit(limit)
-            .populate('brand')
-            .populate('category');
-        products = products.filter(p => p.brand?.isListed && p.category?.isListed && p.isListed && p.status === 'available');
-
-        let cartCount = 0;
-        if (user) {
-            const cart = await Cart.findOne({ user: user._id }).populate('items.product');
-            if (cart) {
-                cartCount = cart.items.reduce((sum, item) => {
-                    if (item.product && item.product.isListed && item.product.status === 'available') {
-                        return sum + item.quantity;
-                    }
-                    return sum;
-                }, 0);
-            }
-        }
-
-        return res.render('user/products', {
-            user,
-            cartCount,
-            products,
-            categories,
-            brands,
-            wishlist,
-            search: search || '',
-            category: category || '',
-            brandId: brand || '',
-            minPrice: minPrice || '',
-            maxPrice: maxPrice || '',
-            sort: sort || '',
-            currentPage: parseInt(page),
-            totalPages: Math.ceil(totalProducts / limit),
-            hasMore: parseInt(page) * limit < totalProducts
-        });
-    } catch (error) {
-        console.error('Error loading products page:', error);
-        res.status(500).render('user/error', {
-            message: 'Server error',
-            user: req.session.user || null,
-            cartCount: 0,
-            search: req.query.search || ''
-        });
+    let query = { isListed: true };
+    if (search) {
+      query.name = { $regex: search, $options: 'i' };
     }
+    if (category) {
+      query.category = category;
+    }
+    if (brand) {
+      query.brand = brand;
+    }
+    if (minPrice || maxPrice) {
+      query.salePrice = {};
+      if (minPrice) query.salePrice.$gte = parseFloat(minPrice);
+      if (maxPrice) query.salePrice.$lte = parseFloat(maxPrice);
+    }
+
+    let sortOption = {};
+    if (sort === 'latest') sortOption.createdAt = -1;
+    else if (sort === 'price-asc') sortOption.salePrice = 1;
+    else if (sort === 'price-desc') sortOption.salePrice = -1;
+    else if (sort === 'rating') sortOption.rating = -1;
+
+    const categories = await Category.find({ isListed: true });
+    const brands = await Brand.find({ isListed: true });
+    let user = null;
+    if (req.session.user && req.session.user._id) {
+      user = await User.findById(req.session.user._id);
+      console.log('Session userId in loadProducts:', req.session.user._id);
+    } else {
+      console.log('No valid session userId in loadProducts');
+    }
+
+    let wishlist = [];
+    if (user) {
+      const wishlistDoc = await Wishlist.findOne({ userId: user._id }).populate({
+        path: 'products.productId',
+        match: { isListed: true, status: 'available' }
+      });
+      wishlist = wishlistDoc
+        ? wishlistDoc.products
+          .filter(item => item.productId)
+          .map(item => item.productId._id.toString())
+        : [];
+      console.log('Wishlist product IDs in loadProducts:', wishlist);
+    }
+
+    const totalProducts = await Product.countDocuments(query);
+    let products = await Product.find(query)
+      .sort(sortOption)
+      .skip((page - 1) * limit)
+      .limit(limit)
+      .populate('brand')
+      .populate('category');
+    products = products.filter(p => p.brand?.isListed && p.category?.isListed && p.isListed && p.status === 'available');
+
+    let cartCount = 0;
+    if (user) {
+      const cart = await Cart.findOne({ user: user._id }).populate('items.product');
+      if (cart) {
+        cartCount = cart.items.reduce((sum, item) => {
+          if (item.product && item.product.isListed && item.product.status === 'available') {
+            return sum + item.quantity;
+          }
+          return sum;
+        }, 0);
+      }
+    }
+
+    return res.render('user/products', {
+      user,
+      cartCount,
+      products,
+      categories,
+      brands,
+      wishlist,
+      search: search || '',
+      category: category || '',
+      brandId: brand || '',
+      minPrice: minPrice || '',
+      maxPrice: maxPrice || '',
+      sort: sort || '',
+      currentPage: parseInt(page),
+      totalPages: Math.ceil(totalProducts / limit),
+      hasMore: parseInt(page) * limit < totalProducts
+    });
+  } catch (error) {
+    console.error('Error loading products page:', error);
+    res.status(500).render('user/error', {
+      message: 'Server error',
+      user: req.session.user || null,
+      cartCount: 0,
+      search: req.query.search || ''
+    });
+  }
 };
 
 const loadProductDetails = async (req, res) => {
@@ -729,8 +729,8 @@ const loadProductDetails = async (req, res) => {
       });
       wishlist = wishlistDoc
         ? wishlistDoc.products
-            .filter(item => item.productId)
-            .map(item => item.productId._id.toString())
+          .filter(item => item.productId)
+          .map(item => item.productId._id.toString())
         : [];
     }
 
@@ -808,17 +808,17 @@ const loadProductDetails = async (req, res) => {
       cartCount: 0,
     });
   }
-}; 
-  
-  
+};
+
+
 const loadlogout = async (req, res) => {
-    try {
-        req.session.user = null;
-        res.redirect('/');
-    } catch (error) {
-        console.error('Error during logout process:', error);
-        res.status(500).send('An error during logging out.');
-    }
+  try {
+    req.session.user = null;
+    res.redirect('/');
+  } catch (error) {
+    console.error('Error during logout process:', error);
+    res.status(500).send('An error during logging out.');
+  }
 };
 
 
@@ -854,27 +854,27 @@ const loadRefferal = async (req, res) => {
     console.error('Error loading referral page:', error.message);
     res.status(500).send('Internal server error');
   }
-}; 
+};
 
 module.exports = {
-    loadlanding,
-    pageNotFound,
-    loadSignUp,
-    signup,
-    verifyOtp,
-    resendOtp,
-    loadlogin,
-    login,
-    forgotPasswordPage,
-    handleForgotPassword,
-    forgotPasswordOtp,
-    loadChangePassword,
-    changePassword,
-    loadProducts,
-    loadProductDetails,
-    loadlogout,
-    resendForgotOtp,
-    generateOtp,
-    sendVerificationEmail,
-    loadRefferal
+  loadlanding,
+  pageNotFound,
+  loadSignUp,
+  signup,
+  verifyOtp,
+  resendOtp,
+  loadlogin,
+  login,
+  forgotPasswordPage,
+  handleForgotPassword,
+  forgotPasswordOtp,
+  loadChangePassword,
+  changePassword,
+  loadProducts,
+  loadProductDetails,
+  loadlogout,
+  resendForgotOtp,
+  generateOtp,
+  sendVerificationEmail,
+  loadRefferal
 }

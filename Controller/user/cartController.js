@@ -2,7 +2,7 @@ const Cart = require("../../Model/cartSchema");
 const User = require("../../Model/userSchema");
 const Wishlist = require('../../Model/wishlistSchema')
 const Coupon = require('../../Model/coupenSchema')
-const Product = require("../../Model/productSchema"); 
+const Product = require("../../Model/productSchema");
 const loadcart = async (req, res) => {
     try {
         if (!req.session.user || !req.session.user._id) {
@@ -27,16 +27,16 @@ const loadcart = async (req, res) => {
         }
 
         let cart = await Cart.findOne({ userId }).populate('items.product');
-        if(!cart){
-            cart = new Cart({ userId, items: [] }); 
+        if (!cart) {
+            cart = new Cart({ userId, items: [] });
         }
         const availableCoupons = await Coupon.find({
-      isActive: true,
-      validFrom: { $lte: new Date() },
-      validUntil: { $gte: new Date() },
-    });
+            isActive: true,
+            validFrom: { $lte: new Date() },
+            validUntil: { $gte: new Date() },
+        });
         let cartCount = 0;
-         let subtotal = 0;
+        let subtotal = 0;
         let tax = 0;
         const shippingFee = 10;
         let total = 0;
@@ -55,7 +55,7 @@ const loadcart = async (req, res) => {
             await cart.save();
 
             cartCount = cart.items.reduce((sum, item) => sum + item.quantity, 0);
-            tax = +(subtotal *0.10).toFixed(2)
+            tax = +(subtotal * 0.10).toFixed(2)
             total = subtotal + tax + shippingFee - couponDiscount;
             recommended = await Product.find({
                 _id: { $nin: cart.items.map(item => item.product._id) },
@@ -130,15 +130,14 @@ const addToCart = async (req, res) => {
             }
             existingItem.quantity = newQuantity;
         } else {
-            cart.items.push({ 
-                product: productId, 
+            cart.items.push({
+                product: productId,
                 quantity: parseInt(quantity),
             });
         }
 
         await cart.save();
 
-        // ✅ Remove from wishlist if exists
         const wishlist = await Wishlist.findOne({ userId });
         if (wishlist && wishlist.products.some(p => p.productId.toString() === productId)) {
             await Wishlist.updateOne(
@@ -209,36 +208,36 @@ const updateCart = async (req, res) => {
         item.quantity = parseInt(quantity);
         await cart.save();
 
-await cart.populate('items.product');
+        await cart.populate('items.product');
 
-let total = 0;
-let cartCount = 0;
+        let total = 0;
+        let cartCount = 0;
 
-cart.items.forEach(item => {
-    if (
-        item.product &&
-        !item.product.isDeleted &&
-        !item.product.isBlocked &&
-        item.product.status === 'available'
-    ) {
-        total += item.product.salePrice * item.quantity;
-        cartCount += item.quantity;
-    }
-});
+        cart.items.forEach(item => {
+            if (
+                item.product &&
+                !item.product.isDeleted &&
+                !item.product.isBlocked &&
+                item.product.status === 'available'
+            ) {
+                total += item.product.salePrice * item.quantity;
+                cartCount += item.quantity;
+            }
+        });
 
-let tax = +(total * 0.10).toFixed(2);         
-let shippingFee = 10;                        
-let grandTotal = +(total + tax + shippingFee).toFixed(2);
+        let tax = +(total * 0.10).toFixed(2);
+        let shippingFee = 10;
+        let grandTotal = +(total + tax + shippingFee).toFixed(2);
 
-res.status(200).json({
-    success: true,
-    message: "Cart updated successfully",
-    total,
-    tax,
-    shippingFee,
-    grandTotal,
-    cartCount
-});
+        res.status(200).json({
+            success: true,
+            message: "Cart updated successfully",
+            total,
+            tax,
+            shippingFee,
+            grandTotal,
+            cartCount
+        });
 
     } catch (error) {
         console.error("Error updating cart:", error);
@@ -266,27 +265,27 @@ const removeFromCart = async (req, res) => {
 
         await cart.populate('items.product');
         let total = 0;
-let cartCount = 0;
-cart.items.forEach(item => {
-    if (item.product && !item.product.isDeleted && !item.product.isBlocked && item.product.status === 'available') {
-        total += item.product.salePrice * item.quantity;
-        cartCount += item.quantity;
-    }
-});
+        let cartCount = 0;
+        cart.items.forEach(item => {
+            if (item.product && !item.product.isDeleted && !item.product.isBlocked && item.product.status === 'available') {
+                total += item.product.salePrice * item.quantity;
+                cartCount += item.quantity;
+            }
+        });
 
-const tax = +(total * 0.10).toFixed(2);
-const shippingFee = 10; 
-const grandTotal = +(total + tax + shippingFee).toFixed(2);
+        const tax = +(total * 0.10).toFixed(2);
+        const shippingFee = 10;
+        const grandTotal = +(total + tax + shippingFee).toFixed(2);
 
-res.status(200).json({ 
-    success: true, 
-    message: "Product removed from cart", 
-    total,
-    tax,
-    shippingFee,
-    grandTotal,
-    cartCount
-});
+        res.status(200).json({
+            success: true,
+            message: "Product removed from cart",
+            total,
+            tax,
+            shippingFee,
+            grandTotal,
+            cartCount
+        });
 
     } catch (error) {
         console.error("Error removing from cart:", error);
@@ -310,8 +309,8 @@ const clearCart = async (req, res) => {
         cart.items = [];
         await cart.save();
 
-        res.status(200).json({ 
-            success: true, 
+        res.status(200).json({
+            success: true,
             message: "Cart cleared successfully",
             total: 0,
             cartCount: 0

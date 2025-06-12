@@ -123,7 +123,7 @@ async function generateInvoicePDF(order, outputPath) {
           <!-- Header -->
           <div class="header">
             <div>
-              <img src="file://${path.join(__dirname, '../public/images/TIMZO.jpg')}" alt="Timzo Logo">
+                <h2>TIMZO<h2>
             </div>
             <div class="company-info">
               <strong>Timzo Pvt. Ltd.</strong><br>

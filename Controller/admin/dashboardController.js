@@ -247,7 +247,7 @@ const loadAdminDashboard = async (req, res) => {
     });
 
     res.render('admin/admindashbord', {
-      activePage : 'dashboard',
+      activePage: 'dashboard',
       bestSellingProducts: bestSellingProducts || [],
       bestSellingCategories: bestSellingCategories || [],
       bestSellingBrands: bestSellingBrands || [],
@@ -347,7 +347,7 @@ const generateLedgerReport = async (req, res) => {
       bestSellingBrands = await Order.aggregate([
         { $match: { orderStatus: 'Delivered' } },
         { $unwind: '$items' },
-        { $match: { 'items.status': { $ne: 'Cancelled' } } },  
+        { $match: { 'items.status': { $ne: 'Cancelled' } } },
         {
           $lookup: {
             from: 'products',
@@ -625,7 +625,7 @@ const generateLedgerReport = async (req, res) => {
     addTable(brandHeaders, brandRows, brandColumnWidths);
 
     addSectionHeader('Sales Data');
-    
+
     doc.fontSize(14).font('Helvetica-Bold').text('Daily Sales', 40, doc.y);
     const dailyHeaders = ['Date', 'Sales (₹)'];
     const dailyRows = reportData.chartData.daily.labels.map((label, index) => ({

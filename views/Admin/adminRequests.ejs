@@ -1,164 +1,183 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Admin - Manage Requests - Timzo</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="icon" type="image/x-icon" href="/images/TIMZO.jpg">
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link rel="icon" type="image/x-icon" href="/images/TIMZO.jpg" />
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
-        .table-container {
-            max-height: 70vh;
-            overflow-y: auto;
-        }
+      .table-container {
+        max-height: 70vh;
+        overflow-y: auto;
+        padding-left: 60px;
+      }
 
-        .table-container::-webkit-scrollbar {
-            width: 8px;
-        }
+      .table-container::-webkit-scrollbar {
+        width: 8px;
+      }
 
-        .table-container::-webkit-scrollbar-thumb {
-            background-color: #6b7280;
-            border-radius: 4px;
-        }
+      .table-container::-webkit-scrollbar-thumb {
+        background-color: #6b7280;
+        border-radius: 4px;
+      }
 
-        .table-container::-webkit-scrollbar-track {
-            background-color: #e5e7eb;
-        }
+      .table-container::-webkit-scrollbar-track {
+        background-color: #e5e7eb;
+      }
+      .sidebar {
+        width: 250px;
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100%;
+        background-color: #1f2937;
+        color: white;
+        padding-top: 20px;
+        transition: transform 0.3s ease;
+      }
     </style>
-</head>
+  </head>
 
-<body class="bg-gray-100">
- <!-- Include the sidebar -->
-  <%- include('.././partials/admin/adminsidebar', { activePage: 'orders', admin: admin || {} }) %>
-  
-  <!-- Include the navbar -->
-
+  <body class="bg-gray-100">
+    <!-- Include the sidebar -->
+    <aside class="sidebar">
+      <%- include('.././partials/admin/adminsidebar', { activePage: 'orders',
+      admin: admin || {} }) %>
+    </aside>
+    <!-- Include the navbar -->
 
     <div class="flex">
-        
+      <div class="ml-64 mt-16 p-6 flex-1">
+        <h1 class="text-2xl font-bold text-gray-800 mb-6 text-center">
+          Manage Cancellation/Return Requests
+        </h1>
 
-        <div class="ml-64 mt-16 p-6 flex-1">
-            <h1 class="text-2xl font-bold text-gray-800 mb-6 text-center">Manage Cancellation/Return Requests</h1>
-
-
-            <% if (requests.length===0) { %>
-                <div class="text-center text-gray-600">
-                    <p>No pending requests.</p>
-                </div>
-                <% } else { %>
-                    <div class="table-container">
-                        <table class="w-full bg-white shadow-lg rounded-lg overflow-hidden">
-                            <thead class="bg-gray-200">
-                                <tr>
-                                    <th class="p-3 text-left text-gray-700">Order ID</th>
-                                    <th class="p-3 text-left text-gray-700">Customer</th>
-                                    <th class="p-3 text-left text-gray-700">Product</th>
-                                    <th class="p-3 text-left text-gray-700">Action</th>
-                                    <th class="p-3 text-left text-gray-700">Reason</th>
-                                    <th class="p-3 text-left text-gray-700">Request Date</th>
-                                    <th class="p-3 text-left text-gray-700">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <% requests.forEach(request=> { %>
-                                    <tr class="border-b border-gray-200 hover:bg-gray-50">
-                                        <td class="p-3">
-                                            <%= request.orderId %>
-                                        </td>
-                                        <td class="p-3">
-                                            <%= request.user %>
-                                        </td>
-                                        <td class="p-3">
-                                            <%= request.productName %>
-                                        </td>
-                                        <td class="p-3">
-                                            <%= request.action.charAt(0).toUpperCase() + request.action.slice(1) %>
-                                        </td>
-                                        <td class="p-3">
-                                            <%= request.reason %>
-                                        </td>
-                                        <td class="p-3">
-                                            <%= new Date(request.requestDate).toLocaleDateString('en-IN', {
-                                                month: 'short' , day: 'numeric' , year: 'numeric' }) %>
-                                        </td>
-                                        <td class="p-3 flex gap-2">
-                                            <button onclick="handleRequest(
+        <% if (requests.length===0) { %>
+        <div class="text-center text-gray-600">
+          <p>No pending requests.</p>
+        </div>
+        <% } else { %>
+        <div class="table-container">
+          <table class="w-full bg-white shadow-lg rounded-lg overflow-hidden">
+            <thead class="bg-gray-200">
+              <tr>
+                <th class="p-3 text-left text-gray-700">Order ID</th>
+                <th class="p-3 text-left text-gray-700">Customer</th>
+                <th class="p-3 text-left text-gray-700">Product</th>
+                <th class="p-3 text-left text-gray-700">Action</th>
+                <th class="p-3 text-left text-gray-700">Reason</th>
+                <th class="p-3 text-left text-gray-700">Request Date</th>
+                <th class="p-3 text-left text-gray-700">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% requests.forEach(request=> { %>
+              <tr class="border-b border-gray-200 hover:bg-gray-50">
+                <td class="p-3"><%= request.orderId %></td>
+                <td class="p-3"><%= request.user %></td>
+                <td class="p-3"><%= request.productName %></td>
+                <td class="p-3">
+                  <%= request.action.charAt(0).toUpperCase() +
+                  request.action.slice(1) %>
+                </td>
+                <td class="p-3"><%= request.reason %></td>
+                <td class="p-3">
+                  <%= new Date(request.requestDate).toLocaleDateString('en-IN',
+                  { month: 'short' , day: 'numeric' , year: 'numeric' }) %>
+                </td>
+                <td class="p-3 flex gap-2">
+                  <button
+                    onclick="handleRequest(
     <%= JSON.stringify(request.orderId) %>, 
     <%= JSON.stringify(request.productId) %>, 
     <%= JSON.stringify(request.action) %>, 
     true
-)">Approve</button>
+)"
+                  >
+                    Approve
+                  </button>
 
-                                            <button onclick="handleRequest(
+                  <button
+                    onclick="handleRequest(
     <%= JSON.stringify(request.orderId) %>, 
     <%= JSON.stringify(request.productId) %>, 
     <%= JSON.stringify(request.action) %>, 
     false
-)">Reject</button>
-
-
-                                        </td>
-                                    </tr>
-                                    <% }) %>
-                            </tbody>
-                        </table>
-                    </div>
-
-
-
-                    <% } %>
+)"
+                  >
+                    Reject
+                  </button>
+                </td>
+              </tr>
+              <% }) %>
+            </tbody>
+          </table>
         </div>
+
+        <% } %>
+      </div>
     </div>
 
-    <footer class="bg-gray-100 p-4 text-center text-gray-600 text-sm shadow-inner">
-        © <%= new Date().getFullYear() %> Timzo Admin Panel. All rights reserved.
+    <footer
+      class="bg-gray-100 p-4 text-center text-gray-600 text-sm shadow-inner"
+    >
+      © <%= new Date().getFullYear() %> Timzo Admin Panel. All rights reserved.
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-        async function handleRequest(orderId, productId, action, approve) {
-            const actionText = approve ? 'Approve' : 'Reject';
-            const confirm = await Swal.fire({
-                title: `${actionText} Request`,
-                text: `Are you sure you want to ${actionText.toLowerCase()} this ${action} request?`,
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonText: `Yes, ${actionText}`,
-                cancelButtonText: 'Cancel'
-            });
+      async function handleRequest(orderId, productId, action, approve) {
+        const actionText = approve ? "Approve" : "Reject";
+        const confirm = await Swal.fire({
+          title: `${actionText} Request`,
+          text: `Are you sure you want to ${actionText.toLowerCase()} this ${action} request?`,
+          icon: "question",
+          showCancelButton: true,
+          confirmButtonText: `Yes, ${actionText}`,
+          cancelButtonText: "Cancel",
+        });
 
-            if (!confirm.isConfirmed) return;
+        if (!confirm.isConfirmed) return;
 
-            try {
-                Swal.fire({
-                    title: 'Processing...',
-                    allowOutsideClick: false,
-                    didOpen: () => Swal.showLoading()
-                });
+        try {
+          Swal.fire({
+            title: "Processing...",
+            allowOutsideClick: false,
+            didOpen: () => Swal.showLoading(),
+          });
 
-                const response = await fetch('/admin/handle-request', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ orderId, productId, action, approve })
-                });
+          const response = await fetch("/admin/handle-request", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ orderId, productId, action, approve }),
+          });
 
-                const data = await response.json();
+          const data = await response.json();
 
-                if (data.success) {
-                    Swal.fire('Success', data.message, 'success');
-                    setTimeout(() => window.location.reload(), 1500);
-                } else {
-                    Swal.fire('Error', data.message || 'Failed to process request', 'error');
-                }
-            } catch (error) {
-                console.error(`Error ${actionText.toLowerCase()}ing request:`, error);
-                Swal.fire('Error', 'Something went wrong.', 'error');
-            }
+          if (data.success) {
+            Swal.fire("Success", data.message, "success");
+            setTimeout(() => window.location.reload(), 1500);
+          } else {
+            Swal.fire(
+              "Error",
+              data.message || "Failed to process request",
+              "error"
+            );
+          }
+        } catch (error) {
+          console.error(`Error ${actionText.toLowerCase()}ing request:`, error);
+          Swal.fire("Error", "Something went wrong.", "error");
         }
+      }
     </script>
-</body>
-
+  </body>
 </html>

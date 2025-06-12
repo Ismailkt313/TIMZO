@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,15 +16,18 @@
             background: linear-gradient(135deg, #f4f4f4, #e0e0e0);
             overflow-x: hidden;
         }
+
         .container-fluid {
             padding: 0;
         }
+
         .main-content {
             padding: 40px 20px;
             background: #ffffff;
             min-height: 100vh;
             overflow-y: auto;
         }
+
         .contact-container {
             max-width: 1200px;
             margin: 0 auto;
@@ -32,6 +36,7 @@
             box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
             padding: 40px;
         }
+
         .contact-container h1 {
             font-size: 32px;
             font-weight: 700;
@@ -40,6 +45,7 @@
             margin-bottom: 30px;
             letter-spacing: 1px;
         }
+
         .section {
             background: #f8f9fa;
             border-radius: 12px;
@@ -47,34 +53,41 @@
             margin-bottom: 25px;
             transition: transform 0.2s ease;
         }
+
         .section:hover {
             transform: translateY(-5px);
         }
+
         .section h2 {
             font-size: 22px;
             font-weight: 600;
             color: #333;
             margin-bottom: 20px;
         }
+
         .section p {
             color: #666;
             font-size: 16px;
             line-height: 1.6;
             margin-bottom: 10px;
         }
+
         .contact-info i {
             color: #1a1a1a;
             margin-right: 10px;
             font-size: 18px;
         }
+
         .contact-info a {
             color: #1a1a1a;
             text-decoration: none;
             transition: color 0.3s ease;
         }
+
         .contact-info a:hover {
             color: #ffd700;
         }
+
         .map-placeholder {
             height: 300px;
             background: #e9ecef;
@@ -85,16 +98,19 @@
             color: #666;
             font-size: 16px;
         }
+
         .contact-form .form-control {
             border-radius: 8px;
             border: 1px solid #dee2e6;
             padding: 10px;
             font-size: 16px;
         }
+
         .contact-form .form-control:focus {
             border-color: #1a1a1a;
             box-shadow: 0 0 5px rgba(26, 26, 26, 0.2);
         }
+
         .btn-custom {
             background: #1a1a1a;
             color: #ffffff;
@@ -105,41 +121,51 @@
             border: none;
             transition: all 0.3s ease;
         }
+
         .btn-custom:hover {
             background: #ffd700;
             color: #1a1a1a;
             transform: scale(1.05);
         }
+
         .toast-container {
             z-index: 1055;
         }
+
         @media (max-width: 767.98px) {
             .contact-container {
                 padding: 15px;
             }
+
             .contact-container h1 {
                 font-size: 24px;
             }
+
             .section h2 {
                 font-size: 20px;
             }
+
             .section p {
                 font-size: 14px;
             }
+
             .contact-form .form-control {
                 font-size: 14px;
                 padding: 8px;
             }
+
             .btn-custom {
                 padding: 10px 20px;
                 font-size: 14px;
             }
+
             .map-placeholder {
                 height: 200px;
             }
         }
     </style>
 </head>
+
 <body>
     <div class="container-fluid">
         <div class="main-content">
@@ -149,7 +175,8 @@
                 <!-- Contact Form Section -->
                 <div class="section">
                     <h2>Get in Touch</h2>
-                    <p>Have a question or need assistance? Fill out the form below, and we’ll get back to you as soon as possible.</p>
+                    <p>Have a question or need assistance? Fill out the form below, and we’ll get back to you as soon as
+                        possible.</p>
                     <form id="contactForm" class="contact-form">
                         <div class="row">
                             <div class="col-md-6 mb-3">
@@ -180,7 +207,8 @@
                     <div class="contact-info">
                         <p><i class="fas fa-envelope"></i> <a href="mailto:support@timzo.com">support@timzo.com</a></p>
                         <p><i class="fas fa-phone"></i> <a href="tel:+1234567890">+1 (234) 567-890</a></p>
-                        <p><i class="fas fa-map-marker-alt"></i> 123 Timzo Avenue, Suite 456, New York, NY 10001, USA</p>
+                        <p><i class="fas fa-map-marker-alt"></i> 123 Timzo Avenue, Suite 456, New York, NY 10001, USA
+                        </p>
                     </div>
                 </div>
 
@@ -234,4 +262,5 @@
         });
     </script>
 </body>
+
 </html>

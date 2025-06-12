@@ -1,106 +1,103 @@
-  <!DOCTYPE html>
-  <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>User Sidebar</title>
+<!DOCTYPE html>
+<html lang="en">
 
-    <!-- Bootstrap and Tailwind -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>User Sidebar</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 
 
-    
-  </head>
-  <body class="bg-gray-100 font-sans">
 
-    <!-- Sidebar -->
-    <div class="h-screen w-64 bg-gray-900 text-white fixed top-0 left-0 shadow-xl flex flex-col">
-      
-      <!-- Header -->
-      <div class="p-6 text-xl font-semibold border-b border-gray-700 text-center">
-        <% if (user && user.fullname) { %>
-          <%= user.fullname %>
-        <% } else { %>
-          Guest
-        <% } %>
-      </div>
+</head>
 
-      <!-- Avatar -->
-      <div class="flex justify-center items-center py-5 border-b border-gray-700">
-        <div class="w-16 h-16 bg-gray-600 rounded-full flex items-center justify-center text-2xl font-bold uppercase">
-          <% if (user && user.fullname) { %>
-            <%= user.fullname.charAt(0) %>
+<body class="bg-gray-100 font-sans">
+
+  <div class="h-screen w-64 bg-gray-900 text-white fixed top-0 left-0 shadow-xl flex flex-col">
+
+    <div class="p-6 text-xl font-semibold border-b border-gray-700 text-center">
+      <% if (user && user.fullname) { %>
+        <%= user.fullname %>
           <% } else { %>
-            ?
-          <% } %>
-        </div>
-      </div>
-
-      <!-- Navigation -->
-      <nav class="flex-1 px-4 py-6 space-y-3 text-sm font-medium">
-        <a href="/user/account"
-          class="flex items-center gap-3 px-4 py-2 rounded-md transition-all duration-200 
-                  <%= currentPage === 'profile' ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white' %>">
-          <i class="fas fa-user w-4 text-sm"></i> My Profile
-        </a>
-
-        <a href="/user/address"
-          class="flex items-center gap-3 px-4 py-2 rounded-md transition-all duration-200 
-                  <%= currentPage === 'address' ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white' %>">
-          <i class="fas fa-map-marker-alt w-4 text-sm"></i> My Address
-        </a>
-
-        <a href="/user/orders"
-          class="flex items-center gap-3 px-4 py-2 rounded-md transition-all duration-200 
-                  <%= currentPage === 'orders' ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white' %>">
-          <i class="fas fa-shopping-bag w-4 text-sm"></i> My Orders
-        </a>
-
-        <a href="/user/wallet"
-          class="flex items-center gap-3 px-4 py-2 rounded-md transition-all duration-200 
-                  <%= currentPage === 'wallet' ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white' %>">
-          <i class="fas fa-wallet w-4 text-sm"></i> My Wallet
-        </a>
-
-  <a href="/user/newPassword"
-          class="flex items-center gap-3 px-4 py-2 rounded-md transition-all duration-200 
-                  <%= currentPage === 'changepassword' ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white' %>">
-          <i class="fas fa-lock w-4 text-sm"></i> Change Password
-        </a>
-
-        <a href="/user/sidewishlist"
-          class="flex items-center gap-3 px-4 py-2 rounded-md transition-all duration-200 
-                  <%= currentPage === 'Wishlist' ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white' %>">
-          <i class="fas fa-lock w-4 text-sm"></i> Wishlist
-        </a>
-        
-        <a href="/user/coupons"
-          class="flex items-center gap-3 px-4 py-2 rounded-md transition-all duration-200 
-                  <%= currentPage === 'coupons' ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white' %>">
-          <i class="fas fa-ticket-alt w-4 text-sm"></i> My Coupon
-        </a>
-
-      
-
-        <a href="/user/referral"
-          class="flex items-center gap-3 px-4 py-2 rounded-md transition-all duration-200 
-                  <%= currentPage === 'referral' ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white' %>">
-          <i class="fas fa-users w-4 text-sm"></i> Refer & Earn
-        </a>
-        <a href="/user/"
-          class="flex items-center gap-3 px-4 py-2 rounded-md transition-all duration-200 ">
-          <i class="fas fa-user w-4 text-sm"></i> Home
-        </a>
-
-        <a href="/logout"
-          class="flex items-center gap-3 px-4 py-2 rounded-md transition-all duration-200 
-                  text-red-400 hover:bg-red-500 hover:text-white">
-          <i class="fas fa-sign-out-alt w-4 text-sm"></i> Log Out
-        </a>
-      </nav>
+            Guest
+            <% } %>
     </div>
 
-  </body>
-  </html>
+    <!-- Avatar -->
+    <div class="flex justify-center items-center py-5 border-b border-gray-700">
+      <div class="w-16 h-16 bg-gray-600 rounded-full flex items-center justify-center text-2xl font-bold uppercase">
+        <% if (user && user.fullname) { %>
+          <%= user.fullname.charAt(0) %>
+            <% } else { %>
+              ?
+              <% } %>
+      </div>
+    </div>
+
+    <nav class="flex-1 px-4 py-6 space-y-3 text-sm font-medium">
+      <a href="/user/account"
+        class="flex items-center gap-3 px-4 py-2 rounded-md transition-all duration-200 
+                  <%= currentPage === 'profile' ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white' %>">
+        <i class="fas fa-user w-4 text-sm"></i> My Profile
+      </a>
+
+      <a href="/user/address"
+        class="flex items-center gap-3 px-4 py-2 rounded-md transition-all duration-200 
+                  <%= currentPage === 'address' ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white' %>">
+        <i class="fas fa-map-marker-alt w-4 text-sm"></i> My Address
+      </a>
+
+      <a href="/user/orders"
+        class="flex items-center gap-3 px-4 py-2 rounded-md transition-all duration-200 
+                  <%= currentPage === 'orders' ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white' %>">
+        <i class="fas fa-shopping-bag w-4 text-sm"></i> My Orders
+      </a>
+
+      <a href="/user/wallet"
+        class="flex items-center gap-3 px-4 py-2 rounded-md transition-all duration-200 
+                  <%= currentPage === 'wallet' ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white' %>">
+        <i class="fas fa-wallet w-4 text-sm"></i> My Wallet
+      </a>
+
+      <a href="/user/newPassword"
+        class="flex items-center gap-3 px-4 py-2 rounded-md transition-all duration-200 
+                  <%= currentPage === 'changepassword' ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white' %>">
+        <i class="fas fa-lock w-4 text-sm"></i> Change Password
+      </a>
+
+      <a href="/user/sidewishlist"
+        class="flex items-center gap-3 px-4 py-2 rounded-md transition-all duration-200 
+                  <%= currentPage === 'Wishlist' ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white' %>">
+        <i class="fas fa-lock w-4 text-sm"></i> Wishlist
+      </a>
+
+      <a href="/user/coupons"
+        class="flex items-center gap-3 px-4 py-2 rounded-md transition-all duration-200 
+                  <%= currentPage === 'coupons' ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white' %>">
+        <i class="fas fa-ticket-alt w-4 text-sm"></i> My Coupon
+      </a>
+
+
+
+      <a href="/user/referral"
+        class="flex items-center gap-3 px-4 py-2 rounded-md transition-all duration-200 
+                  <%= currentPage === 'referral' ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white' %>">
+        <i class="fas fa-users w-4 text-sm"></i> Refer & Earn
+      </a>
+      <a href="/user/" class="flex items-center gap-3 px-4 py-2 rounded-md transition-all duration-200 ">
+        <i class="fas fa-user w-4 text-sm"></i> Home
+      </a>
+
+      <a href="/logout" class="flex items-center gap-3 px-4 py-2 rounded-md transition-all duration-200 
+                  text-red-400 hover:bg-red-500 hover:text-white">
+        <i class="fas fa-sign-out-alt w-4 text-sm"></i> Log Out
+      </a>
+    </nav>
+  </div>
+
+</body>
+
+</html>

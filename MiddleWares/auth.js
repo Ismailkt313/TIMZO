@@ -14,7 +14,7 @@ const userAuth = (req, res, next) => {
             })
             .catch(error => {
                 console.log("error in userAuth middleware:", error);
-                res.status(500).send("Internal server error"); 
+                res.status(500).send("Internal server error");
             });
     } else {
         res.redirect("/login");
@@ -32,7 +32,7 @@ const adminAuth = (req, res, next) => {
 };
 
 
-module.exports={
+module.exports = {
     userAuth,
     adminAuth
 }

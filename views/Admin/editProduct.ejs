@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -8,175 +9,305 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <style>
-    .error-message { color: #dc3545; font-size: 0.875rem; }
-    .thumbnails-container { display: flex; overflow-x: auto; gap: 10px; margin-top: 10px; }
-    .thumbnail { position: relative; }
-    .thumbnail img { width: 60px; height: auto; border: 1px solid #ddd; border-radius: 4px; }
-    .remove-icon { position: absolute; top: -5px; right: -5px; background: #dc3545; color: white; border-radius: 50%; width: 20px; height: 20px; text-align: center; cursor: pointer; font-size: 14px; }
-    .sidebar { width: 250px; min-height: 100vh; background-color: #1a202c; color: white; padding: 1rem; position: fixed; }
+    .error-message {
+      color: #dc3545;
+      font-size: 0.875rem;
+    }
+
+    .thumbnails-container {
+      display: flex;
+      overflow-x: auto;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .thumbnail {
+      position: relative;
+    }
+
+    .thumbnail img {
+      width: 60px;
+      height: auto;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+
+    .remove-icon {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background: #dc3545;
+      color: white;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      text-align: center;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .sidebar {
+      width: 250px;
+      min-height: 100vh;
+      background-color: #1a202c;
+      color: white;
+      padding: 1rem;
+      position: fixed;
+    }
+
     .main-content {
       margin-left: 290px;
       padding: 2rem;
-    }    .content-header { margin-bottom: 1rem; }
-    body { padding-top: 70px; }
-    .content-header h2 { font-size: 1.5rem; font-weight: 700; color: #2d3748; }
-    .card { border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-    .btn-primary { background-color: #2b6cb0; border-color: #2b6cb0; }
-    .btn-primary:hover { background-color: #2c5282; border-color: #2c5282; }
-    .form-control, .form-select { border-radius: 6px; }
-    .crop-container { position: relative; display: none; margin-top: 10px; }
-    .crop-box { position: absolute; border: 2px dashed #2b6cb0; cursor: move; }
-    .crop-box .resize-handle { position: absolute; width: 10px; height: 10px; background: #2b6cb0; cursor: nwse-resize; bottom: -5px; right: -5px; }
+    }
+
+    .content-header {
+      margin-bottom: 1rem;
+    }
+
+    body {
+      padding-top: 70px;
+    }
+
+    .content-header h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #2d3748;
+    }
+
+    .card {
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-primary {
+      background-color: #2b6cb0;
+      border-color: #2b6cb0;
+    }
+
+    .btn-primary:hover {
+      background-color: #2c5282;
+      border-color: #2c5282;
+    }
+
+    .form-control,
+    .form-select {
+      border-radius: 6px;
+    }
+
+    .crop-container {
+      position: relative;
+      display: none;
+      margin-top: 10px;
+    }
+
+    .crop-box {
+      position: absolute;
+      border: 2px dashed #2b6cb0;
+      cursor: move;
+    }
+
+    .crop-box .resize-handle {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      background: #2b6cb0;
+      cursor: nwse-resize;
+      bottom: -5px;
+      right: -5px;
+    }
+
     @media (max-width: 767px) {
-      .sidebar { display: none; }
-      .main-content { margin-left: 0; padding: 1rem; }
-      body { padding-top: 56px; }
-      .form-control, .form-select { font-size: 0.9rem; }
-      .content-header h2 { font-size: 1.25rem; }
-      .btn-primary { width: 100%; }
-      .thumbnail img { width: 50px; }
-      .crop-container canvas { max-width: 100%; }
+      .sidebar {
+        display: none;
+      }
+
+      .main-content {
+        margin-left: 0;
+        padding: 1rem;
+      }
+
+      body {
+        padding-top: 56px;
+      }
+
+      .form-control,
+      .form-select {
+        font-size: 0.9rem;
+      }
+
+      .content-header h2 {
+        font-size: 1.25rem;
+      }
+
+      .btn-primary {
+        width: 100%;
+      }
+
+      .thumbnail img {
+        width: 50px;
+      }
+
+      .crop-container canvas {
+        max-width: 100%;
+      }
     }
   </style>
 </head>
+
 <body class="d-flex">
   <aside class="sidebar">
-      <%- include('.././partials/admin/adminsidebar', { activePage: 'products', admin: admin || {} }) %>
+    <%- include('.././partials/admin/adminsidebar', { activePage: 'products' , admin: admin || {} }) %>
 
   </aside>
   <div class="flex-grow-1 main-content">
- <!-- Include the sidebar -->
-  
-  <!-- Include the navbar -->
-  <section class="content-main">
+    <!-- Include the sidebar -->
+
+    <!-- Include the navbar -->
+    <section class="content-main">
       <div class="content-header">
         <h2 class="content-title">Edit Watch</h2>
       </div>
       <% if (error) { %>
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
           <%= error %>
-          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
-      <% } %>
-      <div class="card mb-4">
-        <div class="card-body">
-          <form method="post" action="/admin/editProduct/<%= product._id %>" enctype="multipart/form-data" onsubmit="return validateForm()">
-            <div class="mb-4">
-              <label for="product_name" class="form-label">Watch Name</label>
-              <input type="text" placeholder="e.g., TIMZO Chrono X" name="productName" class="form-control" id="product_name" value="<%= product.name %>" />
-              <div id="productName-error" class="error-message"></div>
-            </div>
-            <div class="mb-4">
-              <label class="form-label">Brand</label>
-              <select class="form-select" name="brand">
-                <option value="">Select Brand</option>
-                <% brand.forEach(b => { %>
-                  <option value="<%= b._id %>" <%= product.brand._id.toString() === b._id.toString() ? 'selected' : '' %>><%= b.name %></option>
-                <% }) %>
-              </select>
-              <div id="brand-error" class="error-message"></div>
-            </div>
-            <div class="mb-4">
-              <label class="form-label">Category</label>
-              <select class="form-select" name="category">
-                <option value="">Select Category</option>
-                <% cat.forEach(c => { %>
-                  <option value="<%= c._id %>" <%= product.category._id.toString() === c._id.toString() ? 'selected' : '' %>><%= c.name %></option>
-                <% }) %>
-              </select>
-              <div id="category-error" class="error-message"></div>
-            </div>
-            <div class="mb-4">
-              <label for="descriptionid" class="form-label">Description</label>
-              <textarea placeholder="Describe the watch..." name="description" class="form-control" id="descriptionid" rows="4"><%= product.description %></textarea>
-              <div id="description-error" class="error-message"></div>
-            </div>
-            <div class="row">
-              <div class="col-lg-4 mb-4">
-                <label class="form-label">Regular Price</label>
-                <input placeholder="$" name="regularPrice" type="text" class="form-control" value="<%= product.regularPrice %>" />
-                <div id="regularPrice-error" class="error-message"></div>
-              </div>
-              <div class="col-lg-4 mb-4">
-                <label class="form-label">Stock</label>
-                <input name="stock" type="text" class="form-control" value="<%= product.stock %>" />
-                <div id="stock-error" class="error-message"></div>
-              </div>
-            </div>
-            <div class="mb-4">
-              <label class="form-label">Color</label>
-              <input name="color" type="text" placeholder="e.g., Black" class="form-control" value="<%= product.color %>" />
-              <div id="color-error" class="error-message"></div>
-            </div>
-            <div class="mb-4">
-              <label class="form-label">Material</label>
-              <input name="material" type="text" placeholder="e.g., Stainless Steel" class="form-control" value="<%= product.material %>" />
-              <div id="material-error" class="error-message"></div>
-            </div>
-            <div class="mb-4">
-              <label class="form-label">Water Resistance</label>
-              <select class="form-select" name="waterResistance">
-                <option value="Not specified" <%= product.waterResistance === 'Not specified' ? 'selected' : '' %>>Not specified</option>
-                <option value="30m" <%= product.waterResistance === '30m' ? 'selected' : '' %>>30m</option>
-                <option value="50m" <%= product.waterResistance === '50m' ? 'selected' : '' %>>50m</option>
-                <option value="100m" <%= product.waterResistance === '100m' ? 'selected' : '' %>>100m</option>
-                <option value="200m" <%= product.waterResistance === '200m' ? 'selected' : '' %>>200m</option>
-                <option value="300m" <%= product.waterResistance === '300m' ? 'selected' : '' %>>300m</option>
-              </select>
-              <div id="waterResistance-error" class="error-message"></div>
-            </div>
-            <div class="mb-4">
-              <label class="form-label">Warranty</label>
-              <select class="form-select" name="warranty">
-                <option value="1 Year" <%= product.warranty === '1 Year' ? 'selected' : '' %>>1 Year</option>
-                <option value="2 Years" <%= product.warranty === '2 Years' ? 'selected' : '' %>>2 Years</option>
-                <option value="3 Years" <%= product.warranty === '3 Years' ? 'selected' : '' %>>3 Years</option>
-                <option value="Limited Lifetime" <%= product.warranty === 'Limited Lifetime' ? 'selected' : '' %>>Limited Lifetime</option>
-              </select>
-              <div id="warranty-error" class="error-message"></div>
-            </div>
-            <div class="mb-4">
-              <label class="form-label">Movement Type</label>
-              <select class="form-select" name="movementType">
-                <option value="" <%= !product.movementType ? 'selected' : '' %>>Select Movement Type</option>
-                <option value="Quartz" <%= product.movementType === 'Quartz' ? 'selected' : '' %>>Quartz</option>
-                <option value="Automatic" <%= product.movementType === 'Automatic' ? 'selected' : '' %>>Automatic</option>
-                <option value="Manual" <%= product.movementType === 'Manual' ? 'selected' : '' %>>Manual</option>
-                <option value="Solar" <%= product.movementType === 'Solar' ? 'selected' : '' %>>Solar</option>
-              </select>
-              <div id="movementType-error" class="error-message"></div>
-            </div>
-            <div class="card mb-4">
-              <div class="card-header">
-                <h4>Watch Images (Up to 4)</h4>
-              </div>
-              <div class="card-body">
-                <div class="row">
-                  <% for (let i = 1; i <= 4; i++) { %>
-                    <div class="col-md-6 mb-3">
-                      <label for="input<%= i %>">Image <%= i %></label>
-                      <input class="form-control" type="file" name="images" id="input<%= i %>" accept="image/*" onchange="viewImage(event, <%= i %>)" />
-                      <img src="<%= product.images[i-1] || '' %>" alt="" id="imgView<%= i %>" class="mt-2" style="max-height: 150px; display: <%= product.images[i-1] ? 'block' : 'none' %>;" />
-                      <div class="crop-container" id="cropContainer<%= i %>">
-                        <canvas id="cropCanvas<%= i %>"></canvas>
-                        <div class="crop-box" id="cropBox<%= i %>">
-                          <div class="resize-handle"></div>
-                        </div>
-                        <button type="button" class="btn btn-success btn-sm mt-2" onclick="saveCrop(<%= i %>)">Save Crop</button>
-                        <input type="hidden" name="cropData<%= i %>" id="cropData<%= i %>" value="">
-                      </div>
-                    </div>
-                  <% } %>
+        <% } %>
+          <div class="card mb-4">
+            <div class="card-body">
+              <form method="post" action="/admin/editProduct/<%= product._id %>" enctype="multipart/form-data"
+                onsubmit="return validateForm()">
+                <div class="mb-4">
+                  <label for="product_name" class="form-label">Watch Name</label>
+                  <input type="text" placeholder="e.g., TIMZO Chrono X" name="productName" class="form-control"
+                    id="product_name" value="<%= product.name %>" />
+                  <div id="productName-error" class="error-message"></div>
                 </div>
-                <div id="images-error" class="error-message"></div>
-                <div id="thumbnailsContainer" class="thumbnails-container"></div>
-              </div>
+                <div class="mb-4">
+                  <label class="form-label">Brand</label>
+                  <select class="form-select" name="brand">
+                    <option value="">Select Brand</option>
+                    <% brand.forEach(b=> { %>
+                      <option value="<%= b._id %>" <%=product.brand._id.toString()===b._id.toString() ? 'selected' : ''
+                        %>><%= b.name %>
+                      </option>
+                      <% }) %>
+                  </select>
+                  <div id="brand-error" class="error-message"></div>
+                </div>
+                <div class="mb-4">
+                  <label class="form-label">Category</label>
+                  <select class="form-select" name="category">
+                    <option value="">Select Category</option>
+                    <% cat.forEach(c=> { %>
+                      <option value="<%= c._id %>" <%=product.category._id.toString()===c._id.toString() ? 'selected'
+                        : '' %>><%= c.name %>
+                      </option>
+                      <% }) %>
+                  </select>
+                  <div id="category-error" class="error-message"></div>
+                </div>
+                <div class="mb-4">
+                  <label for="descriptionid" class="form-label">Description</label>
+                  <textarea placeholder="Describe the watch..." name="description" class="form-control"
+                    id="descriptionid" rows="4"><%= product.description %></textarea>
+                  <div id="description-error" class="error-message"></div>
+                </div>
+                <div class="row">
+                  <div class="col-lg-4 mb-4">
+                    <label class="form-label">Regular Price</label>
+                    <input placeholder="$" name="regularPrice" type="text" class="form-control"
+                      value="<%= product.regularPrice %>" />
+                    <div id="regularPrice-error" class="error-message"></div>
+                  </div>
+                  <div class="col-lg-4 mb-4">
+                    <label class="form-label">Stock</label>
+                    <input name="stock" type="text" class="form-control" value="<%= product.stock %>" />
+                    <div id="stock-error" class="error-message"></div>
+                  </div>
+                </div>
+                <div class="mb-4">
+                  <label class="form-label">Color</label>
+                  <input name="color" type="text" placeholder="e.g., Black" class="form-control"
+                    value="<%= product.color %>" />
+                  <div id="color-error" class="error-message"></div>
+                </div>
+                <div class="mb-4">
+                  <label class="form-label">Material</label>
+                  <input name="material" type="text" placeholder="e.g., Stainless Steel" class="form-control"
+                    value="<%= product.material %>" />
+                  <div id="material-error" class="error-message"></div>
+                </div>
+                <div class="mb-4">
+                  <label class="form-label">Water Resistance</label>
+                  <select class="form-select" name="waterResistance">
+                    <option value="Not specified" <%=product.waterResistance==='Not specified' ? 'selected' : '' %>>Not
+                      specified</option>
+                    <option value="30m" <%=product.waterResistance==='30m' ? 'selected' : '' %>>30m</option>
+                    <option value="50m" <%=product.waterResistance==='50m' ? 'selected' : '' %>>50m</option>
+                    <option value="100m" <%=product.waterResistance==='100m' ? 'selected' : '' %>>100m</option>
+                    <option value="200m" <%=product.waterResistance==='200m' ? 'selected' : '' %>>200m</option>
+                    <option value="300m" <%=product.waterResistance==='300m' ? 'selected' : '' %>>300m</option>
+                  </select>
+                  <div id="waterResistance-error" class="error-message"></div>
+                </div>
+                <div class="mb-4">
+                  <label class="form-label">Warranty</label>
+                  <select class="form-select" name="warranty">
+                    <option value="1 Year" <%=product.warranty==='1 Year' ? 'selected' : '' %>>1 Year</option>
+                    <option value="2 Years" <%=product.warranty==='2 Years' ? 'selected' : '' %>>2 Years</option>
+                    <option value="3 Years" <%=product.warranty==='3 Years' ? 'selected' : '' %>>3 Years</option>
+                    <option value="Limited Lifetime" <%=product.warranty==='Limited Lifetime' ? 'selected' : '' %>
+                      >Limited Lifetime</option>
+                  </select>
+                  <div id="warranty-error" class="error-message"></div>
+                </div>
+                <div class="mb-4">
+                  <label class="form-label">Movement Type</label>
+                  <select class="form-select" name="movementType">
+                    <option value="" <%=!product.movementType ? 'selected' : '' %>>Select Movement Type</option>
+                    <option value="Quartz" <%=product.movementType==='Quartz' ? 'selected' : '' %>>Quartz</option>
+                    <option value="Automatic" <%=product.movementType==='Automatic' ? 'selected' : '' %>>Automatic
+                    </option>
+                    <option value="Manual" <%=product.movementType==='Manual' ? 'selected' : '' %>>Manual</option>
+                    <option value="Solar" <%=product.movementType==='Solar' ? 'selected' : '' %>>Solar</option>
+                  </select>
+                  <div id="movementType-error" class="error-message"></div>
+                </div>
+                <div class="card mb-4">
+                  <div class="card-header">
+                    <h4>Watch Images (Up to 4)</h4>
+                  </div>
+                  <div class="card-body">
+                    <div class="row">
+                      <% for (let i=1; i <=4; i++) { %>
+                        <div class="col-md-6 mb-3">
+                          <label for="input<%= i %>">Image <%= i %></label>
+                          <input class="form-control" type="file" name="images" id="input<%= i %>" accept="image/*"
+                            onchange="viewImage(event, <%= i %>)" />
+                          <img src="<%= product.images[i-1] || '' %>" alt="" id="imgView<%= i %>" class="mt-2"
+                            style="max-height: 150px; display: <%= product.images[i-1] ? 'block' : 'none' %>;" />
+                          <div class="crop-container" id="cropContainer<%= i %>">
+                            <canvas id="cropCanvas<%= i %>"></canvas>
+                            <div class="crop-box" id="cropBox<%= i %>">
+                              <div class="resize-handle"></div>
+                            </div>
+                            <button type="button" class="btn btn-success btn-sm mt-2" onclick="saveCrop(<%= i %>)">Save
+                              Crop</button>
+                            <input type="hidden" name="cropData<%= i %>" id="cropData<%= i %>" value="">
+                          </div>
+                        </div>
+                        <% } %>
+                    </div>
+                    <div id="images-error" class="error-message"></div>
+                    <div id="thumbnailsContainer" class="thumbnails-container"></div>
+                  </div>
+                </div>
+                <button class="btn btn-md rounded btn-primary" type="submit">Update Watch</button>
+                <a href="/admin/getProduct" class="btn btn-md rounded btn-secondary">Cancel</a>
+              </form>
             </div>
-            <button class="btn btn-md rounded btn-primary" type="submit">Update Watch</button>
-            <a href="/admin/getProduct" class="btn btn-md rounded btn-secondary">Cancel</a>
-          </form>
-        </div>
-      </div>
+          </div>
     </section>
     <%- include('.././Partials/admin/footer') %>
   </div>
@@ -185,37 +316,36 @@
     let currentCropIndex = null;
     let cropData = {};
 
-function viewImage(event, index) {
-  const input = event.target;
-  const file = input.files[0];
-  if (!file) return;
+    function viewImage(event, index) {
+      const input = event.target;
+      const file = input.files[0];
+      if (!file) return;
 
-  // ✅ Validate file type
-  const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
-  if (!allowedTypes.includes(file.type)) {
-    Swal.fire({
-      icon: 'error',
-      title: 'Unsupported File',
-      text: 'Please upload only JPEG, PNG, or WEBP image files.',
-    });
-    input.value = ''; // Reset the file input
-    return;
-  }
+      const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+      if (!allowedTypes.includes(file.type)) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Unsupported File',
+          text: 'Please upload only JPEG, PNG, or WEBP image files.',
+        });
+        input.value = '';
+        return;
+      }
 
-  const reader = new FileReader();
-  reader.onload = function () {
-    const dataURL = reader.result;
-    const image = document.getElementById(`imgView${index}`);
-    image.src = dataURL;
-    image.style.display = 'block';
+      const reader = new FileReader();
+      reader.onload = function () {
+        const dataURL = reader.result;
+        const image = document.getElementById(`imgView${index}`);
+        image.src = dataURL;
+        image.style.display = 'block';
 
-    const cropContainer = document.getElementById(`cropContainer${index}`);
-    cropContainer.style.display = 'block';
-    setupCropper(index, image);
-    handleFileSelect();
-  };
-  reader.readAsDataURL(file);
-}
+        const cropContainer = document.getElementById(`cropContainer${index}`);
+        cropContainer.style.display = 'block';
+        setupCropper(index, image);
+        handleFileSelect();
+      };
+      reader.readAsDataURL(file);
+    }
 
     function setupCropper(index, image) {
       const canvas = document.getElementById(`cropCanvas${index}`);
@@ -428,4 +558,5 @@ function viewImage(event, index) {
     }
   </script>
 </body>
+
 </html>

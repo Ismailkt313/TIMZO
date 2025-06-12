@@ -7,8 +7,8 @@ const categorySchema = new mongoose.Schema({
   categoryOffer: { type: Number, default: 0 },
   sales: { type: Number, default: 0 },
   stock: { type: Number, default: 0 },
-  isDeleted: { type: Boolean, default: false }, 
-  deletedAt: { type: Date } 
+  isDeleted: { type: Boolean, default: false },
+  deletedAt: { type: Date }
 });
- 
+
 module.exports = mongoose.model('Category', categorySchema);

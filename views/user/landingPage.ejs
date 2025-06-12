@@ -1,878 +1,1143 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Timzo - Premium Watches</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css">
-    <link rel="icon" type="image/x-icon" href="/images/TIMZO.jpg">
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css" />
+    <link rel="icon" type="image/x-icon" href="/images/TIMZO.jpg" />
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: #f9fafb;
-            color: #a6b5ca;
-            margin: 0;
-        }
-        .fullbody{
-            background-color: #9eb5d6;
-        }
-        .quick-view-text {
-            cursor: pointer;
-            color: #555;
-            font-size: 14px;
-            font-weight: 500;
-            transition: color 0.2s ease;
-            display: block;
-            text-align: center;
-            margin-bottom: 8px;
-        }
-        .quick-view-text:hover {
-            color: #ff8800;
-            text-decoration: underline;
-        }
-        .btn-custom {
-            background-color: #ff8800;
-            color: white;
-            border: none;
-            padding: 6px 16px;
-            font-size: 14px;
-            transition: background-color 0.3s;
-        }
-        .btn-custom:hover {
-            background-color: #e07000;
-        }
-        a {
-            text-decoration: none !important;
-            color: inherit;
-        }
-        a:hover {
-            color: #ffd700;
-        }
+      body {
+        font-family: "Poppins", sans-serif;
+        background-color: #f9fafb;
+        color: #a6b5ca;
+        margin: 0;
+      }
+      .fullbody {
+        background-color: #9eb5d6;
+      }
+      .quick-view-text {
+        cursor: pointer;
+        color: #555;
+        font-size: 14px;
+        font-weight: 500;
+        transition: color 0.2s ease;
+        display: block;
+        text-align: center;
+        margin-bottom: 8px;
+      }
+      .quick-view-text:hover {
+        color: #ff8800;
+        text-decoration: underline;
+      }
+      .btn-custom {
+        background-color: #ff8800;
+        color: white;
+        border: none;
+        padding: 6px 16px;
+        font-size: 14px;
+        transition: background-color 0.3s;
+      }
+      .btn-custom:hover {
+        background-color: #e07000;
+      }
+      a {
+        text-decoration: none !important;
+        color: inherit;
+      }
+      a:hover {
+        color: #ffd700;
+      }
+      .hero-carousel {
+        position: relative;
+        height: 600px;
+      }
+      .carousel-item {
+        background-size: cover;
+        background-position: center;
+        height: 600px;
+        position: relative;
+        transition: transform 0.6s ease-in-out;
+      }
+      .carousel-item.active {
+        transform: scale(1.02);
+      }
+      .carousel-item::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          to bottom,
+          rgba(0, 0, 0, 0.7),
+          rgba(0, 0, 0, 0.5)
+        );
+      }
+      .carousel-caption {
+        top: 50%;
+        transform: translateY(-50%);
+        text-align: left;
+        max-width: 600px;
+      }
+      .carousel-control-prev,
+      .carousel-control-next {
+        width: 5%;
+        background: rgba(0, 0, 0, 0.3);
+        border-radius: 50%;
+        margin: 0 20px;
+        transition: background 0.3s ease;
+      }
+      .carousel-control-prev:hover,
+      .carousel-control-next:hover {
+        background: rgba(0, 0, 0, 0.6);
+      }
+      .carousel-indicators [data-bs-target] {
+        background-color: #ffd700;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        margin: 0 5px;
+      }
+      .carousel-indicators .active {
+        background-color: #facc15;
+      }
+      .btn-gold {
+        background: linear-gradient(45deg, #ffd700, #facc15);
+        color: #1f2937;
+        padding: 0.75rem 2rem;
+        border-radius: 9999px;
+        font-weight: 600;
+        transition: transform 0.3s ease, background 0.3s ease;
+      }
+      .btn-gold:hover {
+        transform: scale(1.05);
+        background: linear-gradient(45deg, #facc15, #ffd700);
+      }
+      .product-card {
+        position: relative;
+        background: #fff;
+        border-radius: 12px;
+        overflow: hidden;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+      .product-card:hover {
+        transform: scale(1.03);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+      }
+      .product-card img {
+        height: 200px;
+        object-fit: cover;
+        width: 100%;
+      }
+      .product-card .badge {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        font-size: 0.75rem;
+        padding: 0.5rem;
+      }
+      .product-card .product-title,
+      .product-card .product-price {
+        color: #1f2937 !important;
+      }
+      .filter-bar {
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        padding: 1rem;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        margin-bottom: 2rem;
+      }
+      .filter-bar .btn {
+        transition: background 0.3s ease, color 0.3s ease;
+      }
+      .filter-bar .btn:hover {
+        background: #ffd700;
+        color: #1f2937;
+      }
+      .filter-bar .active {
+        background: #ffd700;
+        color: #1f2937;
+      }
+      .sale-banner {
+        position: relative;
+        padding: 100px 0;
+        background: url("https://images.unsplash.com/photo-1543163521-1bf539c55dd2")
+          center center fixed;
+        background-size: cover;
+      }
+      .sale-banner::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          to bottom,
+          rgba(0, 0, 0, 0.8),
+          rgba(0, 0, 0, 0.6)
+        );
+      }
+      .countdown-timer {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        margin-top: 1rem;
+      }
+      .countdown-timer div {
+        background: #fff;
+        color: #1f2937;
+        padding: 0.75rem;
+        border-radius: 8px;
+        text-align: center;
+        min-width: 60px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      }
+      .section-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 2rem;
+        text-align: center;
+        position: relative;
+      }
+      .section-title::after {
+        content: "";
+        width: 60px;
+        height: 4px;
+        background: #ffd700;
+        position: absolute;
+        bottom: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+      .watch-gallery .gallery-item {
+        position: relative;
+        border-radius: 12px;
+        overflow: hidden;
+        height: 300px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+      .watch-gallery .gallery-item:hover {
+        transform: scale(1.03);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+      }
+      .watch-gallery img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      .modal-content {
+        border-radius: 12px;
+        border: none;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+      }
+      .modal-body {
+        padding: 2rem;
+      }
+      .modal-body h4 {
+        font-size: 1.75rem;
+        margin-bottom: 1rem;
+      }
+      .modal-body .text-muted {
+        font-size: 1rem;
+        margin-bottom: 0.5rem;
+      }
+      .modal-body .fw-bold {
+        font-size: 1.25rem;
+        color: #1f2937;
+        margin-bottom: 1rem;
+      }
+      .modal-body p {
+        font-size: 1rem;
+        line-height: 1.6;
+        margin-bottom: 1.5rem;
+      }
+      .modal-body .rating {
+        margin-bottom: 1.5rem;
+      }
+      .modal-loading {
+        display: none;
+        text-align: center;
+        padding: 2rem;
+      }
+      .modal-loading .spinner-border {
+        color: #ff8800;
+      }
+      .wishlist-btn {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: rgba(255, 255, 255, 0.8);
+        border: none;
+        border-radius: 50%;
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        color: #6b7280;
+        transition: color 0.3s ease, background 0.3s ease;
+      }
+      .wishlist-btn:hover {
+        background: #ffd700;
+        color: #1f2937;
+      }
+      .wishlist-btn.active {
+        color: #ef4444;
+        background: #ffe4e1;
+      }
+      @media (max-width: 768px) {
         .hero-carousel {
-            position: relative;
-            height: 600px;
+          height: 400px;
         }
         .carousel-item {
-            background-size: cover;
-            background-position: center;
-            height: 600px;
-            position: relative;
-            transition: transform 0.6s ease-in-out;
-        }
-        .carousel-item.active {
-            transform: scale(1.02);
-        }
-        .carousel-item::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.5));
+          height: 400px;
         }
         .carousel-caption {
-            top: 50%;
-            transform: translateY(-50%);
-            text-align: left;
-            max-width: 600px;
+          text-align: center;
+          max-width: 100%;
+          padding: 0 1rem;
         }
-        .carousel-control-prev,
-        .carousel-control-next {
-            width: 5%;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 50%;
-            margin: 0 20px;
-            transition: background 0.3s ease;
+        .carousel-caption h1 {
+          font-size: 2rem;
         }
-        .carousel-control-prev:hover,
-        .carousel-control-next:hover {
-            background: rgba(0, 0, 0, 0.6);
-        }
-        .carousel-indicators [data-bs-target] {
-            background-color: #ffd700;
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            margin: 0 5px;
-        }
-        .carousel-indicators .active {
-            background-color: #facc15;
-        }
-        .btn-gold {
-            background: linear-gradient(45deg, #ffd700, #facc15);
-            color: #1f2937;
-            padding: 0.75rem 2rem;
-            border-radius: 9999px;
-            font-weight: 600;
-            transition: transform 0.3s ease, background 0.3s ease;
-        }
-        .btn-gold:hover {
-            transform: scale(1.05);
-            background: linear-gradient(45deg, #facc15, #ffd700);
-        }
-        .product-card {
-            position: relative;
-            background: #fff;
-            border-radius: 12px;
-            overflow: hidden;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        .product-card:hover {
-            transform: scale(1.03);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-        }
-        .product-card img {
-            height: 200px;
-            object-fit: cover;
-            width: 100%;
-        }
-        .product-card .badge {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            font-size: 0.75rem;
-            padding: 0.5rem;
-        }
-        .product-card .product-title,
-        .product-card .product-price {
-            color: #1f2937 !important;
+        .carousel-caption p {
+          font-size: 1rem;
         }
         .filter-bar {
-            background: #fff;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            padding: 1rem;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            margin-bottom: 2rem;
-        }
-        .filter-bar .btn {
-            transition: background 0.3s ease, color 0.3s ease;
-        }
-        .filter-bar .btn:hover {
-            background: #ffd700;
-            color: #1f2937;
-        }
-        .filter-bar .active {
-            background: #ffd700;
-            color: #1f2937;
+          position: static;
         }
         .sale-banner {
-            position: relative;
-            padding: 100px 0;
-            background: url('https://images.unsplash.com/photo-1543163521-1bf539c55dd2') center center fixed;
-            background-size: cover;
+          padding: 60px 0;
         }
-        .sale-banner::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.6));
-        }
-        .countdown-timer {
-            display: flex;
-            gap: 1rem;
-            justify-content: center;
-            margin-top: 1rem;
-        }
-        .countdown-timer div {
-            background: #fff;
-            color: #1f2937;
-            padding: 0.75rem;
-            border-radius: 8px;
-            text-align: center;
-            min-width: 60px;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-        }
-        .section-title {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: #1f2937;
-            margin-bottom: 2rem;
-            text-align: center;
-            position: relative;
-        }
-        .section-title::after {
-            content: '';
-            width: 60px;
-            height: 4px;
-            background: #ffd700;
-            position: absolute;
-            bottom: -10px;
-            left: 50%;
-            transform: translateX(-50%);
+        .product-card img {
+          height: 150px;
         }
         .watch-gallery .gallery-item {
-            position: relative;
-            border-radius: 12px;
-            overflow: hidden;
-            height: 300px;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+          height: 200px;
         }
-        .watch-gallery .gallery-item:hover {
-            transform: scale(1.03);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        .section-title {
+          font-size: 2rem;
         }
-        .watch-gallery img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        .modal-content {
-            border-radius: 12px;
-            border: none;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-        }
-        .modal-body {
-            padding: 2rem;
-        }
-        .modal-body h4 {
-            font-size: 1.75rem;
-            margin-bottom: 1rem;
-        }
-        .modal-body .text-muted {
-            font-size: 1rem;
-            margin-bottom: 0.5rem;
-        }
-        .modal-body .fw-bold {
-            font-size: 1.25rem;
-            color: #1f2937;
-            margin-bottom: 1rem;
-        }
-        .modal-body p {
-            font-size: 1rem;
-            line-height: 1.6;
-            margin-bottom: 1.5rem;
-        }
-        .modal-body .rating {
-            margin-bottom: 1.5rem;
-        }
-        .modal-loading {
-            display: none;
-            text-align: center;
-            padding: 2rem;
-        }
-        .modal-loading .spinner-border {
-            color: #ff8800;
-        }
-        .wishlist-btn {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: rgba(255, 255, 255, 0.8);
-            border: none;
-            border-radius: 50%;
-            width: 36px;
-            height: 36px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.25rem;
-            color: #6b7280;
-            transition: color 0.3s ease, background 0.3s ease;
-        }
-        .wishlist-btn:hover {
-            background: #ffd700;
-            color: #1f2937;
-        }
-        .wishlist-btn.active {
-            color: #ef4444;
-            background: #ffe4e1;
-        }
-        @media (max-width: 768px) {
-            .hero-carousel {
-                height: 400px;
-            }
-            .carousel-item {
-                height: 400px;
-            }
-            .carousel-caption {
-                text-align: center;
-                max-width: 100%;
-                padding: 0 1rem;
-            }
-            .carousel-caption h1 {
-                font-size: 2rem;
-            }
-            .carousel-caption p {
-                font-size: 1rem;
-            }
-            .filter-bar {
-                position: static;
-            }
-            .sale-banner {
-                padding: 60px 0;
-            }
-            .product-card img {
-                height: 150px;
-            }
-            .watch-gallery .gallery-item {
-                height: 200px;
-            }
-            .section-title {
-                font-size: 2rem;
-            }
-        }
+      }
     </style>
-</head>
-<body class="fullbody">
-    <%- include('../Partials/user/navbar', { user: user, cartCount: cartCount, search: search }) %>
+  </head>
+  <body class="fullbody">
+    <%- include('../Partials/user/navbar', { user: user, cartCount: cartCount,
+    search: search }) %>
 
     <div class="toast-container position-fixed bottom-0 end-0 p-3">
-        <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
-            <div class="toast-header">
-                <strong class="me-auto">Notification</strong>
-                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-            </div>
-            <div class="toast-body">
-            </div>
+      <div
+        id="liveToast"
+        class="toast"
+        role="alert"
+        aria-live="assertive"
+        aria-atomic="true"
+      >
+        <div class="toast-header">
+          <strong class="me-auto">Notification</strong>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="toast"
+            aria-label="Close"
+          ></button>
         </div>
+        <div class="toast-body"></div>
+      </div>
     </div>
 
-    <div id="heroCarousel" class="carousel slide hero-carousel carousel-slide" data-bs-ride="carousel">
-        <div class="carousel-indicators">
-            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
-            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
+    <div
+      id="heroCarousel"
+      class="carousel slide hero-carousel carousel-slide"
+      data-bs-ride="carousel"
+    >
+      <div class="carousel-indicators">
+        <button
+          type="button"
+          data-bs-target="#heroCarousel"
+          data-bs-slide-to="0"
+          class="active"
+          aria-current="true"
+          aria-label="Slide 1"
+        ></button>
+        <button
+          type="button"
+          data-bs-target="#heroCarousel"
+          data-bs-slide-to="1"
+          aria-label="Slide 2"
+        ></button>
+      </div>
+      <div class="carousel-inner">
+        <div
+          class="carousel-item active"
+          style="
+            background-image: url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c');
+          "
+          data-bs-interval="3000"
+        >
+          <div class="carousel-caption">
+            <h1
+              class="display-4 fw-bold"
+              data-aos="fade-up"
+              data-aos-duration="1000"
+            >
+              New Year, Big Sale
+            </h1>
+            <p
+              class="lead"
+              data-aos="fade-up"
+              data-aos-delay="200"
+              data-aos-duration="1000"
+            >
+              Up to 50% Off Premium Watches
+            </p>
+            <a
+              href="/products"
+              class="btn btn-gold"
+              data-aos="fade-up"
+              data-aos-delay="400"
+              data-aos-duration="1000"
+              aria-label="Shop Now"
+              >Shop Now</a
+            >
+          </div>
         </div>
-        <div class="carousel-inner">
-            <div class="carousel-item active" style="background-image: url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c');" data-bs-interval="3000">
-                <div class="carousel-caption">
-                    <h1 class="display-4 fw-bold" data-aos="fade-up" data-aos-duration="1000">New Year, Big Sale</h1>
-                    <p class="lead" data-aos="fade-up" data-aos-delay="200" data-aos-duration="1000">Up to 50% Off Premium Watches</p>
-                    <a href="/products" class="btn btn-gold" data-aos="fade-up" data-aos-delay="400" data-aos-duration="1000" aria-label="Shop Now">Shop Now</a>
-                </div>
-            </div>
-            <div class="carousel-item" style="background-image: url('https://images.unsplash.com/photo-1524592094714-0f0654e20314');" data-bs-interval="3000">
-                <div class="carousel-caption">
-                    <h1 class="display-4 fw-bold" data-aos="fade-up" data-aos-duration="1000">Timeless Elegance</h1>
-                    <p class="lead" data-aos="fade-up" data-aos-delay="200" data-aos-duration="1000">Discover Our Latest Collections</p>
-                    <a href="/products" class="btn btn-gold" data-aos="fade-up" data-aos-delay="400" data-aos-duration="1000" aria-label="Explore Now">Explore Now</a>
-                </div>
-            </div>
+        <div
+          class="carousel-item"
+          style="
+            background-image: url('https://images.unsplash.com/photo-1524592094714-0f0654e20314');
+          "
+          data-bs-interval="3000"
+        >
+          <div class="carousel-caption">
+            <h1
+              class="display-4 fw-bold"
+              data-aos="fade-up"
+              data-aos-duration="1000"
+            >
+              Timeless Elegance
+            </h1>
+            <p
+              class="lead"
+              data-aos="fade-up"
+              data-aos-delay="200"
+              data-aos-duration="1000"
+            >
+              Discover Our Latest Collections
+            </p>
+            <a
+              href="/products"
+              class="btn btn-gold"
+              data-aos="fade-up"
+              data-aos-delay="400"
+              data-aos-duration="1000"
+              aria-label="Explore Now"
+              >Explore Now</a
+            >
+          </div>
         </div>
-        <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev" aria-label="Previous Slide">
-            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Previous</span>
-        </button>
-        <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next" aria-label="Next Slide">
-            <span class="carousel-control-next-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Next</span>
-        </button>
+      </div>
+      <button
+        class="carousel-control-prev"
+        type="button"
+        data-bs-target="#heroCarousel"
+        data-bs-slide="prev"
+        aria-label="Previous Slide"
+      >
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Previous</span>
+      </button>
+      <button
+        class="carousel-control-next"
+        type="button"
+        data-bs-target="#heroCarousel"
+        data-bs-slide="next"
+        aria-label="Next Slide"
+      >
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Next</span>
+      </button>
     </div>
-
 
     <section class="container my-5" data-aos="fade-up">
-        <h2 class="section-title">New Arrivals</h2>
-        <div class="row g-4" id="newArrivals">
-            <% newArrivals && newArrivals.forEach(product => { %>
-                <div class="col-6 col-md-3" data-brand="<%= product.brand?.name || 'Unknown' %>" data-price="<%= product.salePrice || 0 %>" data-rating="<%= product.rating || 0 %>" data-product-id="<%= product._id %>" data-aos="fade-up">
-                    <div class="product-card">
-                        <% if (product.createdAt && product.createdAt > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)) { %>
-                            <span class="badge bg-success">New</span>
-                        <% } else if (product.regularPrice && product.salePrice < product.regularPrice) { %>
-                            <span class="badge bg-danger">Sale</span>
-                        <% } %>
-                        <button class="wishlist-btn <%= wishlist.includes(product._id.toString()) ? 'active' : '' %>" data-product-id="<%= product._id %>" aria-label="Toggle Wishlist">
-                            <i class="<%= wishlist.includes(product._id.toString()) ? 'fas fa-heart' : 'far fa-heart' %>"></i>
-                        </button>
-                        <a href="/products/<%= product._id %>" aria-label="View <%= product.name %>">
-                            <img src="<%= product.images && product.images[0] || '/images/placeholder.jpg' %>" class="card-img-top" alt="<%= product.name %>">
-                            <div class="card-body text-center">
-                                <h5 class="product-title"><%= product.name %></h5>
-                                <p class="text-muted"><%= product.brand?.name || 'No Brand' %></p>
-                                <div class="rating">
-                                    <% for(let i = 0; i < Math.floor(product.rating || 0); i++) { %>
-                                        <i class="fas fa-star text-warning" aria-hidden="true"></i>
-                                    <% } %>
-                                    <% for(let i = Math.floor(product.rating || 0); i < 5; i++) { %>
-                                        <i class="far fa-star text-muted" aria-hidden="true"></i>
-                                    <% } %>
-                                </div>
-                                <p class="product-price fw-bold">₹<%= product.salePrice?.toFixed(2) || '0.00' %></p>
-                            </div>
-                        </a>
-                        <span class="quick-view-text" data-bs-toggle="modal" data-bs-target="#quickViewModal" data-product-id="<%= product._id %>">
-                            Quick View
-                        </span>
-                        <div class="text-center mt-2">
-                            <button class="btn btn-success btn-custom btn-sm add-to-cart" onclick="addToCart('<%= product._id %>')">
-                                Add to Cart
-                            </button>
-                        </div>
-                    </div>
+      <h2 class="section-title">New Arrivals</h2>
+      <div class="row g-4" id="newArrivals">
+        <% newArrivals && newArrivals.forEach(product => { %>
+        <div
+          class="col-6 col-md-3"
+          data-brand="<%= product.brand?.name || 'Unknown' %>"
+          data-price="<%= product.salePrice || 0 %>"
+          data-rating="<%= product.rating || 0 %>"
+          data-product-id="<%= product._id %>"
+          data-aos="fade-up"
+        >
+          <div class="product-card">
+            <% if (product.createdAt && product.createdAt > new Date(Date.now()
+            - 7 * 24 * 60 * 60 * 1000)) { %>
+            <span class="badge bg-success">New</span>
+            <% } else if (product.regularPrice && product.salePrice <
+            product.regularPrice) { %>
+            <span class="badge bg-danger">Sale</span>
+            <% } %>
+            <button
+              class="wishlist-btn <%= wishlist.includes(product._id.toString()) ? 'active' : '' %>"
+              data-product-id="<%= product._id %>"
+              aria-label="Toggle Wishlist"
+            >
+              <i
+                class="<%= wishlist.includes(product._id.toString()) ? 'fas fa-heart' : 'far fa-heart' %>"
+              ></i>
+            </button>
+            <a
+              href="/products/<%= product._id %>"
+              aria-label="View <%= product.name %>"
+            >
+              <img
+                src="<%= product.images && product.images[0] || '/images/placeholder.jpg' %>"
+                class="card-img-top"
+                alt="<%= product.name %>"
+              />
+              <div class="card-body text-center">
+                <h5 class="product-title"><%= product.name %></h5>
+                <p class="text-muted">
+                  <%= product.brand?.name || 'No Brand' %>
+                </p>
+                <div class="rating">
+                  <% for(let i = 0; i < Math.floor(product.rating || 0); i++) {
+                  %>
+                  <i class="fas fa-star text-warning" aria-hidden="true"></i>
+                  <% } %> <% for(let i = Math.floor(product.rating || 0); i < 5;
+                  i++) { %>
+                  <i class="far fa-star text-muted" aria-hidden="true"></i>
+                  <% } %>
                 </div>
-            <% }); %>
+                <p class="product-price fw-bold">
+                  ₹<%= product.salePrice?.toFixed(2) || '0.00' %>
+                </p>
+              </div>
+            </a>
+            <span
+              class="quick-view-text"
+              data-bs-toggle="modal"
+              data-bs-target="#quickViewModal"
+              data-product-id="<%= product._id %>"
+            >
+              Quick View
+            </span>
+            <div class="text-center mt-2">
+              <button
+                class="btn btn-success btn-custom btn-sm add-to-cart"
+                onclick="addToCart('<%= product._id %>')"
+              >
+                Add to Cart
+              </button>
+            </div>
+          </div>
         </div>
+        <% }); %>
+      </div>
     </section>
 
     <section class="sale-banner text-white text-center" data-aos="fade-up">
-        <div class="container">
-            <h2 class="display-5 fw-bold">Limited Time Offer</h2>
-            <p class="lead">Up to 50% Off - Grab It Fast!</p>
-            <div class="countdown-timer" id="countdown">
-                <div><span id="days">00</span><br>Days</div>
-                <div><span id="hours">00</span><br>Hours</div>
-                <div><span id="minutes">00</span><br>Minutes</div>
-                <div><span id="seconds">00</span><br>Seconds</div>
-            </div>
-            <a href="/products?sale=true" class="btn btn-gold mt-4" aria-label="Shop Sale Items">Shop Sale</a>
+      <div class="container">
+        <h2 class="display-5 fw-bold">Limited Time Offer</h2>
+        <p class="lead">Up to 50% Off - Grab It Fast!</p>
+        <div class="countdown-timer" id="countdown">
+          <div><span id="days">00</span><br />Days</div>
+          <div><span id="hours">00</span><br />Hours</div>
+          <div><span id="minutes">00</span><br />Minutes</div>
+          <div><span id="seconds">00</span><br />Seconds</div>
         </div>
+        <a
+          href="/products?sale=true"
+          class="btn btn-gold mt-4"
+          aria-label="Shop Sale Items"
+          >Shop Sale</a
+        >
+      </div>
     </section>
 
     <section class="container my-5" data-aos="fade-up">
-        <h2 class="section-title">Trending</h2>
-        <div class="row g-4" id="trendingProducts">
-            <% trendingProducts && trendingProducts.forEach(product => { %>
-                <div class="col-6 col-md-3" data-brand="<%= product.brand?.name || 'Unknown' %>" data-price="<%= product.salePrice || 0 %>" data-rating="<%= product.rating || 0 %>" data-product-id="<%= product._id %>" data-aos="fade-up">
-                    <div class="product-card">
-                        <% if (product.createdAt && product.createdAt > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)) { %>
-                            <span class="badge bg-success">New</span>
-                        <% } else if (product.regularPrice && product.salePrice < product.regularPrice) { %>
-                            <span class="badge bg-danger">Sale</span>
-                        <% } %>
-                        <button class="wishlist-btn <%= wishlist.includes(product._id.toString()) ? 'active' : '' %>" data-product-id="<%= product._id %>" aria-label="Toggle Wishlist">
-                            <i class="<%= wishlist.includes(product._id.toString()) ? 'fas fa-heart' : 'far fa-heart' %>"></i>
-                        </button>
-                        <a href="/products/<%= product._id %>" aria-label="View <%= product.name %>">
-                            <img src="<%= product.images && product.images[0] || '/images/placeholder.jpg' %>" class="card-img-top" alt="<%= product.name %>">
-                            <div class="card-body text-center">
-                                <h5 class="product-title"><%= product.name %></h5>
-                                <p class="text-muted"><%= product.brand?.name || 'No Brand' %></p>
-                                <div class="rating">
-                                    <% for(let i = 0; i < Math.floor(product.rating || 0); i++) { %>
-                                        <i class="fas fa-star text-warning" aria-hidden="true"></i>
-                                    <% } %>
-                                    <% for(let i = Math.floor(product.rating || 0); i < 5; i++) { %>
-                                        <i class="far fa-star text-muted" aria-hidden="true"></i>
-                                    <% } %>
-                                </div>
-                                <p class="product-price fw-bold">₹<%= product.salePrice?.toFixed(2) || '0.00' %></p>
-                            </div>
-                        </a>
-                        <span class="quick-view-text" data-bs-toggle="modal" data-bs-target="#quickViewModal" data-product-id="<%= product._id %>">
-                            Quick View
-                        </span>
-                        <div class="text-center mt-2">
-                            <button class="btn btn-success btn-custom btn-sm add-to-cart" onclick="addToCart('<%= product._id %>')">
-                                Add to Cart
-                            </button>
-                        </div>
-                    </div>
+      <h2 class="section-title">Trending</h2>
+      <div class="row g-4" id="trendingProducts">
+        <% trendingProducts && trendingProducts.forEach(product => { %>
+        <div
+          class="col-6 col-md-3"
+          data-brand="<%= product.brand?.name || 'Unknown' %>"
+          data-price="<%= product.salePrice || 0 %>"
+          data-rating="<%= product.rating || 0 %>"
+          data-product-id="<%= product._id %>"
+          data-aos="fade-up"
+        >
+          <div class="product-card">
+            <% if (product.createdAt && product.createdAt > new Date(Date.now()
+            - 7 * 24 * 60 * 60 * 1000)) { %>
+            <span class="badge bg-success">New</span>
+            <% } else if (product.regularPrice && product.salePrice <
+            product.regularPrice) { %>
+            <span class="badge bg-danger">Sale</span>
+            <% } %>
+            <button
+              class="wishlist-btn <%= wishlist.includes(product._id.toString()) ? 'active' : '' %>"
+              data-product-id="<%= product._id %>"
+              aria-label="Toggle Wishlist"
+            >
+              <i
+                class="<%= wishlist.includes(product._id.toString()) ? 'fas fa-heart' : 'far fa-heart' %>"
+              ></i>
+            </button>
+            <a
+              href="/products/<%= product._id %>"
+              aria-label="View <%= product.name %>"
+            >
+              <img
+                src="<%= product.images && product.images[0] || '/images/placeholder.jpg' %>"
+                class="card-img-top"
+                alt="<%= product.name %>"
+              />
+              <div class="card-body text-center">
+                <h5 class="product-title"><%= product.name %></h5>
+                <p class="text-muted">
+                  <%= product.brand?.name || 'No Brand' %>
+                </p>
+                <div class="rating">
+                  <% for(let i = 0; i < Math.floor(product.rating || 0); i++) {
+                  %>
+                  <i class="fas fa-star text-warning" aria-hidden="true"></i>
+                  <% } %> <% for(let i = Math.floor(product.rating || 0); i < 5;
+                  i++) { %>
+                  <i class="far fa-star text-muted" aria-hidden="true"></i>
+                  <% } %>
                 </div>
-            <% }); %>
+                <p class="product-price fw-bold">
+                  ₹<%= product.salePrice?.toFixed(2) || '0.00' %>
+                </p>
+              </div>
+            </a>
+            <span
+              class="quick-view-text"
+              data-bs-toggle="modal"
+              data-bs-target="#quickViewModal"
+              data-product-id="<%= product._id %>"
+            >
+              Quick View
+            </span>
+            <div class="text-center mt-2">
+              <button
+                class="btn btn-success btn-custom btn-sm add-to-cart"
+                onclick="addToCart('<%= product._id %>')"
+              >
+                Add to Cart
+              </button>
+            </div>
+          </div>
         </div>
+        <% }); %>
+      </div>
     </section>
 
-          <section class="container my-5 watch-gallery" data-aos="fade-up">
-        <h2 class="section-title">Featured Watches</h2>
-        <div class="row g-4">
-            <div class="col-md-4 col-6">
-                <div class="gallery-item">
-                    <img src="https://images.unsplash.com/photo-1523170335258-f5ed11844a49" alt="Fastrack Automatics">
-                </div>
-            </div>
-            <div class="col-md-4 col-6">
-                <div class="gallery-item">
-                    <img src="https://images.unsplash.com/photo-1542496658-e33a6d0d50f6" alt="Rolex Classic">
-                </div>
-            </div>
-            <div class="col-md-4 col-6">
-                <div class="gallery-item">
-                    <img src="https://images.unsplash.com/photo-1594576722512-582bcd46fba3" alt="Luxury Chronograph">
-                </div>
-            </div>
-            <div class="col-md-4 col-6">
-                <div class="gallery-item">
-                    <img src="https://images.unsplash.com/photo-1612817288484-6f916006741a" alt="Classic Diver">
-                </div>
-            </div>
-            <div class="col-md-4 col-6">
-                <div class="gallery-item">
-                    <img src="https://images.unsplash.com/photo-1522312346375-d1a52e2b99b3" alt="Minimalist Watch">
-                </div>
-            </div>
-            <div class="col-md-4 col-6">
-                <div class="gallery-item">
-                    <img src="https://tse1.mm.bing.net/th?id=OIP.YhEUnnUK46ymQHtzJFfWbgHaHa&pid=Api&P=0&h=180" alt="Sport Chrono">
-                </div>
-            </div>
+    <section class="container my-5 watch-gallery" data-aos="fade-up">
+      <h2 class="section-title">Featured Watches</h2>
+      <div class="row g-4">
+        <div class="col-md-4 col-6">
+          <div class="gallery-item">
+            <img
+              src="https://images.unsplash.com/photo-1523170335258-f5ed11844a49"
+              alt="Fastrack Automatics"
+            />
+          </div>
         </div>
+        <div class="col-md-4 col-6">
+          <div class="gallery-item">
+            <img
+              src="https://images.unsplash.com/photo-1542496658-e33a6d0d50f6"
+              alt="Rolex Classic"
+            />
+          </div>
+        </div>
+        <div class="col-md-4 col-6">
+          <div class="gallery-item">
+            <img
+              src="https://images.unsplash.com/photo-1594576722512-582bcd46fba3"
+              alt="Luxury Chronograph"
+            />
+          </div>
+        </div>
+        <div class="col-md-4 col-6">
+          <div class="gallery-item">
+            <img
+              src="https://images.unsplash.com/photo-1612817288484-6f916006741a"
+              alt="Classic Diver"
+            />
+          </div>
+        </div>
+        <div class="col-md-4 col-6">
+          <div class="gallery-item">
+            <img
+              src="https://images.unsplash.com/photo-1522312346375-d1a52e2b99b3"
+              alt="Minimalist Watch"
+            />
+          </div>
+        </div>
+        <div class="col-md-4 col-6">
+          <div class="gallery-item">
+            <img
+              src="https://tse1.mm.bing.net/th?id=OIP.YhEUnnUK46ymQHtzJFfWbgHaHa&pid=Api&P=0&h=180"
+              alt="Sport Chrono"
+            />
+          </div>
+        </div>
+      </div>
     </section>
-
-    
 
     <section class="container my-5" data-aos="fade-up">
-        <h2 class="section-title">Explore More</h2>
-        <div class="row g-4" id="exploreProducts">
-            <% exploreProducts && exploreProducts.forEach(product => { %>
-                <div class="col-6 col-md-3" data-brand="<%= product.brand?.name || 'Unknown' %>" data-price="<%= product.salePrice || 0 %>" data-rating="<%= product.rating || 0 %>" data-product-id="<%= product._id %>" data-aos="fade-up">
-                    <div class="product-card">
-                        <% if (product.createdAt && product.createdAt > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)) { %>
-                            <span class="badge bg-success">New</span>
-                        <% } else if (product.regularPrice && product.salePrice < product.regularPrice) { %>
-                            <span class="badge bg-danger">Sale</span>
-                        <% } %>
-                        <button class="wishlist-btn <%= wishlist.includes(product._id.toString()) ? 'active' : '' %>" data-product-id="<%= product._id %>" aria-label="Toggle Wishlist">
-                            <i class="<%= wishlist.includes(product._id.toString()) ? 'fas fa-heart' : 'far fa-heart' %>"></i>
-                        </button>
-                        <a href="/products/<%= product._id %>" aria-label="View <%= product.name %>">
-                            <img src="<%= product.images && product.images[0] || '/images/placeholder.jpg' %>" class="card-img-top" alt="<%= product.name %>">
-                            <div class="card-body text-center">
-                                <h5 class="product-title"><%= product.name %></h5>
-                                <p class="text-muted"><%= product.brand?.name || 'No Brand' %></p>
-                                <div class="rating">
-                                    <% for(let i = 0; i < Math.floor(product.rating || 0); i++) { %>
-                                        <i class="fas fa-star text-warning" aria-hidden="true"></i>
-                                    <% } %>
-                                    <% for(let i = Math.floor(product.rating || 0); i < 5; i++) { %>
-                                        <i class="far fa-star text-muted" aria-hidden="true"></i>
-                                    <% } %>
-                                </div>
-                                <p class="product-price fw-bold">₹<%= product.salePrice?.toFixed(2) || '0.00' %></p>
-                            </div>
-                        </a>
-                        <span class="quick-view-text" data-bs-toggle="modal" data-bs-target="#quickViewModal" data-product-id="<%= product._id %>">
-                            Quick View
-                        </span>
-                        <div class="text-center mt-2">
-                            <button class="btn btn-success btn-custom btn-sm add-to-cart" onclick="addToCart('<%= product._id %>')">
-                                Add to Cart
-                            </button>
-                        </div>
-                    </div>
+      <h2 class="section-title">Explore More</h2>
+      <div class="row g-4" id="exploreProducts">
+        <% exploreProducts && exploreProducts.forEach(product => { %>
+        <div
+          class="col-6 col-md-3"
+          data-brand="<%= product.brand?.name || 'Unknown' %>"
+          data-price="<%= product.salePrice || 0 %>"
+          data-rating="<%= product.rating || 0 %>"
+          data-product-id="<%= product._id %>"
+          data-aos="fade-up"
+        >
+          <div class="product-card">
+            <% if (product.createdAt && product.createdAt > new Date(Date.now()
+            - 7 * 24 * 60 * 60 * 1000)) { %>
+            <span class="badge bg-success">New</span>
+            <% } else if (product.regularPrice && product.salePrice <
+            product.regularPrice) { %>
+            <span class="badge bg-danger">Sale</span>
+            <% } %>
+            <button
+              class="wishlist-btn <%= wishlist.includes(product._id.toString()) ? 'active' : '' %>"
+              data-product-id="<%= product._id %>"
+              aria-label="Toggle Wishlist"
+            >
+              <i
+                class="<%= wishlist.includes(product._id.toString()) ? 'fas fa-heart' : 'far fa-heart' %>"
+              ></i>
+            </button>
+            <a
+              href="/products/<%= product._id %>"
+              aria-label="View <%= product.name %>"
+            >
+              <img
+                src="<%= product.images && product.images[0] || '/images/placeholder.jpg' %>"
+                class="card-img-top"
+                alt="<%= product.name %>"
+              />
+              <div class="card-body text-center">
+                <h5 class="product-title"><%= product.name %></h5>
+                <p class="text-muted">
+                  <%= product.brand?.name || 'No Brand' %>
+                </p>
+                <div class="rating">
+                  <% for(let i = 0; i < Math.floor(product.rating || 0); i++) {
+                  %>
+                  <i class="fas fa-star text-warning" aria-hidden="true"></i>
+                  <% } %> <% for(let i = Math.floor(product.rating || 0); i < 5;
+                  i++) { %>
+                  <i class="far fa-star text-muted" aria-hidden="true"></i>
+                  <% } %>
                 </div>
-            <% }); %>
+                <p class="product-price fw-bold">
+                  ₹<%= product.salePrice?.toFixed(2) || '0.00' %>
+                </p>
+              </div>
+            </a>
+            <span
+              class="quick-view-text"
+              data-bs-toggle="modal"
+              data-bs-target="#quickViewModal"
+              data-product-id="<%= product._id %>"
+            >
+              Quick View
+            </span>
+            <div class="text-center mt-2">
+              <button
+                class="btn btn-success btn-custom btn-sm add-to-cart"
+                onclick="addToCart('<%= product._id %>')"
+              >
+                Add to Cart
+              </button>
+            </div>
+          </div>
         </div>
+        <% }); %>
+      </div>
     </section>
 
-    <div class="modal fade" id="quickViewModal" tabindex="-1" aria-labelledby="quickViewModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="quickViewModalLabel">Product Details</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-loading">
-                    <div class="spinner-border" role="status">
-                        <span class="visually-hidden">Loading...</span>
-                    </div>
-                    <p>Loading product details...</p>
-                </div>
-                <div class="modal-body" style="display: none;">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <img id="quickViewImage" src="" class="img-fluid rounded" alt="Product">
-                        </div>
-                        <div class="col-md-6">
-                            <h4 id="quickViewName"></h4>
-                            <p id="quickViewBrand" class="text-muted"></p>
-                            <p id="quickViewPrice" class="fw-bold"></p>
-                            <p id="quickViewDescription"></p>
-                            <div class="rating" id="quickViewRating"></div>
-                            <input type="number" id="quickViewQuantityInput" class="form-control d-inline-block w-25 mb-2" min="1" value="1">
-                            <button class="btn btn-custom add-to-cart" onclick="addToCart(document.getElementById('quickViewAddToCart').getAttribute('data-product-id'))" id="quickViewAddToCart" data-product-id="">Add to Cart</button>
-                        </div>
-                    </div>
-                </div>
+    <div
+      class="modal fade"
+      id="quickViewModal"
+      tabindex="-1"
+      aria-labelledby="quickViewModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="quickViewModalLabel">
+              Product Details
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-loading">
+            <div class="spinner-border" role="status">
+              <span class="visually-hidden">Loading...</span>
             </div>
+            <p>Loading product details...</p>
+          </div>
+          <div class="modal-body" style="display: none">
+            <div class="row">
+              <div class="col-md-6">
+                <img
+                  id="quickViewImage"
+                  src=""
+                  class="img-fluid rounded"
+                  alt="Product"
+                />
+              </div>
+              <div class="col-md-6">
+                <h4 id="quickViewName"></h4>
+                <p id="quickViewBrand" class="text-muted"></p>
+                <p id="quickViewPrice" class="fw-bold"></p>
+                <p id="quickViewDescription"></p>
+                <div class="rating" id="quickViewRating"></div>
+                <input
+                  type="number"
+                  id="quickViewQuantityInput"
+                  class="form-control d-inline-block w-25 mb-2"
+                  min="1"
+                  value="1"
+                />
+                <button
+                  class="btn btn-custom add-to-cart"
+                  onclick="addToCart(document.getElementById('quickViewAddToCart').getAttribute('data-product-id'))"
+                  id="quickViewAddToCart"
+                  data-product-id=""
+                >
+                  Add to Cart
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
+      </div>
     </div>
-
-  
 
     <%- include('.././Partials/user/footer') %>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script>
-    AOS.init({ duration: 800, once: true });
+      AOS.init({ duration: 800, once: true });
 
-    const toastEl = document.getElementById('liveToast');
-    const toast = new bootstrap.Toast(toastEl);
+      const toastEl = document.getElementById('liveToast');
+      const toast = new bootstrap.Toast(toastEl);
 
-    const initialWishlist = <%- JSON.stringify(wishlist) %>;
-    console.log('Initial wishlist from server:', initialWishlist);
+      const initialWishlist = <%- JSON.stringify(wishlist) %>;
+      console.log('Initial wishlist from server:', initialWishlist);
 
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', e => {
-            e.preventDefault();
-            const target = document.querySelector(anchor.getAttribute('href'));
-            if (target) {
-                target.scrollIntoView({ behavior: 'smooth' });
-            }
-        });
-    });
+      document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+          anchor.addEventListener('click', e => {
+              e.preventDefault();
+              const target = document.querySelector(anchor.getAttribute('href'));
+              if (target) {
+                  target.scrollIntoView({ behavior: 'smooth' });
+              }
+          });
+      });
 
-    function startCountdown() {
-        const endDate = new Date('2025-12-31T23:59:59').getTime();
-        const timer = setInterval(() => {
-            const now = new Date().getTime();
-            const distance = endDate - now;
-            if (distance < 0) {
-                clearInterval(timer);
-                document.getElementById('countdown').innerHTML = '<p>Sale Ended!</p>';
-                return;
-            }
-            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-            document.getElementById('days').textContent = days.toString().padStart(2, '0');
-            document.getElementById('hours').textContent = hours.toString().padStart(2, '0');
-            document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
-            document.getElementById('seconds').textContent = seconds.toString().padStart(2, '0');
-        }, 1000);
-    }
-    startCountdown();
+      function startCountdown() {
+          const endDate = new Date('2025-12-31T23:59:59').getTime();
+          const timer = setInterval(() => {
+              const now = new Date().getTime();
+              const distance = endDate - now;
+              if (distance < 0) {
+                  clearInterval(timer);
+                  document.getElementById('countdown').innerHTML = '<p>Sale Ended!</p>';
+                  return;
+              }
+              const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+              const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+              const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+              const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+              document.getElementById('days').textContent = days.toString().padStart(2, '0');
+              document.getElementById('hours').textContent = hours.toString().padStart(2, '0');
+              document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
+              document.getElementById('seconds').textContent = seconds.toString().padStart(2, '0');
+          }, 1000);
+      }
+      startCountdown();
 
-    async function syncWishlist() {
-        const isLoggedIn = <%= user ? 'true' : 'false' %>;
-        if (!isLoggedIn) return;
+      async function syncWishlist() {
+          const isLoggedIn = <%= user ? 'true' : 'false' %>;
+          if (!isLoggedIn) return;
 
-        try {
-            const response = await fetch('/user/wishlist', {
-                method: 'GET',
-                headers: { 'Content-Type': 'application/json' }
-            });
-            const data = await response.json();
-            console.log('Wishlist from server:', data.wishlist);
-            if (data.success && data.wishlist) {
-                const wishlist = data.wishlist.map(item => item.productId._id.toString());
-                document.querySelectorAll('.wishlist-btn').forEach(button => {
-                    const productId = button.getAttribute('data-product-id');
-                    const isInWishlist = wishlist.includes(productId);
-                    button.classList.toggle('active', isInWishlist);
-                    const icon = button.querySelector('i');
-                    icon.classList.toggle('far', !isInWishlist);
-                    icon.classList.toggle('fas', isInWishlist);
-                });
-            }
-        } catch (error) {
-            console.error('Error syncing wishlist:', error);
-        }
-    }
+          try {
+              const response = await fetch('/user/wishlist', {
+                  method: 'GET',
+                  headers: { 'Content-Type': 'application/json' }
+              });
+              const data = await response.json();
+              console.log('Wishlist from server:', data.wishlist);
+              if (data.success && data.wishlist) {
+                  const wishlist = data.wishlist.map(item => item.productId._id.toString());
+                  document.querySelectorAll('.wishlist-btn').forEach(button => {
+                      const productId = button.getAttribute('data-product-id');
+                      const isInWishlist = wishlist.includes(productId);
+                      button.classList.toggle('active', isInWishlist);
+                      const icon = button.querySelector('i');
+                      icon.classList.toggle('far', !isInWishlist);
+                      icon.classList.toggle('fas', isInWishlist);
+                  });
+              }
+          } catch (error) {
+              console.error('Error syncing wishlist:', error);
+          }
+      }
 
-    window.addEventListener('load', syncWishlist);
+      window.addEventListener('load', syncWishlist);
 
-    function addToCart(productId) {
-        const quantityInput = document.getElementById(`quantityInput-${productId}`) || document.getElementById('quickViewQuantityInput');
-        const quantity = parseInt(quantityInput ? quantityInput.value : 1);
-        const isLoggedIn = <%= user ? 'true' : 'false' %>;
-        if (!isLoggedIn) {
-            Swal.fire({
-                icon: 'warning',
-                title: 'Please Log In',
-                text: 'You need to be logged in to add items to your cart.',
-                confirmButtonText: 'Log In'
-            }).then(result => {
-                if (result.isConfirmed) window.location.href = '/login';
-            });
-            return;
-        }
-        fetch('/user/add-to-cart', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                productId: productId,
-                quantity: quantity
-            })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                toastEl.querySelector('.toast-body').textContent = data.message || 'Product added to cart';
-                toast.show();
-                const cartCountElement = document.querySelector('.cart-count');
-                if (cartCountElement) {
-                    cartCountElement.textContent = data.cartCount || (parseInt(cartCountElement.textContent) + quantity);
-                }
-            } else {
-                toastEl.querySelector('.toast-body').textContent = data.message || 'Failed to add item to cart';
-                toast.show();
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            toastEl.querySelector('.toast-body').textContent = 'An error occurred while adding item to cart';
-            toast.show();
-        });
-    }
+      function addToCart(productId) {
+          const quantityInput = document.getElementById(`quantityInput-${productId}`) || document.getElementById('quickViewQuantityInput');
+          const quantity = parseInt(quantityInput ? quantityInput.value : 1);
+          const isLoggedIn = <%= user ? 'true' : 'false' %>;
+          if (!isLoggedIn) {
+              Swal.fire({
+                  icon: 'warning',
+                  title: 'Please Log In',
+                  text: 'You need to be logged in to add items to your cart.',
+                  confirmButtonText: 'Log In'
+              }).then(result => {
+                  if (result.isConfirmed) window.location.href = '/login';
+              });
+              return;
+          }
+          fetch('/user/add-to-cart', {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                  productId: productId,
+                  quantity: quantity
+              })
+          })
+          .then(response => response.json())
+          .then(data => {
+              if (data.success) {
+                  toastEl.querySelector('.toast-body').textContent = data.message || 'Product added to cart';
+                  toast.show();
+                  const cartCountElement = document.querySelector('.cart-count');
+                  if (cartCountElement) {
+                      cartCountElement.textContent = data.cartCount || (parseInt(cartCountElement.textContent) + quantity);
+                  }
+              } else {
+                  toastEl.querySelector('.toast-body').textContent = data.message || 'Failed to add item to cart';
+                  toast.show();
+              }
+          })
+          .catch(error => {
+              console.error('Error:', error);
+              toastEl.querySelector('.toast-body').textContent = 'An error occurred while adding item to cart';
+              toast.show();
+          });
+      }
 
-    document.querySelectorAll('.wishlist-btn').forEach(button => {
-        button.addEventListener('click', async (e) => {
-            e.stopPropagation();
-            const productId = button.getAttribute('data-product-id');
-            const isLoggedIn = <%= user ? 'true' : 'false' %>;
+      document.querySelectorAll('.wishlist-btn').forEach(button => {
+          button.addEventListener('click', async (e) => {
+              e.stopPropagation();
+              const productId = button.getAttribute('data-product-id');
+              const isLoggedIn = <%= user ? 'true' : 'false' %>;
 
-            if (!isLoggedIn) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Please Log In',
-                    text: 'You need to be logged in to add items to your wishlist.',
-                    confirmButtonText: 'Log In'
-                }).then(result => {
-                    if (result.isConfirmed) window.location.href = '/login';
-                });
-                return;
-            }
+              if (!isLoggedIn) {
+                  Swal.fire({
+                      icon: 'warning',
+                      title: 'Please Log In',
+                      text: 'You need to be logged in to add items to your wishlist.',
+                      confirmButtonText: 'Log In'
+                  }).then(result => {
+                      if (result.isConfirmed) window.location.href = '/login';
+                  });
+                  return;
+              }
 
-            try {
-                const isInWishlist = button.classList.contains('active');
-                const endpoint = isInWishlist ? '/user/remove-from-wishlist' : '/user/wishlist/add';
-                const response = await fetch(endpoint, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ productId })
-                });
+              try {
+                  const isInWishlist = button.classList.contains('active');
+                  const endpoint = isInWishlist ? '/user/remove-from-wishlist' : '/user/wishlist/add';
+                  const response = await fetch(endpoint, {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ productId })
+                  });
 
-                const data = await response.json();
-                if (data.success) {
-                    button.classList.toggle('active');
-                    button.querySelector('i').classList.toggle('far');
-                    button.querySelector('i').classList.toggle('fas');
-                    toastEl.querySelector('.toast-body').textContent = data.message || (isInWishlist ? 'Removed from Wishlist' : 'Added to Wishlist');
-                    toast.show();
-                    console.log(`Product ${productId} ${isInWishlist ? 'removed from' : 'added to'} wishlist`); 
-                } else {
-                    toastEl.querySelector('.toast-body').textContent = data.message || 'Failed to update wishlist';
-                    toast.show();
-                }
-            } catch (error) {
-                console.error('Error updating wishlist:', error);
-                toastEl.querySelector('.toast-body').textContent = 'An error occurred while updating wishlist';
-                toast.show();
-            }
-        });
-    });
+                  const data = await response.json();
+                  if (data.success) {
+                      button.classList.toggle('active');
+                      button.querySelector('i').classList.toggle('far');
+                      button.querySelector('i').classList.toggle('fas');
+                      toastEl.querySelector('.toast-body').textContent = data.message || (isInWishlist ? 'Removed from Wishlist' : 'Added to Wishlist');
+                      toast.show();
+                      console.log(`Product ${productId} ${isInWishlist ? 'removed from' : 'added to'} wishlist`);
+                  } else {
+                      toastEl.querySelector('.toast-body').textContent = data.message || 'Failed to update wishlist';
+                      toast.show();
+                  }
+              } catch (error) {
+                  console.error('Error updating wishlist:', error);
+                  toastEl.querySelector('.toast-body').textContent = 'An error occurred while updating wishlist';
+                  toast.show();
+              }
+          });
+      });
 
-    document.querySelectorAll('.quick-view-text').forEach(span => {
-        span.addEventListener('click', async (e) => {
-            e.stopPropagation();
-            const productId = span.getAttribute('data-product-id');
-            const productCard = document.querySelector(`[data-product-id="${productId}"]`);
-            if (!productCard) return;
+      document.querySelectorAll('.quick-view-text').forEach(span => {
+          span.addEventListener('click', async (e) => {
+              e.stopPropagation();
+              const productId = span.getAttribute('data-product-id');
+              const productCard = document.querySelector(`[data-product-id="${productId}"]`);
+              if (!productCard) return;
 
-            const modalLoading = document.querySelector('#quickViewModal .modal-loading');
-            const modalBody = document.querySelector('#quickViewModal .modal-body');
-            modalLoading.style.display = 'block';
-            modalBody.style.display = 'none';
+              const modalLoading = document.querySelector('#quickViewModal .modal-loading');
+              const modalBody = document.querySelector('#quickViewModal .modal-body');
+              modalLoading.style.display = 'block';
+              modalBody.style.display = 'none';
 
-            try {
-                let name = productCard.querySelector('.product-title')?.textContent || 'Unknown Product';
-                let brand = productCard.querySelector('.text-muted')?.textContent || 'No Brand';
-                let price = productCard.querySelector('.product-price')?.textContent || '$0.00';
-                let image = productCard.querySelector('img')?.src || '/images/placeholder.jpg';
-                let rating = parseFloat(productCard.getAttribute('data-rating') || 0);
-                let description = '';
+              try {
+                  let name = productCard.querySelector('.product-title')?.textContent || 'Unknown Product';
+                  let brand = productCard.querySelector('.text-muted')?.textContent || 'No Brand';
+                  let price = productCard.querySelector('.product-price')?.textContent || '$0.00';
+                  let image = productCard.querySelector('img')?.src || '/images/placeholder.jpg';
+                  let rating = parseFloat(productCard.getAttribute('data-rating') || 0);
+                  let description = '';
 
-                const products = [
-                    ...(<%- JSON.stringify(newArrivals || []) %>),
-                    ...(<%- JSON.stringify(trendingProducts || []) %>),
-                    ...(<%- JSON.stringify(exploreProducts || []) %>)
-                ];
-                const product = products.find(p => p._id.toString() === productId);
-                if (product?.description) {
-                    description = product.description;
-                } else {
-                    const response = await fetch(`/products/${productId}`, {
-                        method: 'GET',
-                        headers: { 'Content-Type': 'application/json' }
-                    });
-                    const data = await response.json();
-                    if (data.success && data.product) {
-                        name = data.product.name || name;
-                        brand = data.product.brand?.name || brand;
-                        price = `$${data.product.salePrice?.toFixed(2) || '0.00'}`;
-                        image = data.product.images && data.product.images[0] || image;
-                        rating = data.product.rating || rating;
-                        description = data.product.description || 'No description available.';
-                    } else {
-                        description = 'No description available.';
-                    }
-                }
+                  const products = [
+                      ...(<%- JSON.stringify(newArrivals || []) %>),
+                      ...(<%- JSON.stringify(trendingProducts || []) %>),
+                      ...(<%- JSON.stringify(exploreProducts || []) %>)
+                  ];
+                  const product = products.find(p => p._id.toString() === productId);
+                  if (product?.description) {
+                      description = product.description;
+                  } else {
+                      const response = await fetch(`/products/${productId}`, {
+                          method: 'GET',
+                          headers: { 'Content-Type': 'application/json' }
+                      });
+                      const data = await response.json();
+                      if (data.success && data.product) {
+                          name = data.product.name || name;
+                          brand = data.product.brand?.name || brand;
+                          price = `$${data.product.salePrice?.toFixed(2) || '0.00'}`;
+                          image = data.product.images && data.product.images[0] || image;
+                          rating = data.product.rating || rating;
+                          description = data.product.description || 'No description available.';
+                      } else {
+                          description = 'No description available.';
+                      }
+                  }
 
-                document.getElementById('quickViewName').textContent = name;
-                document.getElementById('quickViewBrand').textContent = brand;
-                document.getElementById('quickViewPrice').textContent = price;
-                document.getElementById('quickViewImage').src = image;
-                document.getElementById('quickViewDescription').innerHTML = description;
-                document.getElementById('quickViewAddToCart').setAttribute('data-product-id', productId);
+                  document.getElementById('quickViewName').textContent = name;
+                  document.getElementById('quickViewBrand').textContent = brand;
+                  document.getElementById('quickViewPrice').textContent = price;
+                  document.getElementById('quickViewImage').src = image;
+                  document.getElementById('quickViewDescription').innerHTML = description;
+                  document.getElementById('quickViewAddToCart').setAttribute('data-product-id', productId);
 
-                const ratingContainer = document.getElementById('quickViewRating');
-                ratingContainer.innerHTML = '';
-                for (let i = 0; i < Math.floor(rating); i++) {
-                    ratingContainer.innerHTML += '<i class="fas fa-star text-warning" aria-hidden="true"></i>';
-                }
-                for (let i = Math.floor(rating); i < 5; i++) {
-                    ratingContainer.innerHTML += '<i class="far fa-star text-muted" aria-hidden="true"></i>';
-                }
+                  const ratingContainer = document.getElementById('quickViewRating');
+                  ratingContainer.innerHTML = '';
+                  for (let i = 0; i < Math.floor(rating); i++) {
+                      ratingContainer.innerHTML += '<i class="fas fa-star text-warning" aria-hidden="true"></i>';
+                  }
+                  for (let i = Math.floor(rating); i < 5; i++) {
+                      ratingContainer.innerHTML += '<i class="far fa-star text-muted" aria-hidden="true"></i>';
+                  }
 
-                modalLoading.style.display = 'none';
-                modalBody.style.display = 'block';
-            } catch (error) {
-                console.error('Error loading Quick View:', error);
-                modalLoading.style.display = 'none';
-                modalBody.style.display = 'block';
-                document.getElementById('quickViewDescription').innerHTML = 'Error loading product details.';
-            }
-        });
-    });
+                  modalLoading.style.display = 'none';
+                  modalBody.style.display = 'block';
+              } catch (error) {
+                  console.error('Error loading Quick View:', error);
+                  modalLoading.style.display = 'none';
+                  modalBody.style.display = 'block';
+                  document.getElementById('quickViewDescription').innerHTML = 'Error loading product details.';
+              }
+          });
+      });
 
-    function applyFilters(sectionId, sortSelectId) {
-        const section = document.getElementById(sectionId);
-        if (!section) return;
-        const sortSelect = document.getElementById(sortSelectId);
-        if (!sortSelect) return;
-        const sort = sortSelect.value;
-        const brand = section.querySelector('.filter-brand.active')?.getAttribute('data-brand') || 'all';
+      function applyFilters(sectionId, sortSelectId) {
+          const section = document.getElementById(sectionId);
+          if (!section) return;
+          const sortSelect = document.getElementById(sortSelectId);
+          if (!sortSelect) return;
+          const sort = sortSelect.value;
+          const brand = section.querySelector('.filter-brand.active')?.getAttribute('data-brand') || 'all';
 
-        const products = Array.from(section.querySelectorAll('.col-6'));
-        products.sort((a, b) => {
-            const aPrice = parseFloat(a.getAttribute('data-price') || 0);
-            const bPrice = parseFloat(b.getAttribute('data-price') || 0);
-            const aRating = parseFloat(a.getAttribute('data-rating') || 0);
-            const bRating = parseFloat(a.getAttribute('data-rating') || 0);
+          const products = Array.from(section.querySelectorAll('.col-6'));
+          products.sort((a, b) => {
+              const aPrice = parseFloat(a.getAttribute('data-price') || 0);
+              const bPrice = parseFloat(b.getAttribute('data-price') || 0);
+              const aRating = parseFloat(a.getAttribute('data-rating') || 0);
+              const bRating = parseFloat(a.getAttribute('data-rating') || 0);
 
-            if (sort === 'price-asc') return aPrice - bPrice;
-            if (sort === 'price-desc') return bPrice - aPrice;
-            if (sort === 'rating-desc') return bRating - aRating;
-            return 0;
-        });
+              if (sort === 'price-asc') return aPrice - bPrice;
+              if (sort === 'price-desc') return bPrice - aPrice;
+              if (sort === 'rating-desc') return bRating - aRating;
+              return 0;
+          });
 
-        products.forEach(product => {
-            const productBrand = product.getAttribute('data-brand') || 'Unknown';
-            product.style.display = (brand === 'all' || brand === productBrand) ? 'block' : 'none';
-        });
+          products.forEach(product => {
+              const productBrand = product.getAttribute('data-brand') || 'Unknown';
+              product.style.display = (brand === 'all' || brand === productBrand) ? 'block' : 'none';
+          });
 
-        section.innerHTML = '';
-        products.forEach(product => section.appendChild(product));
-    }
+          section.innerHTML = '';
+          products.forEach(product => section.appendChild(product));
+      }
 
-    ['newArrivals', 'trendingProducts', 'exploreProducts'].forEach(sectionId => {
-        const sortSelect = document.getElementById(`sort${sectionId.charAt(0).toUpperCase() + sectionId.slice(1)}`);
-        if (sortSelect) {
-            sortSelect.addEventListener('change', () => applyFilters(sectionId, sortSelect.id));
-        }
+      ['newArrivals', 'trendingProducts', 'exploreProducts'].forEach(sectionId => {
+          const sortSelect = document.getElementById(`sort${sectionId.charAt(0).toUpperCase() + sectionId.slice(1)}`);
+          if (sortSelect) {
+              sortSelect.addEventListener('change', () => applyFilters(sectionId, sortSelect.id));
+          }
 
-        document.querySelectorAll(`#${sectionId} .filter-brand`).forEach(button => {
-            button.addEventListener('click', () => {
-                document.querySelectorAll(`#${sectionId} .filter-brand`).forEach(btn => btn.classList.remove('active'));
-                button.classList.add('active');
-                applyFilters(sectionId, sortSelect?.id);
-            });
-        });
-    });
-</script>
-</body>
-</html> 
+          document.querySelectorAll(`#${sectionId} .filter-brand`).forEach(button => {
+              button.addEventListener('click', () => {
+                  document.querySelectorAll(`#${sectionId} .filter-brand`).forEach(btn => btn.classList.remove('active'));
+                  button.classList.add('active');
+                  applyFilters(sectionId, sortSelect?.id);
+              });
+          });
+      });
+    </script>
+  </body>
+</html>

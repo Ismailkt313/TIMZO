@@ -88,7 +88,7 @@ const updateReview = async (req, res) => {
 
 const deleteReview = async (req, res) => {
   try {
-    const userId  = req.session.user._id;
+    const userId = req.session.user._id;
     const reviewId = req.params.reviewId;
 
     const review = await Review.findById(reviewId);
@@ -100,7 +100,7 @@ const deleteReview = async (req, res) => {
       return res.status(403).json({ message: 'Not authorized to delete this review' });
     }
 
-await Review.findByIdAndDelete(reviewId);
+    await Review.findByIdAndDelete(reviewId);
 
     res.status(200).json({
       success: true,
@@ -113,4 +113,3 @@ await Review.findByIdAndDelete(reviewId);
 };
 
 module.exports = { submitReview, updateReview, deleteReview };
-  

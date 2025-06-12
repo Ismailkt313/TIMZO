@@ -1,4 +1,4 @@
-const Cart = require('../Model/cartSchema'); 
+const Cart = require('../Model/cartSchema');
 
 const cartCountMiddleware = async (req, res, next) => {
     try {
@@ -14,7 +14,7 @@ const cartCountMiddleware = async (req, res, next) => {
     } catch (err) {
         console.error("Error in cartCountMiddleware:", err);
         res.locals.cartCount = 0;
-        next(); // don't block the request
+        next();
     }
 };
 

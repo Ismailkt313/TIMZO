@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -18,11 +19,13 @@
             margin: 0;
             overflow-x: hidden;
         }
+
         .sales-report-section {
             max-width: 1200px;
             margin: auto;
             padding: 1.5rem;
         }
+
         .sales-report-card {
             background: #ffffff;
             border-radius: 1.25rem;
@@ -31,6 +34,7 @@
             position: relative;
             overflow: hidden;
         }
+
         .sales-report-card::before {
             content: '';
             position: absolute;
@@ -40,6 +44,7 @@
             height: 4px;
             background: linear-gradient(90deg, #28a745, #34c759);
         }
+
         .filter-form {
             display: flex;
             flex-wrap: wrap;
@@ -50,6 +55,7 @@
             border-radius: 0.625rem;
             align-items: center;
         }
+
         .filter-form select,
         .filter-form input {
             padding: 0.5rem 0.75rem;
@@ -58,6 +64,7 @@
             font-size: 0.875rem;
             min-width: 120px;
         }
+
         .filter-form button {
             background: linear-gradient(90deg, #212529, #343a40);
             color: #ffffff;
@@ -66,21 +73,26 @@
             font-weight: 500;
             transition: all 0.3s ease;
         }
+
         .filter-form button:hover {
             background: linear-gradient(90deg, #28a745, #34c759);
         }
+
         .filter-form .download-btn {
             background: linear-gradient(90deg, #2563eb, #3b82f6);
         }
+
         .filter-form .download-btn:hover {
             background: linear-gradient(90deg, #1e40af, #2563eb);
         }
+
         .summary-box {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 1rem;
             margin-bottom: 1.5rem;
         }
+
         .summary-card {
             background: #f8f9fa;
             padding: 1rem;
@@ -88,22 +100,26 @@
             text-align: center;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
         }
+
         .summary-card h3 {
             font-size: 1rem;
             color: #6c757d;
             margin-bottom: 0.5rem;
         }
+
         .summary-card p {
             font-size: 1.25rem;
             font-weight: 600;
             color: #212529;
         }
+
         .sales-table {
             width: 100%;
             border-collapse: separate;
             border-spacing: 0;
             margin-top: 1rem;
         }
+
         .sales-table th,
         .sales-table td {
             padding: 0.75rem 1rem;
@@ -111,15 +127,18 @@
             border-bottom: 1px solid #e9ecef;
             font-size: 0.875rem;
         }
+
         .sales-table th {
             background: #f1f3f5;
             color: #343a40;
             font-weight: 600;
         }
+
         .discount-row {
             color: #28a745;
             font-weight: 500;
         }
+
         .chart-container {
             margin: 2rem auto;
             padding: 1.5rem;
@@ -128,12 +147,14 @@
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
             max-width: 1000px;
         }
+
         .pagination {
             display: flex;
             justify-content: center;
             align-items: center;
             margin-top: 1.5rem;
         }
+
         .pagination a {
             padding: 0.5rem 0.75rem;
             margin: 0 0.25rem;
@@ -143,179 +164,212 @@
             color: #343a40;
             transition: all 0.3s ease;
         }
+
         .pagination a:hover {
             background-color: #28a745;
             color: #ffffff;
             border-color: #28a745;
         }
+
         .pagination a.disabled {
             pointer-events: none;
             color: #6c757d;
             border-color: #d1d5db;
             background-color: #f8f9fa;
         }
+
         .pagination a.active {
             background-color: #28a745;
             color: #ffffff;
             border-color: #28a745;
         }
+
         @media (max-width: 767px) {
             .sales-report-section {
                 padding: 1rem;
             }
+
             .filter-form {
                 flex-direction: column;
                 align-items: stretch;
             }
+
             .summary-box {
                 grid-template-columns: 1fr;
             }
+
             .sales-table th,
             .sales-table td {
                 font-size: 0.75rem;
                 padding: 0.5rem;
             }
+
             .chart-container {
                 padding: 1rem;
             }
         }
     </style>
 </head>
+
 <body>
     <div class="container-fluid min-h-screen flex">
-        <%- include('.././partials/admin/adminsidebar', { activePage: 'sales-report', admin: admin || {} }) %>
-        <div class="flex-1 p-6 mt-16">
-            <div class="sales-report-section">
-                <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">Admin Sales Report</h1>
-                <div class="sales-report-card">
-                    <!-- Filter Form -->
-                    <form class="filter-form" method="GET" action="/admin/sales-report" onsubmit="updateReportType()">
-                        <div class="flex flex-col">
-                            <label for="reportType" class="text-sm font-medium text-gray-700">Report Type:</label>
-                            <select name="reportType" id="reportType" onchange="toggleDateFields()">
-                                <option value="daily" <%= reportType === 'daily' ? 'selected' : '' %>>Daily</option>
-                                <option value="weekly" <%= reportType === 'weekly' ? 'selected' : '' %>>Weekly</option>
-                                <option value="last-week" <%= reportType === 'last-week' ? 'selected' : '' %>>Last Week</option>
-                                <option value="yearly" <%= reportType === 'yearly' ? 'selected' : '' %>>Yearly</option>
-                                <option value="custom" <%= reportType === 'custom' ? 'selected' : '' %>>Custom Range</option>
-                            </select>
-                            <input type="hidden" name="reportTypeHidden" id="reportTypeHidden">
-                        </div>
-                        <div id="customDateFields" class="<%= reportType === 'custom' ? '' : 'hidden' %> flex flex-col sm:flex-row gap-4">
-                            <div>
-                                <label for="startDate" class="text-sm font-medium text-gray-700">Start Date:</label>
-                                <input type="date" name="startDate" id="startDate" value="<%= startDate %>">
+        <%- include('.././partials/admin/adminsidebar', { activePage: 'sales-report' , admin: admin || {} }) %>
+            <div class="flex-1 p-6 mt-16">
+                <div class="sales-report-section">
+                    <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">Admin Sales Report</h1>
+                    <div class="sales-report-card">
+                        <!-- Filter Form -->
+                        <form class="filter-form" method="GET" action="/admin/sales-report"
+                            onsubmit="updateReportType()">
+                            <div class="flex flex-col">
+                                <label for="reportType" class="text-sm font-medium text-gray-700">Report Type:</label>
+                                <select name="reportType" id="reportType" onchange="toggleDateFields()">
+                                    <option value="daily" <%=reportType==='daily' ? 'selected' : '' %>>Daily</option>
+                                    <option value="weekly" <%=reportType==='weekly' ? 'selected' : '' %>>Weekly</option>
+                                    <option value="last-week" <%=reportType==='last-week' ? 'selected' : '' %>>Last Week
+                                    </option>
+                                    <option value="yearly" <%=reportType==='yearly' ? 'selected' : '' %>>Yearly</option>
+                                    <option value="custom" <%=reportType==='custom' ? 'selected' : '' %>>Custom Range
+                                    </option>
+                                </select>
+                                <input type="hidden" name="reportTypeHidden" id="reportTypeHidden">
                             </div>
-                            <div>
-                                <label for="endDate" class="text-sm font-medium text-gray-700">End Date:</label>
-                                <input type="date" name="endDate" id="endDate" value="<%= endDate %>">
+                            <div id="customDateFields"
+                                class="<%= reportType === 'custom' ? '' : 'hidden' %> flex flex-col sm:flex-row gap-4">
+                                <div>
+                                    <label for="startDate" class="text-sm font-medium text-gray-700">Start Date:</label>
+                                    <input type="date" name="startDate" id="startDate" value="<%= startDate %>">
+                                </div>
+                                <div>
+                                    <label for="endDate" class="text-sm font-medium text-gray-700">End Date:</label>
+                                    <input type="date" name="endDate" id="endDate" value="<%= endDate %>">
+                                </div>
+                            </div>
+                            <div class="flex gap-2">
+                                <button type="submit">Generate Report</button>
+                                <button type="button" class="download-btn" onclick="downloadReport('pdf')">Download
+                                    PDF</button>
+                                <button type="button" class="download-btn" onclick="downloadReport('excel')">Download
+                                    Excel</button>
+                            </div>
+                        </form>
+
+                        <!-- Summary Cards -->
+                        <div class="summary-box">
+                            <div class="summary-card">
+                                <h3>Overall Sales Count</h3>
+                                <p>
+                                    <%= report.totalOrders %>
+                                </p>
+                            </div>
+                            <div class="summary-card">
+                                <h3>Overall Order Amount</h3>
+                                <p>₹<%= report.totalAmount.toFixed(2) %>
+                                </p>
+                            </div>
+                            <div class="summary-card">
+                                <h3>Overall Discount</h3>
+                                <p class="discount-row">₹<%= report.totalDiscount.toFixed(2) %>
+                                </p>
                             </div>
                         </div>
-                        <div class="flex gap-2">
-                            <button type="submit">Generate Report</button>
-                            <button type="button" class="download-btn" onclick="downloadReport('pdf')">Download PDF</button>
-                            <button type="button" class="download-btn" onclick="downloadReport('excel')">Download Excel</button>
-                        </div>
-                    </form>
 
-                    <!-- Summary Cards -->
-                    <div class="summary-box">
-                        <div class="summary-card">
-                            <h3>Overall Sales Count</h3>
-                            <p><%= report.totalOrders %></p>
-                        </div>
-                        <div class="summary-card">
-                            <h3>Overall Order Amount</h3>
-                            <p>₹<%= report.totalAmount.toFixed(2) %></p>
-                        </div>
-                        <div class="summary-card">
-                            <h3>Overall Discount</h3>
-                            <p class="discount-row">₹<%= report.totalDiscount.toFixed(2) %></p>
-                        </div>
-                    </div>
-
-                    <!-- Sales Table -->
-                    <div class="overflow-x-auto">
-                        <!-- Display current range -->
-                        <p class="text-sm text-gray-600 mb-2">
-                            Showing <%= (currentPage - 1) * 10 + 1 %> to <%= Math.min(currentPage * 10, totalOrders) %> of <%= totalOrders %> orders
-                        </p>
-                        <table class="sales-table">
-                            <thead>
-                                <tr>
-                                    <th>Order ID</th>
-                                    <th>User</th>
-                                    <th>Date</th>
-                                    <th>Items</th>
-                                    <th>Subtotal</th>
-                                    <th>Discount</th>
-                                    <th>Total Amount</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <% if (orders.length > 0) { %>
-                                    <% orders.forEach(order => { %>
-                                        <tr>
-                                            <td><%= order.orderId %></td>
-                                            <td><%= order.user ? order.user.email : 'N/A' %></td>
-                                            <td><%= new Date(order.orderDate).toLocaleDateString('en-IN') %></td>
-                                            <td>
-                                                <% order.items.forEach(item => { %>
-                                                    <p><%= item.productName %> (Qty: <%= item.quantity %>)</p>
-                                                <% }) %>
-                                            </td>
-                                            <td>₹<%= order.subtotal.toFixed(2) %></td>
-                                            <td class="discount-row">₹<%= order.discount.toFixed(2) %></td>
-                                            <td>₹<%= order.totalAmount.toFixed(2) %></td>
-                                            <td>
-                                                <span class="badge <%= order.orderStatus === 'Delivered' ? 'bg-green-500' : order.orderStatus === 'Cancelled' ? 'bg-red-500' : 'bg-yellow-500' %> text-white">
-                                                    <%= order.orderStatus %>
-                                                </span>
-                                            </td>
-                                        </tr>
-                                    <% }) %>
-                                <% } else { %>
+                        <!-- Sales Table -->
+                        <div class="overflow-x-auto">
+                            <!-- Display current range -->
+                            <p class="text-sm text-gray-600 mb-2">
+                                Showing <%= (currentPage - 1) * 10 + 1 %> to <%= Math.min(currentPage * 10, totalOrders)
+                                        %> of <%= totalOrders %> orders
+                            </p>
+                            <table class="sales-table">
+                                <thead>
                                     <tr>
-                                        <td colspan="8" class="text-center text-gray-600">No orders found for the selected period.</td>
+                                        <th>Order ID</th>
+                                        <th>User</th>
+                                        <th>Date</th>
+                                        <th>Items</th>
+                                        <th>Subtotal</th>
+                                        <th>Discount</th>
+                                        <th>Total Amount</th>
+                                        <th>Status</th>
                                     </tr>
-                                <% } %>
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    <% if (orders.length> 0) { %>
+                                        <% orders.forEach(order=> { %>
+                                            <tr>
+                                                <td>
+                                                    <%= order.orderId %>
+                                                </td>
+                                                <td>
+                                                    <%= order.user ? order.user.email : 'N/A' %>
+                                                </td>
+                                                <td>
+                                                    <%= new Date(order.orderDate).toLocaleDateString('en-IN') %>
+                                                </td>
+                                                <td>
+                                                    <% order.items.forEach(item=> { %>
+                                                        <p>
+                                                            <%= item.productName %> (Qty: <%= item.quantity %>)
+                                                        </p>
+                                                        <% }) %>
+                                                </td>
+                                                <td>₹<%= order.subtotal.toFixed(2) %>
+                                                </td>
+                                                <td class="discount-row">₹<%= order.discount.toFixed(2) %>
+                                                </td>
+                                                <td>₹<%= order.totalAmount.toFixed(2) %>
+                                                </td>
+                                                <td>
+                                                    <span
+                                                        class="badge <%= order.orderStatus === 'Delivered' ? 'bg-green-500' : order.orderStatus === 'Cancelled' ? 'bg-red-500' : 'bg-yellow-500' %> text-white">
+                                                        <%= order.orderStatus %>
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                            <% }) %>
+                                                <% } else { %>
+                                                    <tr>
+                                                        <td colspan="8" class="text-center text-gray-600">No orders
+                                                            found for the selected period.</td>
+                                                    </tr>
+                                                    <% } %>
+                                </tbody>
+                            </table>
 
-                        <!-- Pagination Controls -->
-                        <% if (totalPages > 1) { %>
-                            <div class="pagination">
-                                <!-- Previous Button -->
-                                <a href="/admin/sales-report?reportType=<%= reportType %>&startDate=<%= startDate %>&endDate=<%= endDate %>&page=<%= currentPage - 1 %>" 
-                                   class="<%= currentPage === 1 ? 'disabled' : '' %>">
-                                    Previous
-                                </a>
-
-                                <!-- Page Numbers -->
-                                <% for (let i = 1; i <= totalPages; i++) { %>
-                                    <a href="/admin/sales-report?reportType=<%= reportType %>&startDate=<%= startDate %>&endDate=<%= endDate %>&page=<%= i %>" 
-                                       class="<%= currentPage === i ? 'active' : '' %>">
-                                        <%= i %>
+                            <!-- Pagination Controls -->
+                            <% if (totalPages> 1) { %>
+                                <div class="pagination">
+                                    <!-- Previous Button -->
+                                    <a href="/admin/sales-report?reportType=<%= reportType %>&startDate=<%= startDate %>&endDate=<%= endDate %>&page=<%= currentPage - 1 %>"
+                                        class="<%= currentPage === 1 ? 'disabled' : '' %>">
+                                        Previous
                                     </a>
+
+                                    <!-- Page Numbers -->
+                                    <% for (let i=1; i <=totalPages; i++) { %>
+                                        <a href="/admin/sales-report?reportType=<%= reportType %>&startDate=<%= startDate %>&endDate=<%= endDate %>&page=<%= i %>"
+                                            class="<%= currentPage === i ? 'active' : '' %>">
+                                            <%= i %>
+                                        </a>
+                                        <% } %>
+
+                                            <!-- Next Button -->
+                                            <a href="/admin/sales-report?reportType=<%= reportType %>&startDate=<%= startDate %>&endDate=<%= endDate %>&page=<%= currentPage + 1 %>"
+                                                class="<%= currentPage === totalPages ? 'disabled' : '' %>">
+                                                Next
+                                            </a>
+                                </div>
                                 <% } %>
+                        </div>
 
-                                <!-- Next Button -->
-                                <a href="/admin/sales-report?reportType=<%= reportType %>&startDate=<%= startDate %>&endDate=<%= endDate %>&page=<%= currentPage + 1 %>" 
-                                   class="<%= currentPage === totalPages ? 'disabled' : '' %>">
-                                    Next
-                                </a>
-                            </div>
-                        <% } %>
-                    </div>
-
-                    <!-- Chart -->
-                    <div class="chart-container">
-                        <canvas id="salesChart"></canvas>
+                        <!-- Chart -->
+                        <div class="chart-container">
+                            <canvas id="salesChart"></canvas>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
     </div>
 
     <footer class="bg-white p-4 text-center text-gray-600 text-sm shadow-inner mt-6">
@@ -342,7 +396,7 @@
             window.location.href = url;
         }
 
-        const orders = <%- JSON.stringify(orders) %>;
+        const orders = <% - JSON.stringify(orders) %>;
         const labels = orders.map(order => new Date(order.orderDate).toLocaleDateString('en-IN'));
         const amounts = orders.map(order => order.totalAmount);
         const discounts = orders.map(order => order.discount);
@@ -396,4 +450,5 @@
         });
     </script>
 </body>
+
 </html>

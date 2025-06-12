@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -12,50 +13,61 @@
 
   <style>
     body {
-      padding-top: 70px; 
+      padding-top: 70px;
       background-color: #f8f9fa;
     }
+
     .sidebar {
       min-height: 100vh;
       background-color: #f8f9fa;
       border-right: 1px solid #dee2e6;
     }
+
     .content-area {
       padding: 20px;
     }
+
     .card {
       border-radius: 10px;
       overflow: hidden;
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
       transition: transform 0.2s, box-shadow 0.2s;
     }
+
     .card:hover {
       transform: translateY(-2px);
       box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
     }
+
     .card-header {
       font-weight: 600;
     }
+
     .table-responsive {
       border-radius: 8px;
       overflow: hidden;
     }
+
     .table {
       margin-bottom: 0;
     }
+
     .table th {
       font-weight: 600;
       background-color: #f8f9fa;
     }
+
     .table img {
       max-height: 60px;
       object-fit: contain;
     }
+
     .badge {
       font-weight: 500;
       padding: 5px 10px;
       border-radius: 20px;
     }
+
     .pagination a,
     .pagination .current-page {
       display: inline-block;
@@ -64,10 +76,12 @@
       border-radius: 5px;
       text-decoration: none;
     }
+
     .pagination .current-page {
       background-color: #0d6efd;
       color: white;
     }
+
     .input-upload img {
       max-width: 120px;
       max-height: 120px;
@@ -75,6 +89,7 @@
       border-radius: 5px;
       object-fit: contain;
     }
+
     .message-container {
       position: fixed;
       top: 80px;
@@ -88,22 +103,29 @@
       body {
         padding-top: 56px;
       }
+
       .sidebar {
         display: none;
       }
+
       .content-area {
         padding: 15px;
       }
+
       .card-body {
         padding: 15px;
       }
-      .table th, .table td {
+
+      .table th,
+      .table td {
         font-size: 14px;
         padding: 8px;
       }
+
       .table img {
         max-width: 50px;
       }
+
       .btn-sm {
         padding: 0.25rem 0.5rem;
         font-size: 0.75rem;
@@ -119,346 +141,353 @@
       <div class="alert alert-danger alert-dismissible fade show shadow-lg" role="alert">
         <i class="bi bi-exclamation-triangle-fill me-2"></i>
         <%= messages.error %>
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
       </div>
-    <% } %>
-    <% if (messages.success) { %>
-      <div class="alert alert-success alert-dismissible fade show shadow-lg" role="alert">
-        <i class="bi bi-check-circle-fill me-2"></i>
-        <%= messages.success %>
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-      </div>
-    <% } %>
+      <% } %>
+        <% if (messages.success) { %>
+          <div class="alert alert-success alert-dismissible fade show shadow-lg" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i>
+            <%= messages.success %>
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+          <% } %>
   </div>
 
   <!-- Include the sidebar -->
-  <%- include('.././partials/admin/adminsidebar', { activePage: 'brand', admin: admin || {} }) %>
-  
-  <!-- Main content -->
-  <div class="container-fluid">
-    <div class="row">
-      <div class="col-md-2 sidebar">
-      </div>
+  <%- include('.././partials/admin/adminsidebar', { activePage: 'brand' , admin: admin || {} }) %>
 
-      <div class="col-md-10 col-12 content-area">
-        <section class="content-main">
-          <div class="content-header mb-4">
-            <h2 class="content-title card-title">Brand Management</h2>
-            <nav aria-label="breadcrumb">
-              <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="/admin/dashboard">Dashboard</a></li>
-                <li class="breadcrumb-item active" aria-current="page">Brands</li>
-              </ol>
-            </nav>
-          </div>
+    <!-- Main content -->
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-md-2 sidebar">
+        </div>
 
-          <div class="row">
-            <!-- Add Brand Card -->
-            <div class="col-md-4 col-12 mb-4">
-              <div class="card shadow-sm">
-                <div class="card-header bg-primary text-white">
-                  <h5 class="mb-0">Add New Brand</h5>
-                </div>
-                <div class="card-body">
-                  <form method="post" action="/admin/addbrand" enctype="multipart/form-data" id="brandForm">
-                    <div class="mb-3">
-                      <label for="brandName" class="form-label">Brand Name <span class="text-danger">*</span></label>
-                      <input type="text" name="name" id="brandName" class="form-control" placeholder="Enter brand name" >
-                      <div class="invalid-feedback">Please provide a brand name</div>
-                    </div>
-                    <div class="mb-3">
-                      <label for="brandImage" class="form-label">Brand Logo <span class="text-danger">*</span></label>
-                      <div class="input-upload text-center">
-                        <img id="preview-image" src="#" alt="Image Preview" style="display:none;" class="border p-2 mb-2" />
-                        <input class="form-control" name="image" id="brandImage" type="file" onchange="previewImage(event)" accept="image/*" >
-                        <small class="text-muted">Allowed formats: JPG, JPEG, PNG (Max 2MB)</small>
-                        <div class="invalid-feedback">Please select a valid image file</div>
+        <div class="col-md-10 col-12 content-area">
+          <section class="content-main">
+            <div class="content-header mb-4">
+              <h2 class="content-title card-title">Brand Management</h2>
+              <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                  <li class="breadcrumb-item"><a href="/admin/dashboard">Dashboard</a></li>
+                  <li class="breadcrumb-item active" aria-current="page">Brands</li>
+                </ol>
+              </nav>
+            </div>
+
+            <div class="row">
+              <!-- Add Brand Card -->
+              <div class="col-md-4 col-12 mb-4">
+                <div class="card shadow-sm">
+                  <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Add New Brand</h5>
+                  </div>
+                  <div class="card-body">
+                    <form method="post" action="/admin/addbrand" enctype="multipart/form-data" id="brandForm">
+                      <div class="mb-3">
+                        <label for="brandName" class="form-label">Brand Name <span class="text-danger">*</span></label>
+                        <input type="text" name="name" id="brandName" class="form-control"
+                          placeholder="Enter brand name">
+                        <div class="invalid-feedback">Please provide a brand name</div>
                       </div>
-                    </div>
-                    <div class="d-grid gap-2">
-                      <button type="submit" class="btn btn-success">
-                        <i class="bi bi-plus-circle me-2"></i>Create Brand
-                      </button>
-                    </div>
-                  </form>
+                      <div class="mb-3">
+                        <label for="brandImage" class="form-label">Brand Logo <span class="text-danger">*</span></label>
+                        <div class="input-upload text-center">
+                          <img id="preview-image" src="#" alt="Image Preview" style="display:none;"
+                            class="border p-2 mb-2" />
+                          <input class="form-control" name="image" id="brandImage" type="file"
+                            onchange="previewImage(event)" accept="image/*">
+                          <small class="text-muted">Allowed formats: JPG, JPEG, PNG (Max 2MB)</small>
+                          <div class="invalid-feedback">Please select a valid image file</div>
+                        </div>
+                      </div>
+                      <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-success">
+                          <i class="bi bi-plus-circle me-2"></i>Create Brand
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Brands List Card -->
+              <div class="col-md-8 col-12 mb-4">
+                <div class="card shadow-sm">
+                  <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Brands List</h5>
+                    <span class="badge bg-light text-dark">
+                      <%= data.length %> brands
+                    </span>
+                  </div>
+                  <div class="card-body">
+                    <% if (data.length===0) { %>
+                      <div class="text-center py-5">
+                        <i class="bi bi-box-seam display-4 text-muted"></i>
+                        <h5 class="mt-3">No brands found</h5>
+                        <p class="text-muted">Add your first brand using the form on the left</p>
+                      </div>
+                      <% } else { %>
+                        <div class="table-responsive">
+                          <table class="table table-hover align-middle">
+                            <thead class="table-light">
+                              <tr>
+                                <th>Brand</th>
+                                <th>Logo</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <% data.reverse().forEach((brand, index)=> { %>
+                                <tr>
+                                  <td class="fw-semibold">
+                                    <%= brand.name %>
+                                  </td>
+                                  <td>
+                                    <div class="brand-logo-container"
+                                      style="width: 80px; height: 60px; background-color: #f8f9fa; border-radius: 5px;">
+                                      <img src="<%= brand.image %>" alt="<%= brand.name %>"
+                                        class="img-fluid h-100 w-auto" style="object-fit: contain;">
+                                    </div>
+                                  </td>
+                                  <td>
+                                    <% if (brand.isListed===false) { %>
+                                      <span class="badge bg-danger">Blocked</span>
+                                      <% } else { %>
+                                        <span class="badge bg-success">Active</span>
+                                        <% } %>
+                                  </td>
+                                  <td>
+                                    <div class="d-flex flex-wrap gap-2">
+                                      <button
+                                        class="btn btn-sm toggle-brand-btn <%= brand.isListed ? 'btn-outline-danger' : 'btn-outline-success' %>"
+                                        data-id="<%= brand._id %>"
+                                        data-action="<%= brand.isListed ? 'block' : 'unblock' %>">
+                                        <i
+                                          class="bi <%= brand.isListed ? 'bi-slash-circle' : 'bi-check-circle' %> me-1"></i>
+                                        <%= brand.isListed ? 'Block' : 'Unblock' %>
+                                      </button>
+
+                                      <button class="btn btn-outline-secondary btn-sm delete-brand-btn"
+                                        data-id="<%= brand._id %>">
+                                        <i class="bi bi-trash me-1"></i>Delete
+                                      </button>
+                                    </div>
+                                  </td>
+                                </tr>
+                                <% }) %>
+                            </tbody>
+                          </table>
+                        </div>
+
+                        <!-- Pagination -->
+                        <% if (totalPages> 1) { %>
+                          <div class="d-flex justify-content-center mt-4">
+                            <nav aria-label="Page navigation">
+                              <ul class="pagination">
+                                <% if (currentPage> 1) { %>
+                                  <li class="page-item">
+                                    <a class="page-link" href="/admin/brand?page=<%= currentPage - 1 %>"
+                                      aria-label="Previous">
+                                      <span aria-hidden="true">&laquo;</span>
+                                    </a>
+                                  </li>
+                                  <% } %>
+
+                                    <% for (let i=1; i <=totalPages; i++) { %>
+                                      <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+                                        <a class="page-link" href="/admin/brand?page=<%= i %>">
+                                          <%= i %>
+                                        </a>
+                                      </li>
+                                      <% } %>
+
+                                        <% if (currentPage < totalPages) { %>
+                                          <li class="page-item">
+                                            <a class="page-link" href="/admin/brand?page=<%= currentPage + 1 %>"
+                                              aria-label="Next">
+                                              <span aria-hidden="true">&raquo;</span>
+                                            </a>
+                                          </li>
+                                          <% } %>
+                              </ul>
+                            </nav>
+                          </div>
+                          <% } %>
+                            <% } %>
+                  </div>
                 </div>
               </div>
             </div>
-
-            <!-- Brands List Card -->
-            <div class="col-md-8 col-12 mb-4">
-              <div class="card shadow-sm">
-                <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center">
-                  <h5 class="mb-0">Brands List</h5>
-                  <span class="badge bg-light text-dark"><%= data.length %> brands</span>
-                </div>
-                <div class="card-body">
-                  <% if (data.length === 0) { %>
-                    <div class="text-center py-5">
-                      <i class="bi bi-box-seam display-4 text-muted"></i>
-                      <h5 class="mt-3">No brands found</h5>
-                      <p class="text-muted">Add your first brand using the form on the left</p>
-                    </div>
-                  <% } else { %>
-                    <div class="table-responsive">
-                      <table class="table table-hover align-middle">
-                        <thead class="table-light">
-                          <tr>
-                            <th>Brand</th>
-                            <th>Logo</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <% data.reverse().forEach((brand, index) => { %>
-                          <tr>
-                            <td class="fw-semibold"><%= brand.name %></td>
-                            <td>
-                              <div class="brand-logo-container" style="width: 80px; height: 60px; background-color: #f8f9fa; border-radius: 5px;">
-                                <img src="<%= brand.image %>" alt="<%= brand.name %>" class="img-fluid h-100 w-auto" style="object-fit: contain;">
-                              </div>
-                            </td>
-                            <td>
-                              <% if (brand.isListed === false) { %>
-                              <span class="badge bg-danger">Blocked</span>
-                              <% } else { %>
-                              <span class="badge bg-success">Active</span>
-                              <% } %>
-                            </td>
-                            <td>
-                              <div class="d-flex flex-wrap gap-2">
-                                <button 
-                                  class="btn btn-sm toggle-brand-btn <%= brand.isListed ? 'btn-outline-danger' : 'btn-outline-success' %>"
-                                  data-id="<%= brand._id %>"
-                                  data-action="<%= brand.isListed ? 'block' : 'unblock' %>">
-                                  <i class="bi <%= brand.isListed ? 'bi-slash-circle' : 'bi-check-circle' %> me-1"></i>
-                                  <%= brand.isListed ? 'Block' : 'Unblock' %>
-                                </button>
-                              
-                                <button 
-                                  class="btn btn-outline-secondary btn-sm delete-brand-btn" 
-                                  data-id="<%= brand._id %>">
-                                  <i class="bi bi-trash me-1"></i>Delete
-                                </button>
-                              </div>
-                            </td>
-                          </tr>
-                          <% }) %>
-                        </tbody>
-                      </table>
-                    </div>
-
-                    <!-- Pagination -->
-                    <% if (totalPages > 1) { %>
-                    <div class="d-flex justify-content-center mt-4">
-                      <nav aria-label="Page navigation">
-                        <ul class="pagination">
-                          <% if (currentPage > 1) { %>
-                            <li class="page-item">
-                              <a class="page-link" href="/admin/brand?page=<%= currentPage - 1 %>" aria-label="Previous">
-                                <span aria-hidden="true">&laquo;</span>
-                              </a>
-                            </li>
-                          <% } %>
-                          
-                          <% for (let i = 1; i <= totalPages; i++) { %>
-                            <li class="page-item <%= currentPage === i ? 'active' : '' %>">
-                              <a class="page-link" href="/admin/brand?page=<%= i %>"><%= i %></a>
-                            </li>
-                          <% } %>
-                          
-                          <% if (currentPage < totalPages) { %>
-                            <li class="page-item">
-                              <a class="page-link" href="/admin/brand?page=<%= currentPage + 1 %>" aria-label="Next">
-                                <span aria-hidden="true">&raquo;</span>
-                              </a>
-                            </li>
-                          <% } %>
-                        </ul>
-                      </nav>
-                    </div>
-                    <% } %>
-                  <% } %>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
+          </section>
+        </div>
       </div>
     </div>
-  </div>
 
-  <%- include('.././Partials/admin/footer') %>
+    <%- include('.././Partials/admin/footer') %>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"></script>
- <script>
-  document.addEventListener('DOMContentLoaded', function () {
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"></script>
+      <script>
+        document.addEventListener('DOMContentLoaded', function () {
 
-    // Auto-dismiss alerts after 5 seconds
-    const alerts = document.querySelectorAll('.alert');
-    alerts.forEach(alert => {
-      setTimeout(() => {
-        const bsAlert = new bootstrap.Alert(alert);
-        bsAlert.close();
-      }, 5000);
-    });
-
-    // Image preview and validation
-    window.previewImage = function (event) {
-      const file = event.target.files[0];
-      if (!file) return;
-
-      const validTypes = ['image/jpeg', 'image/png', 'image/jpg'];
-      const maxSize = 2 * 1024 * 1024;
-
-      if (!validTypes.includes(file.type)) {
-        Swal.fire('Invalid File', 'Only JPG, JPEG, and PNG images are allowed.', 'error');
-        event.target.value = '';
-        return;
-      }
-
-      if (file.size > maxSize) {
-        Swal.fire('File Too Large', 'Image must be less than 2MB.', 'error');
-        event.target.value = '';
-        return;
-      }
-
-      const reader = new FileReader();
-      reader.onload = function () {
-        const output = document.getElementById('preview-image');
-        output.src = reader.result;
-        output.style.display = 'block';
-      };
-      reader.readAsDataURL(file);
-    };
-
-    // Form validation
-    const brandForm = document.getElementById('brandForm');
-    if (brandForm) {
-      brandForm.addEventListener('submit', function (e) {
-        if (!this.checkValidity()) {
-          e.preventDefault();
-          e.stopPropagation();
-        }
-        this.classList.add('was-validated');
-      });
-    }
-
-    // Delegated click handler for brand toggle and delete buttons
-    document.body.addEventListener('click', async function (event) {
-      const toggleBtn = event.target.closest('.toggle-brand-btn');
-      const deleteBtn = event.target.closest('.delete-brand-btn');
-
-      // Handle brand status toggle
-      if (toggleBtn) {
-        const brandId = toggleBtn.dataset.id;
-        const action = toggleBtn.dataset.action;
-        const actionText = action === 'block' ? 'Block' : 'Unblock';
-
-        const result = await Swal.fire({
-          title: 'Are you sure?',
-          text: `This will ${actionText.toLowerCase()} the brand.`,
-          icon: 'question',
-          showCancelButton: true,
-          confirmButtonText: `Yes, ${actionText}`,
-          cancelButtonText: 'Cancel',
-          confirmButtonColor: action === 'block' ? '#dc3545' : '#198754'
-        });
-
-        if (!result.isConfirmed) return;
-
-        try {
-          const response = await fetch(`/admin/brand/${brandId}/status?action=${action}`, {
-            method: 'PATCH'
+          const alerts = document.querySelectorAll('.alert');
+          alerts.forEach(alert => {
+            setTimeout(() => {
+              const bsAlert = new bootstrap.Alert(alert);
+              bsAlert.close();
+            }, 5000);
           });
 
-          const data = await response.json();
+          window.previewImage = function (event) {
+            const file = event.target.files[0];
+            if (!file) return;
 
-          if (data.success) {
-            const newAction = action === 'block' ? 'unblock' : 'block';
-            toggleBtn.textContent = newAction === 'block' ? 'Block' : 'Unblock';
-            toggleBtn.dataset.action = newAction;
-            toggleBtn.classList.toggle('btn-outline-danger');
-            toggleBtn.classList.toggle('btn-outline-success');
+            const validTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+            const maxSize = 2 * 1024 * 1024;
 
-            const icon = toggleBtn.querySelector('i');
-            if (icon) {
-              icon.classList.toggle('bi-slash-circle');
-              icon.classList.toggle('bi-check-circle');
+            if (!validTypes.includes(file.type)) {
+              Swal.fire('Invalid File', 'Only JPG, JPEG, and PNG images are allowed.', 'error');
+              event.target.value = '';
+              return;
             }
 
-            const badge = toggleBtn.closest('tr').querySelector('td span.badge');
-            if (badge) {
-              badge.textContent = newAction === 'block' ? 'Active' : 'Blocked';
-              badge.classList.toggle('bg-success');
-              badge.classList.toggle('bg-danger');
+            if (file.size > maxSize) {
+              Swal.fire('File Too Large', 'Image must be less than 2MB.', 'error');
+              event.target.value = '';
+              return;
             }
 
-            Swal.fire('Success!', `Brand ${actionText.toLowerCase()}ed successfully.`, 'success');
-          } else {
-            Swal.fire('Failed!', data.message || 'Operation unsuccessful.', 'error');
+            const reader = new FileReader();
+            reader.onload = function () {
+              const output = document.getElementById('preview-image');
+              output.src = reader.result;
+              output.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+          };
+
+          const brandForm = document.getElementById('brandForm');
+          if (brandForm) {
+            brandForm.addEventListener('submit', function (e) {
+              if (!this.checkValidity()) {
+                e.preventDefault();
+                e.stopPropagation();
+              }
+              this.classList.add('was-validated');
+            });
           }
-        } catch (err) {
-          console.error(err);
-          Swal.fire('Error!', 'Something went wrong.', 'error');
-        }
-      }
 
-      // Handle brand deletion
-      if (deleteBtn) {
-        const brandId = deleteBtn.dataset.id;
+          document.body.addEventListener('click', async function (event) {
+            const toggleBtn = event.target.closest('.toggle-brand-btn');
+            const deleteBtn = event.target.closest('.delete-brand-btn');
 
-        const result = await Swal.fire({
-          title: 'Are you sure?',
-          text: 'This will permanently delete the brand and all associated products!',
-          icon: 'warning',
-          showCancelButton: true,
-          confirmButtonText: 'Yes, delete it!',
-          cancelButtonText: 'Cancel',
-          confirmButtonColor: '#dc3545'
-        });
+            if (toggleBtn) {
+              const brandId = toggleBtn.dataset.id;
+              const action = toggleBtn.dataset.action;
+              const actionText = action === 'block' ? 'Block' : 'Unblock';
 
-        if (!result.isConfirmed) return;
+              const result = await Swal.fire({
+                title: 'Are you sure?',
+                text: `This will ${actionText.toLowerCase()} the brand.`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: `Yes, ${actionText}`,
+                cancelButtonText: 'Cancel',
+                confirmButtonColor: action === 'block' ? '#dc3545' : '#198754'
+              });
 
-        try {
-          const response = await fetch(`/admin/deleteBrand?id=${brandId}`, {
-            method: 'DELETE'
+              if (!result.isConfirmed) return;
+
+              try {
+                const response = await fetch(`/admin/brand/${brandId}/status?action=${action}`, {
+                  method: 'PATCH'
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                  const newAction = action === 'block' ? 'unblock' : 'block';
+                  toggleBtn.textContent = newAction === 'block' ? 'Block' : 'Unblock';
+                  toggleBtn.dataset.action = newAction;
+                  toggleBtn.classList.toggle('btn-outline-danger');
+                  toggleBtn.classList.toggle('btn-outline-success');
+
+                  const icon = toggleBtn.querySelector('i');
+                  if (icon) {
+                    icon.classList.toggle('bi-slash-circle');
+                    icon.classList.toggle('bi-check-circle');
+                  }
+
+                  const badge = toggleBtn.closest('tr').querySelector('td span.badge');
+                  if (badge) {
+                    badge.textContent = newAction === 'block' ? 'Active' : 'Blocked';
+                    badge.classList.toggle('bg-success');
+                    badge.classList.toggle('bg-danger');
+                  }
+
+                  Swal.fire('Success!', `Brand ${actionText.toLowerCase()}ed successfully.`, 'success');
+                } else {
+                  Swal.fire('Failed!', data.message || 'Operation unsuccessful.', 'error');
+                }
+              } catch (err) {
+                console.error(err);
+                Swal.fire('Error!', 'Something went wrong.', 'error');
+              }
+            }
+
+            if (deleteBtn) {
+              const brandId = deleteBtn.dataset.id;
+
+              const result = await Swal.fire({
+                title: 'Are you sure?',
+                text: 'This will permanently delete the brand and all associated products!',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, delete it!',
+                cancelButtonText: 'Cancel',
+                confirmButtonColor: '#dc3545'
+              });
+
+              if (!result.isConfirmed) return;
+
+              try {
+                const response = await fetch(`/admin/deleteBrand?id=${brandId}`, {
+                  method: 'DELETE'
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                  Swal.fire({
+                    title: 'Deleted!',
+                    text: 'Brand has been deleted.',
+                    icon: 'success',
+                    confirmButtonText: 'OK'
+                  }).then(() => location.reload());
+                } else {
+                  Swal.fire('Failed!', data.message || 'Brand deletion failed.', 'error');
+                }
+              } catch (err) {
+                console.error(err);
+                Swal.fire('Error!', 'Something went wrong.', 'error');
+              }
+            }
           });
 
-          const data = await response.json();
-
-          if (data.success) {
-            Swal.fire({
-              title: 'Deleted!',
-              text: 'Brand has been deleted.',
-              icon: 'success',
-              confirmButtonText: 'OK'
-            }).then(() => location.reload());
-          } else {
-            Swal.fire('Failed!', data.message || 'Brand deletion failed.', 'error');
+          function adjustPadding() {
+            const navbar = document.querySelector('.navbar');
+            const body = document.querySelector('body');
+            if (navbar && body) {
+              body.style.paddingTop = `${navbar.offsetHeight}px`;
+            }
           }
-        } catch (err) {
-          console.error(err);
-          Swal.fire('Error!', 'Something went wrong.', 'error');
-        }
-      }
-    });
 
-    // Adjust body padding based on navbar height
-    function adjustPadding() {
-      const navbar = document.querySelector('.navbar');
-      const body = document.querySelector('body');
-      if (navbar && body) {
-        body.style.paddingTop = `${navbar.offsetHeight}px`;
-      }
-    }
+          window.addEventListener('load', adjustPadding);
+          window.addEventListener('resize', adjustPadding);
 
-    window.addEventListener('load', adjustPadding);
-    window.addEventListener('resize', adjustPadding);
-
-  });
-</script>
+        });
+      </script>
 
 </body>
+
 </html>

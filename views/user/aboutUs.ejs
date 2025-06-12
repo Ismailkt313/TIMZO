@@ -1,220 +1,258 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>About Us - Timzo</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="icon" type="image/x-icon" href="/images/TIMZO.jpg">
-   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link rel="icon" type="image/x-icon" href="/images/TIMZO.jpg" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
 
     <style>
-        body {
-            margin: 0;
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #f4f4f4, #e0e0e0);
-            overflow-x: hidden;
-        }
-        .container-fluid {
-            padding: 0;
-        }
-        .main-content {
-            padding: 40px 20px;
-            background: #ffffff;
-            min-height: 100vh;
-            overflow-y: auto;
-        }
+      body {
+        margin: 0;
+        font-family: "Poppins", sans-serif;
+        background: linear-gradient(135deg, #f4f4f4, #e0e0e0);
+        overflow-x: hidden;
+      }
+      .container-fluid {
+        padding: 0;
+      }
+      .main-content {
+        padding: 40px 20px;
+        background: #ffffff;
+        min-height: 100vh;
+        overflow-y: auto;
+      }
+      .about-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        background: #ffffff;
+        border-radius: 20px;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+        padding: 40px;
+      }
+      .about-container h1 {
+        font-size: 32px;
+        font-weight: 700;
+        color: #1a1a1a;
+        text-align: center;
+        margin-bottom: 30px;
+        letter-spacing: 1px;
+      }
+      .section {
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 25px;
+        margin-bottom: 25px;
+        transition: transform 0.2s ease;
+      }
+      .section:hover {
+        transform: translateY(-5px);
+      }
+      .section h2 {
+        font-size: 22px;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 20px;
+      }
+      .section p {
+        color: #666;
+        font-size: 16px;
+        line-height: 1.6;
+      }
+      .team-card {
+        background-color: #ffffff;
+        border-radius: 16px;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        margin-bottom: 20px;
+        text-align: center;
+        transition: transform 0.3s ease;
+      }
+      .team-card:hover {
+        transform: scale(1.05);
+      }
+      .team-card img {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-bottom: 15px;
+        border: 3px solid #ffd700;
+      }
+      .team-card h3 {
+        font-size: 18px;
+        font-weight: 600;
+        color: #1a1a1a;
+        margin-bottom: 5px;
+      }
+      .team-card p {
+        font-size: 14px;
+        color: #666;
+        margin-bottom: 10px;
+      }
+      .team-card .social-links a {
+        color: #1a1a1a;
+        font-size: 18px;
+        margin: 0 8px;
+        transition: color 0.3s ease;
+      }
+      .team-card .social-links a:hover {
+        color: #ffd700;
+      }
+      .btn-custom {
+        background: #1a1a1a;
+        color: #ffffff;
+        padding: 12px 30px;
+        border-radius: 10px;
+        font-size: 16px;
+        font-weight: 500;
+        border: none;
+        transition: all 0.3s ease;
+        display: inline-block;
+      }
+      .btn-custom:hover {
+        background: #ffd700;
+        color: #1a1a1a;
+        transform: scale(1.05);
+      }
+      @media (max-width: 767.98px) {
         .about-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background: #ffffff;
-            border-radius: 20px;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
-            padding: 40px;
+          padding: 15px;
         }
         .about-container h1 {
-            font-size: 32px;
-            font-weight: 700;
-            color: #1a1a1a;
-            text-align: center;
-            margin-bottom: 30px;
-            letter-spacing: 1px;
-        }
-        .section {
-            background: #f8f9fa;
-            border-radius: 12px;
-            padding: 25px;
-            margin-bottom: 25px;
-            transition: transform 0.2s ease;
-        }
-        .section:hover {
-            transform: translateY(-5px);
+          font-size: 24px;
         }
         .section h2 {
-            font-size: 22px;
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 20px;
+          font-size: 20px;
         }
         .section p {
-            color: #666;
-            font-size: 16px;
-            line-height: 1.6;
-        }
-        .team-card {
-            background-color: #ffffff;
-            border-radius: 16px;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-            margin-bottom: 20px;
-            text-align: center;
-            transition: transform 0.3s ease;
-        }
-        .team-card:hover {
-            transform: scale(1.05);
+          font-size: 14px;
         }
         .team-card img {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            object-fit: cover;
-            margin-bottom: 15px;
-            border: 3px solid #ffd700;
+          width: 100px;
+          height: 100px;
         }
         .team-card h3 {
-            font-size: 18px;
-            font-weight: 600;
-            color: #1a1a1a;
-            margin-bottom: 5px;
-        }
-        .team-card p {
-            font-size: 14px;
-            color: #666;
-            margin-bottom: 10px;
-        }
-        .team-card .social-links a {
-            color: #1a1a1a;
-            font-size: 18px;
-            margin: 0 8px;
-            transition: color 0.3s ease;
-        }
-        .team-card .social-links a:hover {
-            color: #ffd700;
+          font-size: 16px;
         }
         .btn-custom {
-            background: #1a1a1a;
-            color: #ffffff;
-            padding: 12px 30px;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: 500;
-            border: none;
-            transition: all 0.3s ease;
-            display: inline-block;
+          padding: 10px 20px;
+          font-size: 14px;
         }
-        .btn-custom:hover {
-            background: #ffd700;
-            color: #1a1a1a;
-            transform: scale(1.05);
-        }
-        @media (max-width: 767.98px) {
-            .about-container {
-                padding: 15px;
-            }
-            .about-container h1 {
-                font-size: 24px;
-            }
-            .section h2 {
-                font-size: 20px;
-            }
-            .section p {
-                font-size: 14px;
-            }
-            .team-card img {
-                width: 100px;
-                height: 100px;
-            }
-            .team-card h3 {
-                font-size: 16px;
-            }
-            .btn-custom {
-                padding: 10px 20px;
-                font-size: 14px;
-            }
-        }
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <div class="container-fluid">
-        <div class="main-content">
-            <div class="about-container">
-                <h1>About Us</h1>
+      <div class="main-content">
+        <div class="about-container">
+          <h1>About Us</h1>
 
-                <!-- Introduction Section -->
-                <div class="section">
-                    <h2>Welcome to Timzo</h2>
-                    <p>
-                        Timzo is your one-stop online store for premium watches, offering a curated selection of timeless designs for men and women. Established in 2020, our mission is to bring elegance and precision to your wrist with exceptional craftsmanship and unparalleled customer service. We believe a watch is more than a timekeeping device—it’s a statement of style and personality.
-                    </p>
-                </div>
+          <!-- Introduction Section -->
+          <div class="section">
+            <h2>Welcome to Timzo</h2>
+            <p>
+              Timzo is your one-stop online store for premium watches, offering
+              a curated selection of timeless designs for men and women.
+              Established in 2020, our mission is to bring elegance and
+              precision to your wrist with exceptional craftsmanship and
+              unparalleled customer service. We believe a watch is more than a
+              timekeeping device—it’s a statement of style and personality.
+            </p>
+          </div>
 
-                <!-- Mission Section -->
-                <div class="section">
-                    <h2>Our Mission</h2>
-                    <p>
-                        At Timzo, we are committed to providing high-quality watches that blend functionality with fashion. We aim to make luxury accessible by offering a wide range of designs at competitive prices, ensuring every customer finds the perfect piece. Our goal is to create a seamless shopping experience with fast shipping, easy returns, and dedicated support.
-                    </p>
-                </div>
+          <!-- Mission Section -->
+          <div class="section">
+            <h2>Our Mission</h2>
+            <p>
+              At Timzo, we are committed to providing high-quality watches that
+              blend functionality with fashion. We aim to make luxury accessible
+              by offering a wide range of designs at competitive prices,
+              ensuring every customer finds the perfect piece. Our goal is to
+              create a seamless shopping experience with fast shipping, easy
+              returns, and dedicated support.
+            </p>
+          </div>
 
-                <!-- Team Section -->
-                <div class="section">
-                    <h2>Meet Our Team</h2>
-                    <div class="row">
-                        <div class="col-md-4">
-                            <div class="team-card">
-                                <img src="/images/Screenshot 2025-05-08 203510.png" alt="Ismail Kannur">
-                                <h3>Ismail Kannur</h3>
-                                <p>Founder & CEO</p>
-                                <div class="social-links">
-                                    <a href="https://l.instagram.com/?u=https%3A%2F%2Fwww.linkedin.com%2Fin%2Fismail-kt-7117a3321%3Futm_source%3Dshare%26utm_campaign%3Dshare_via%26utm_content%3Dprofile%26utm_medium%3Dios_app%26fbclid%3DPAZXh0bgNhZW0CMTEAAaedYshJautuPUIgbXo5G8VB7Cip2_NYaTsmdkRa9d0pz6mJ6n9yuXhpZMyzAQ_aem_v40tQO_Wn0jA0DIlpEM7EA&e=AT29Tv7T73GE8z_R9knKQ3N_7tJwYmphEzAG5mAXd3iixjaZR-0bJwFbvA1XAelSJLo4f5pfPnT6My4ppN2btd5viMPSlMzrDHi3Zbg"><i class="fab fa-linkedin"></i></a>
-                                    <a href="#"><i class="fab fa-twitter"></i></a>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="team-card">
-                                <img src="/images/Screenshot 2025-05-08 203510.png" alt="Ismail Kannur">
-                                <h3>Ismail Kannur</h3>
-                                <p>Head of Design</p>
-                                <div class="social-links">
-                                    <a href="https://l.instagram.com/?u=https%3A%2F%2Fwww.linkedin.com%2Fin%2Fismail-kt-7117a3321%3Futm_source%3Dshare%26utm_campaign%3Dshare_via%26utm_content%3Dprofile%26utm_medium%3Dios_app%26fbclid%3DPAZXh0bgNhZW0CMTEAAaedYshJautuPUIgbXo5G8VB7Cip2_NYaTsmdkRa9d0pz6mJ6n9yuXhpZMyzAQ_aem_v40tQO_Wn0jA0DIlpEM7EA&e=AT29Tv7T73GE8z_R9knKQ3N_7tJwYmphEzAG5mAXd3iixjaZR-0bJwFbvA1XAelSJLo4f5pfPnT6My4ppN2btd5viMPSlMzrDHi3Zbg"><i class="fab fa-linkedin"></i></a>
-                                    <a href="#"><i class="fab fa-twitter"></i></a>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="team-card">
-                                <img src="/images/Screenshot 2025-05-08 203510.png" alt="Ismail Kannur">
-                                <h3>Ismail Kannur</h3>
-                                <p>Customer Support Lead</p>
-                                <div class="social-links">
-                                    <a href="https://l.instagram.com/?u=https%3A%2F%2Fwww.linkedin.com%2Fin%2Fismail-kt-7117a3321%3Futm_source%3Dshare%26utm_campaign%3Dshare_via%26utm_content%3Dprofile%26utm_medium%3Dios_app%26fbclid%3DPAZXh0bgNhZW0CMTEAAaedYshJautuPUIgbXo5G8VB7Cip2_NYaTsmdkRa9d0pz6mJ6n9yuXhpZMyzAQ_aem_v40tQO_Wn0jA0DIlpEM7EA&e=AT29Tv7T73GE8z_R9knKQ3N_7tJwYmphEzAG5mAXd3iixjaZR-0bJwFbvA1XAelSJLo4f5pfPnT6My4ppN2btd5viMPSlMzrDHi3Zbg"><i class="fab fa-linkedin"></i></a>
-                                    <a href="#"><i class="fab fa-twitter"></i></a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+          <!-- Team Section -->
+          <div class="section">
+            <h2>Meet Our Team</h2>
+            <div class="row">
+              <div class="col-md-4">
+                <div class="team-card">
+                  <img
+                    src="/images/Screenshot 2025-05-08 203510.png"
+                    alt="Ismail Kannur"
+                  />
+                  <h3>Ismail Kannur</h3>
+                  <p>Founder & CEO</p>
+                  <div class="social-links">
+                    <a
+                      href="https://l.instagram.com/?u=https%3A%2F%2Fwww.linkedin.com%2Fin%2Fismail-kt-7117a3321%3Futm_source%3Dshare%26utm_campaign%3Dshare_via%26utm_content%3Dprofile%26utm_medium%3Dios_app%26fbclid%3DPAZXh0bgNhZW0CMTEAAaedYshJautuPUIgbXo5G8VB7Cip2_NYaTsmdkRa9d0pz6mJ6n9yuXhpZMyzAQ_aem_v40tQO_Wn0jA0DIlpEM7EA&e=AT29Tv7T73GE8z_R9knKQ3N_7tJwYmphEzAG5mAXd3iixjaZR-0bJwFbvA1XAelSJLo4f5pfPnT6My4ppN2btd5viMPSlMzrDHi3Zbg"
+                      ><i class="fab fa-linkedin"></i
+                    ></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                  </div>
                 </div>
-
-                <!-- Call to Action -->
-                <div class="text-center">
-                    <a href="/products" class="btn btn-custom">Explore Our Collection</a>
+              </div>
+              <div class="col-md-4">
+                <div class="team-card">
+                  <img
+                    src="/images/Screenshot 2025-05-08 203510.png"
+                    alt="Ismail Kannur"
+                  />
+                  <h3>Ismail Kannur</h3>
+                  <p>Head of Design</p>
+                  <div class="social-links">
+                    <a
+                      href="https://l.instagram.com/?u=https%3A%2F%2Fwww.linkedin.com%2Fin%2Fismail-kt-7117a3321%3Futm_source%3Dshare%26utm_campaign%3Dshare_via%26utm_content%3Dprofile%26utm_medium%3Dios_app%26fbclid%3DPAZXh0bgNhZW0CMTEAAaedYshJautuPUIgbXo5G8VB7Cip2_NYaTsmdkRa9d0pz6mJ6n9yuXhpZMyzAQ_aem_v40tQO_Wn0jA0DIlpEM7EA&e=AT29Tv7T73GE8z_R9knKQ3N_7tJwYmphEzAG5mAXd3iixjaZR-0bJwFbvA1XAelSJLo4f5pfPnT6My4ppN2btd5viMPSlMzrDHi3Zbg"
+                      ><i class="fab fa-linkedin"></i
+                    ></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                  </div>
                 </div>
+              </div>
+              <div class="col-md-4">
+                <div class="team-card">
+                  <img
+                    src="/images/Screenshot 2025-05-08 203510.png"
+                    alt="Ismail Kannur"
+                  />
+                  <h3>Ismail Kannur</h3>
+                  <p>Customer Support Lead</p>
+                  <div class="social-links">
+                    <a
+                      href="https://l.instagram.com/?u=https%3A%2F%2Fwww.linkedin.com%2Fin%2Fismail-kt-7117a3321%3Futm_source%3Dshare%26utm_campaign%3Dshare_via%26utm_content%3Dprofile%26utm_medium%3Dios_app%26fbclid%3DPAZXh0bgNhZW0CMTEAAaedYshJautuPUIgbXo5G8VB7Cip2_NYaTsmdkRa9d0pz6mJ6n9yuXhpZMyzAQ_aem_v40tQO_Wn0jA0DIlpEM7EA&e=AT29Tv7T73GE8z_R9knKQ3N_7tJwYmphEzAG5mAXd3iixjaZR-0bJwFbvA1XAelSJLo4f5pfPnT6My4ppN2btd5viMPSlMzrDHi3Zbg"
+                      ><i class="fab fa-linkedin"></i
+                    ></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                  </div>
+                </div>
+              </div>
             </div>
+          </div>
+
+          <div class="text-center">
+            <a href="/products" class="btn btn-custom"
+              >Explore Our Collection</a
+            >
+          </div>
         </div>
+      </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-</body>
+  </body>
 </html>

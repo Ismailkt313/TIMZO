@@ -73,7 +73,7 @@ async function getSalesData(reportType, startDate, endDate) {
         {
             $match: {
                 ...dateFilter,
-                orderStatus: { $in: ['Delivered'] } 
+                orderStatus: { $in: ['Delivered'] }
             }
         },
         {
@@ -143,110 +143,110 @@ const generateAdminSalesReport = async (req, res) => {
 
 
 const generateSalesReportPDF = async (req, res) => {
-  try {
-    const adminId = req.session.admin?.id;
-    if (!adminId) return res.status(401).send('Unauthorized');
+    try {
+        const adminId = req.session.admin?.id;
+        if (!adminId) return res.status(401).send('Unauthorized');
 
-    const { reportType, startDate, endDate } = req.query;
-    const { report, orders } = await getSalesData(reportType, startDate, endDate);
+        const { reportType, startDate, endDate } = req.query;
+        const { report, orders } = await getSalesData(reportType, startDate, endDate);
 
-    const PDFDocument = require('pdfkit');
-    const doc = new PDFDocument({ margin: 10, size: 'A4' });
+        const PDFDocument = require('pdfkit');
+        const doc = new PDFDocument({ margin: 10, size: 'A4' });
 
-    const filename = `Sales_Report_${reportType}_${new Date().toISOString().split('T')[0]}.pdf`;
-    res.setHeader('Content-disposition', `attachment; filename="${filename}"`);
-    res.setHeader('Content-type', 'application/pdf');
-    doc.pipe(res);
+        const filename = `Sales_Report_${reportType}_${new Date().toISOString().split('T')[0]}.pdf`;
+        res.setHeader('Content-disposition', `attachment; filename="${filename}"`);
+        res.setHeader('Content-type', 'application/pdf');
+        doc.pipe(res);
 
-    doc.fontSize(18).text('Timzo Sales Report', { align: 'center' });
-    doc.moveDown(0.3);
-    doc.fontSize(12).text(`Report Type: ${reportType.toUpperCase()}`, { align: 'center' });
-    if (startDate && endDate) {
-      doc.text(`Period: ${startDate} to ${endDate}`, { align: 'center' });
-    }
-    doc.moveDown(1.5);
+        doc.fontSize(18).text('Timzo Sales Report', { align: 'center' });
+        doc.moveDown(0.3);
+        doc.fontSize(12).text(`Report Type: ${reportType.toUpperCase()}`, { align: 'center' });
+        if (startDate && endDate) {
+            doc.text(`Period: ${startDate} to ${endDate}`, { align: 'center' });
+        }
+        doc.moveDown(1.5);
 
-    doc.fontSize(14).text('Summary', { underline: true });
-    doc.moveDown(0.5);
-    doc.fontSize(12);
-    doc.text(`Total Orders: ${report.totalOrders}`);
-    doc.text(`Total Amount: ${report.totalAmount.toFixed(2)}`);
-    doc.text(`Total Discount: ${report.totalDiscount.toFixed(2)}`);
-    doc.moveDown(1.5);
+        doc.fontSize(14).text('Summary', { underline: true });
+        doc.moveDown(0.5);
+        doc.fontSize(12);
+        doc.text(`Total Orders: ${report.totalOrders}`);
+        doc.text(`Total Amount: ${report.totalAmount.toFixed(2)}`);
+        doc.text(`Total Discount: ${report.totalDiscount.toFixed(2)}`);
+        doc.moveDown(1.5);
 
-    doc.fontSize(14).text('Order Details', { underline: true });
-    doc.moveDown(0.5);
+        doc.fontSize(14).text('Order Details', { underline: true });
+        doc.moveDown(0.5);
 
-    const startX = doc.page.margins.left;
-    let y = doc.y;
-    const colWidths = [70, 90, 60, 140, 60, 60, 60, 80]; 
-    const headers = ['Order ID', 'User', 'Date', 'Items', 'Subtotal', 'Discount', 'Total', 'Status'];
-    const totalWidth = colWidths.reduce((a, b) => a + b, 0);
+        const startX = doc.page.margins.left;
+        let y = doc.y;
+        const colWidths = [70, 90, 60, 140, 60, 60, 60, 80];
+        const headers = ['Order ID', 'User', 'Date', 'Items', 'Subtotal', 'Discount', 'Total', 'Status'];
+        const totalWidth = colWidths.reduce((a, b) => a + b, 0);
 
-    const renderHeader = () => {
-      let x = startX;
-      doc.font('Helvetica-Bold').fontSize(10);
-      headers.forEach((header, i) => {
-        doc.text(header, x, y, { width: colWidths[i], align: 'left' });
-        x += colWidths[i];
-      });
-      y += 15;
-      doc.moveTo(startX, y).lineTo(startX + totalWidth, y).stroke();
-      y += 5;
-    };
+        const renderHeader = () => {
+            let x = startX;
+            doc.font('Helvetica-Bold').fontSize(10);
+            headers.forEach((header, i) => {
+                doc.text(header, x, y, { width: colWidths[i], align: 'left' });
+                x += colWidths[i];
+            });
+            y += 15;
+            doc.moveTo(startX, y).lineTo(startX + totalWidth, y).stroke();
+            y += 5;
+        };
 
-    const checkPageBreak = (height) => {
-      if (y + height > doc.page.height - doc.page.margins.bottom) {
-        doc.addPage();
-        y = doc.y;
+        const checkPageBreak = (height) => {
+            if (y + height > doc.page.height - doc.page.margins.bottom) {
+                doc.addPage();
+                y = doc.y;
+                renderHeader();
+            }
+        };
+
         renderHeader();
-      }
-    };
+        doc.font('Helvetica').fontSize(9);
 
-    renderHeader();
-    doc.font('Helvetica').fontSize(9);
+        for (const order of orders) {
+            const itemsText = order.items.map(i => `${i.productName} (Qty: ${i.quantity})`).join('\n');
+            const email = order.user?.email || 'N/A';
+            const status = order.orderStatus;
 
-    for (const order of orders) {
-      const itemsText = order.items.map(i => `${i.productName} (Qty: ${i.quantity})`).join('\n');
-      const email = order.user?.email || 'N/A';
-      const status = order.orderStatus;
+            const rowHeight = Math.max(
+                doc.heightOfString(itemsText, { width: colWidths[3] }),
+                doc.heightOfString(email, { width: colWidths[1] }),
+                doc.heightOfString(status, { width: colWidths[7] }),
+                20
+            );
 
-      const rowHeight = Math.max(
-        doc.heightOfString(itemsText, { width: colWidths[3] }),
-        doc.heightOfString(email, { width: colWidths[1] }),
-        doc.heightOfString(status, { width: colWidths[7] }),
-        20
-      );
+            checkPageBreak(rowHeight + 5);
 
-      checkPageBreak(rowHeight + 5);
+            let x = startX;
+            const row = [
+                order.orderId,
+                email,
+                new Date(order.orderDate).toLocaleDateString('en-IN'),
+                itemsText,
+                `${order.subtotal.toFixed(2)}`,
+                `${order.discount.toFixed(2)}`,
+                `${order.totalAmount.toFixed(2)}`,
+                status
+            ];
 
-      let x = startX;
-      const row = [
-        order.orderId,
-        email,
-        new Date(order.orderDate).toLocaleDateString('en-IN'),
-        itemsText,
-        `${order.subtotal.toFixed(2)}`,
-        `${order.discount.toFixed(2)}`,
-        `${order.totalAmount.toFixed(2)}`,
-        status
-      ];
+            row.forEach((text, i) => {
+                doc.text(text, x, y, { width: colWidths[i], align: 'left' });
+                x += colWidths[i];
+            });
 
-      row.forEach((text, i) => {
-        doc.text(text, x, y, { width: colWidths[i], align: 'left' });
-        x += colWidths[i];
-      });
+            y += rowHeight + 5;
+            doc.moveTo(startX, y).lineTo(startX + totalWidth, y).stroke();
+            y += 5;
+        }
 
-      y += rowHeight + 5;
-      doc.moveTo(startX, y).lineTo(startX + totalWidth, y).stroke();
-      y += 5;
+        doc.end();
+    } catch (err) {
+        console.error('PDF generation error:', err);
+        res.status(500).send('Failed to generate PDF');
     }
-
-    doc.end();
-  } catch (err) {
-    console.error('PDF generation error:', err);
-    res.status(500).send('Failed to generate PDF');
-  }
 };
 
 
@@ -266,33 +266,33 @@ const generateSalesReportExcel = async (req, res) => {
 
         worksheet.addRow(['Timzo Sales Report']).getCell(1).font = { size: 16, bold: true };
         worksheet.addRow([`Report Type: ${reportType.toUpperCase()}`]).getCell(1).font = { size: 12 };
-if (startDate && endDate) {
-    const row = worksheet.addRow([`Period: ${endDate}`]);
-    row.getCell(1).value = `${startDate} to ${endDate}`;
-}
-worksheet.addRow();
+        if (startDate && endDate) {
+            const row = worksheet.addRow([`Period: ${endDate}`]);
+            row.getCell(1).value = `${startDate} to ${endDate}`;
+        }
+        worksheet.addRow();
 
 
-worksheet.addRow(['Summary']).getCell(1).font = { size: 14, bold: true };
+        worksheet.addRow(['Summary']).getCell(1).font = { size: 14, bold: true };
 
-worksheet.addRow(['Total Orders', report.totalOrders]);
-worksheet.addRow(['Total Amount', `₹${report.totalAmount.toFixed(2)}`]);
-worksheet.addRow(['Total Discount', `₹${report.totalDiscount.toFixed(2)}`]);
-worksheet.addRow();
+        worksheet.addRow(['Total Orders', report.totalOrders]);
+        worksheet.addRow(['Total Amount', `₹${report.totalAmount.toFixed(2)}`]);
+        worksheet.addRow(['Total Discount', `₹${report.totalDiscount.toFixed(2)}`]);
+        worksheet.addRow();
 
-const headerRow = worksheet.addRow(['Order ID', 'User', 'Date', 'Items', 'Subtotal', 'AmountDiscount', 'Total', 'Status']);
+        const headerRow = worksheet.addRow(['Order ID', 'User', 'Date', 'Items', 'Subtotal', 'AmountDiscount', 'Total', 'Status']);
 
-headerRow.font = { bold: true, size: 10 };
+        headerRow.font = { bold: true, size: 10 };
 
-headerRow.eachCell((cell) => {
-  cell.fill = {
-    type: 'pattern',
-    pattern: 'solid',
-    fgColor: { argb: 'FFF1F3F5' } 
-  };
-});
+        headerRow.eachCell((cell) => {
+            cell.fill = {
+                type: 'pattern',
+                pattern: 'solid',
+                fgColor: { argb: 'FFF1F3F5' }
+            };
+        });
 
-headerRow.height = 20;
+        headerRow.height = 20;
 
 
         orders.forEach((order) => {
@@ -318,7 +318,7 @@ headerRow.height = 20;
             column.width = Math.min(maxLength + 40, 2);
         });
 
-const filename = `Sales_Report_${reportType}_${new Date().toISOString().split('T')[0]}.xlsx`;
+        const filename = `Sales_Report_${reportType}_${new Date().toISOString().split('T')[0]}.xlsx`;
 
         res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);

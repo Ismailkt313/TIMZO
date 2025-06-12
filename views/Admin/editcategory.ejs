@@ -41,43 +41,43 @@
 
 <body class="bg-gray-100">
 
-        <aside class="sidebar">
-  <%- include('.././partials/admin/adminsidebar', { activePage: 'categories', admin: admin || {} }) %>
-  </aside>
+    <aside class="sidebar">
+        <%- include('.././partials/admin/adminsidebar', { activePage: 'categories' , admin: admin || {} }) %>
+    </aside>
 
 
-        <div class="main-content">
-            <div class="container">
-                <div class="row justify-content-center">
-                    <div class="col-md-6 mt-5">
-                        <h2 class="text-2xl font-bold mb-4">Edit Category</h2>
-                        <% if (error) { %>
-                            <div class="error-message">
-                                <%= error %>
-                            </div>
-                            <% } %>
-                                <form method="post" action="/admin/editcategory/<%= category._id %>">
-                                    <div class="mb-4">
-                                        <label for="categoryName" class="form-label">Name</label>
-                                        <input type="text" name="categoryName" value="<%= category.name %>"
-                                            class="form-control border" id="categoryName" />
-                                    </div>
-                                    <div class="mb-4">
-                                        <label class="form-label">Description</label>
-                                        <textarea name="description" class="form-control border"
-                                            rows="4"><%= category.description || '' %></textarea>
-                                    </div>
-                                    <div class="d-flex justify-content-end gap-2">
-                                        <a href="/admin/categories" class="btn btn-secondary">Cancel</a>
-                                        <button class="btn btn-primary" type="submit">Update Category</button>
-                                    </div>
-                                </form>
-                    </div>
+    <div class="main-content">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-6 mt-5">
+                    <h2 class="text-2xl font-bold mb-4">Edit Category</h2>
+                    <% if (error) { %>
+                        <div class="error-message">
+                            <%= error %>
+                        </div>
+                        <% } %>
+                            <form method="post" action="/admin/editcategory/<%= category._id %>">
+                                <div class="mb-4">
+                                    <label for="categoryName" class="form-label">Name</label>
+                                    <input type="text" name="categoryName" value="<%= category.name %>"
+                                        class="form-control border" id="categoryName" />
+                                </div>
+                                <div class="mb-4">
+                                    <label class="form-label">Description</label>
+                                    <textarea name="description" class="form-control border"
+                                        rows="4"><%= category.description || '' %></textarea>
+                                </div>
+                                <div class="d-flex justify-content-end gap-2">
+                                    <a href="/admin/categories" class="btn btn-secondary">Cancel</a>
+                                    <button class="btn btn-primary" type="submit">Update Category</button>
+                                </div>
+                            </form>
                 </div>
             </div>
         </div>
+    </div>
 
-        <%- include('.././Partials/admin/footer') %>
+    <%- include('.././Partials/admin/footer') %>
 </body>
 
 </html>

@@ -15,8 +15,8 @@ const loadCoupon = async (req, res) => {
       admin,
       limit,
       totalCoupons,
-      success: req.flash('success'), 
-      error: req.flash('error')      
+      success: req.flash('success'),
+      error: req.flash('error')
     });
   } catch (error) {
     console.error('Coupon load error:', error);
@@ -140,10 +140,10 @@ const couponAdd = async (req, res) => {
       hasErrors = true;
     }
 
-if (discountType === 'percentage' && discountAmount > 99) {
-  errors.discountAmount = 'Percentage discount cannot be more than 100%';
-  hasErrors = true;
-}
+    if (discountType === 'percentage' && discountAmount > 99) {
+      errors.discountAmount = 'Percentage discount cannot be more than 100%';
+      hasErrors = true;
+    }
 
 
     const existingCoupon = await Coupon.findOne({ code: code.toUpperCase() });
@@ -321,9 +321,9 @@ const editCoupon = async (req, res) => {
     }
 
     if (discountType === 'percentage' && discountAmount > 99) {
-  errors.discountAmount = 'Percentage discount cannot be more than 100%';
-  hasErrors = true;
-}
+      errors.discountAmount = 'Percentage discount cannot be more than 100%';
+      hasErrors = true;
+    }
 
     const existingCoupon = await Coupon.findOne({
       code: code.toUpperCase(),

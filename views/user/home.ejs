@@ -1,156 +1,164 @@
-
 <%- include('../../views/Partials/user/navbar') %>
 
-<section class="hero-section">
-    <div class="container">
-        <h1>NEW YEAR, <br>BIG SALE</h1>
-        <p>DISCOUNT UP TO 50%</p>
-        <button class="shop-btn">SHOP NOW</button>
-    </div>
-</section>
+    <section class="hero-section">
+        <div class="container">
+            <h1>NEW YEAR, <br>BIG SALE</h1>
+            <p>DISCOUNT UP TO 50%</p>
+            <button class="shop-btn">SHOP NOW</button>
+        </div>
+    </section>
 
-<section class="container">
-    <h2 class="section-title">New Arrivals</h2>
-    <div class="row">
-        <% newArrivals.forEach(product => { %>
-            <div class="col-6 col-md-3">
-                <div class="card product-card">
-                    <img src="<%= product.image %>" class="card-img-top" alt="<%= product.title %>">
-                    <div class="card-body">
-                        <h5 class="product-title"><%= product.title %></h5>
-                        <div class="rating">
-                            <% for(let i = 0; i < product.rating; i++) { %>
-                                <i class="fas fa-star"></i>
-                            <% } %>
-                            <% for(let i = product.rating; i < 5; i++) { %>
-                                <i class="far fa-star"></i>
-                            <% } %>
-                        </div>
-                        <p class="product-price">$<%= product.price.toFixed(2) %></p>
-                    </div>
-                </div>
-            </div>
-        <% }); %>
-    </div>
-</section>
-
-<section class="sale-banner">
-    <div class="container">
-        <h2>SALE</h2>
-        <p>GRAB IT FAST</p>
-    </div>
-</section>
-
-<section class="container">
-    <h2 class="section-title">Trending</h2>
-    <div class="row">
-        <% trendingProducts.forEach(product => { %>
-            <div class="col-6 col-md-4">
-                <div class="card product-card">
-                    <img src="<%= product.image %>" class="card-img-top" alt="<%= product.title %>">
-                    <div class="card-body">
-                        <h5 class="product-title"><%= product.title %></h5>
-                        <div class="rating">
-                            <% for(let i = 0; i < product.rating; i++) { %>
-                                <i class="fas fa-star"></i>
-                            <% } %>
-                            <% for(let i = product.rating; i < 5; i++) { %>
-                                <i class="far fa-star"></i>
-                            <% } %>
-                        </div>
-                        <p class="product-price">$<%= product.price.toFixed(2) %></p>
-                    </div>
-                </div>
-            </div>
-        <% }); %>
-    </div>
-</section>
-
-<section class="container mb-5">
-    <h2 class="section-title">Explore More</h2>
-    <div class="row">
-        <% exploreProducts.forEach(product => { %>
-            <div class="col-6 col-md-3">
-                <div class="card product-card">
-                    <img src="<%= product.image %>" class="card-img-top" alt="<%= product.title %>">
-                    <div class="card-body">
-                        <h5 class="product-title"><%= product.title %></h5>
-                        <div class="rating">
-                            <% for(let i = 0; i < product.rating; i++) { %>
-                                <i class="fas fa-star"></i>
-                            <% } %>
-                            <% for(let i = product.rating; i < 5; i++) { %>
-                                <i class="far fa-star"></i>
-                            <% } %>
-                        </div>
-                        <p class="product-price">$<%= product.price.toFixed(2) %></p>
-                    </div>
-                </div>
-            </div>
-        <% }); %>
-    </div>
-</section>
-
-<section class="container-fluid bg-light py-5">
-    <div class="container">
+    <section class="container">
+        <h2 class="section-title">New Arrivals</h2>
         <div class="row">
-            <div class="col-md-3">
-                <div class="feature-item">
-                    <div class="feature-icon">
-                        <i class="fas fa-truck"></i>
+            <% newArrivals.forEach(product=> { %>
+                <div class="col-6 col-md-3">
+                    <div class="card product-card">
+                        <img src="<%= product.image %>" class="card-img-top" alt="<%= product.title %>">
+                        <div class="card-body">
+                            <h5 class="product-title">
+                                <%= product.title %>
+                            </h5>
+                            <div class="rating">
+                                <% for(let i=0; i < product.rating; i++) { %>
+                                    <i class="fas fa-star"></i>
+                                    <% } %>
+                                        <% for(let i=product.rating; i < 5; i++) { %>
+                                            <i class="far fa-star"></i>
+                                            <% } %>
+                            </div>
+                            <p class="product-price">$<%= product.price.toFixed(2) %>
+                            </p>
+                        </div>
                     </div>
-                    <h5>FREE SHIPPING</h5>
-                    <p>On all orders over $99</p>
                 </div>
-            </div>
-            <div class="col-md-3">
-                <div class="feature-item">
-                    <div class="feature-icon">
-                        <i class="fas fa-shield-alt"></i>
+                <% }); %>
+        </div>
+    </section>
+
+    <section class="sale-banner">
+        <div class="container">
+            <h2>SALE</h2>
+            <p>GRAB IT FAST</p>
+        </div>
+    </section>
+
+    <section class="container">
+        <h2 class="section-title">Trending</h2>
+        <div class="row">
+            <% trendingProducts.forEach(product=> { %>
+                <div class="col-6 col-md-4">
+                    <div class="card product-card">
+                        <img src="<%= product.image %>" class="card-img-top" alt="<%= product.title %>">
+                        <div class="card-body">
+                            <h5 class="product-title">
+                                <%= product.title %>
+                            </h5>
+                            <div class="rating">
+                                <% for(let i=0; i < product.rating; i++) { %>
+                                    <i class="fas fa-star"></i>
+                                    <% } %>
+                                        <% for(let i=product.rating; i < 5; i++) { %>
+                                            <i class="far fa-star"></i>
+                                            <% } %>
+                            </div>
+                            <p class="product-price">$<%= product.price.toFixed(2) %>
+                            </p>
+                        </div>
                     </div>
-                    <h5>HIGH QUALITY</h5>
-                    <p>2-year warranty included</p>
                 </div>
-            </div>
-            <div class="col-md-3">
-                <div class="feature-item">
-                    <div class="feature-icon">
-                        <i class="fas fa-exchange-alt"></i>
+                <% }); %>
+        </div>
+    </section>
+
+    <section class="container mb-5">
+        <h2 class="section-title">Explore More</h2>
+        <div class="row">
+            <% exploreProducts.forEach(product=> { %>
+                <div class="col-6 col-md-3">
+                    <div class="card product-card">
+                        <img src="<%= product.image %>" class="card-img-top" alt="<%= product.title %>">
+                        <div class="card-body">
+                            <h5 class="product-title">
+                                <%= product.title %>
+                            </h5>
+                            <div class="rating">
+                                <% for(let i=0; i < product.rating; i++) { %>
+                                    <i class="fas fa-star"></i>
+                                    <% } %>
+                                        <% for(let i=product.rating; i < 5; i++) { %>
+                                            <i class="far fa-star"></i>
+                                            <% } %>
+                            </div>
+                            <p class="product-price">$<%= product.price.toFixed(2) %>
+                            </p>
+                        </div>
                     </div>
-                    <h5>EASY RETURNS</h5>
-                    <p>30-day money back guarantee</p>
                 </div>
-            </div>
-            <div class="col-md-3">
-                <div class="feature-item">
-                    <div class="feature-icon">
-                        <i class="fas fa-headset"></i>
+                <% }); %>
+        </div>
+    </section>
+
+    <section class="container-fluid bg-light py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="fas fa-truck"></i>
+                        </div>
+                        <h5>FREE SHIPPING</h5>
+                        <p>On all orders over $99</p>
                     </div>
-                    <h5>24/7 SUPPORT</h5>
-                    <p>Dedicated customer service</p>
+                </div>
+                <div class="col-md-3">
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <h5>HIGH QUALITY</h5>
+                        <p>2-year warranty included</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="fas fa-exchange-alt"></i>
+                        </div>
+                        <h5>EASY RETURNS</h5>
+                        <p>30-day money back guarantee</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="fas fa-headset"></i>
+                        </div>
+                        <h5>24/7 SUPPORT</h5>
+                        <p>Dedicated customer service</p>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-</section>
+    </section>
 
-<%- include('../../views/Partials/user/footer') %>
+    <%- include('../../views/Partials/user/footer') %>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function(e) {
-                e.preventDefault();
-                document.querySelector(this.getAttribute('href')).scrollIntoView({
-                    behavior: 'smooth'
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                    anchor.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        document.querySelector(this.getAttribute('href')).scrollIntoView({
+                            behavior: 'smooth'
+                        });
+                    });
+                });
+
+                const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+                const tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                    return new bootstrap.Tooltip(tooltipTriggerEl);
                 });
             });
-        });
-        
-        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-        const tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
-            return new bootstrap.Tooltip(tooltipTriggerEl);
-        });
-    });
-</script>
+        </script>
