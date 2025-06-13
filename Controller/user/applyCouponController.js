@@ -5,7 +5,7 @@ const Order = require('../../Model/orderSchema');
 
 
 const applyCoupon = async (req, res) => {
-    try {
+    try { 
         const { couponCode } = req.body;
         const userId = req.session.user._id;
 

@@ -181,18 +181,6 @@
                       <i class="fas fa-calendar-alt mr-2"></i> Placed on:
                       <%= new Date(order.orderDate).toLocaleDateString() %>
                     </p>
-                    <p class="text-gray-600 text-sm mb-1">
-                      Subtotal: ₹<%= order.calculated.subtotal.toFixed(2) %>
-                    </p>
-                    <p class="text-gray-600 text-sm mb-1">
-                      Discount: -₹<%= order.calculated.totalDiscount.toFixed(2) %>
-                    </p>
-                    <p class="text-gray-600 text-sm mb-1">
-                      Tax (10%): ₹<%= order.calculated.tax.toFixed(2) %>
-                    </p>
-                    <p class="text-gray-600 text-sm mb-1">
-                      Shipping Fee: ₹<%= order.calculated.shippingFee.toFixed(2) %>
-                    </p>
 
                     <p class="text-gray-800 font-semibold text-sm mt-1">
                       Total: ₹<%= order.totalAmount.toFixed(2) %>
