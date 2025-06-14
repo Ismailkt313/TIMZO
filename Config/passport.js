@@ -9,12 +9,16 @@ passport.use(
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
       callbackURL: "https://timzo.store/auth/google/callback",
+      passReqToCallback: true, // ✅ Add this
     },
-    async (accessToken, refreshToken, profile, done) => {
+    async (req, accessToken, refreshToken, profile, done) => {
       try {
-        const user = await User.findOne({ googleId: profile.id });
+        let user = await User.findOne({ googleId: profile.id });
 
-        if (user) return done(null, user);
+        if (user) {
+          req.session.user = user; // ✅ safe to use now
+          return done(null, user);
+        }
 
         const newUser = new User({
           fullname: profile.displayName,
@@ -23,7 +27,7 @@ passport.use(
         });
 
         await newUser.save();
-        req.session.user = user;
+        req.session.user = newUser; // ✅ set the session
         return done(null, newUser);
       } catch (error) {
         return done(error, null);
@@ -31,6 +35,7 @@ passport.use(
     }
   )
 );
+
 
 passport.serializeUser((user, done) => {
   done(null, user.id);
