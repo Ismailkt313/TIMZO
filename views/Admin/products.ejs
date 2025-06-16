@@ -52,7 +52,7 @@
 
   <div class="flex min-h-screen">
     <div class="w-64 bg-dark text-white">
-      <%- include('.././Partials/Admin/adminsidebar', { activePage: 'product' , admin: admin || {} }) %>
+      <%- include('../../Partials/admin/adminsidebar', { activePage: 'product' , admin: admin || {} }) %>
     </div>
     <style>
       body {
@@ -215,7 +215,7 @@
     </main>
   </div>
 
-  <%- include('.././Partials/Admin/footer') %>
+  <%- include('../../Partials/admin/footer') %>
 
     <script>
       function toggleDeletedView() {
