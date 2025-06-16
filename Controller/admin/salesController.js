@@ -122,7 +122,7 @@ const generateAdminSalesReport = async (req, res) => {
 
         const paginatedOrders = orders.slice(skip, skip + limit);
 
-        res.render('admin/salesReport', {
+        res.render('Admin/salesReport', {
             report,
             orders: paginatedOrders,
             reportType,

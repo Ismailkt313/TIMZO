@@ -19,7 +19,7 @@ const loadsidewishlist = async (req, res) => {
 
         const filteredProducts = wishlist ? wishlist.products.filter(p => p.productId) : [];
 
-        res.render('user/sidebarwishlist', {
+        res.render('user/sidebarWishlist', {
             wishlist: filteredProducts,
             user: req.session.user
         });
