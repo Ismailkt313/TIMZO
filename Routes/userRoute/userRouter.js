@@ -30,7 +30,7 @@ router.get('/changepassword', userController.loadChangePassword);
 router.post('/changepassword', userController.changePassword);
 router.get('/logout', userController.loadlogout);
 router.get('/products', userController.loadProducts);
-router.get('/products/:id', userAuth, userController.loadProductDetails);
+router.get('/products/:id', userController.loadProductDetails);
 router.get('/cart', userAuth, cartController.loadcart);
 router.post('/add-to-cart', userAuth, cartController.addToCart);
 router.post('/addtocart', userAuth, wishlistController.addToCart)

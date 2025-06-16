@@ -10,14 +10,14 @@ const errorHandler = (err, req, res, next) => {
             stack: process.env.NODE_ENV === 'production' ? null : err.stack,
         });
     }
-
+    console.log('error here')
     if (statusCode === 404) {
         return res.status(404).render('error404', {
             message: err.message || 'Page Not Found',
         });
     }
 
-    res.status(statusCode).render('error404', {
+    return res.status(statusCode).render('error500', {
         message: err.message || 'Something went wrong',
         status: statusCode,
         stack: process.env.NODE_ENV === 'production' ? null : err.stack,
