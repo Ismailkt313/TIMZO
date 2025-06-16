@@ -786,7 +786,7 @@ const loadProductDetails = async (req, res) => {
       .populate('brand')
       .limit(6);
 
-    res.render('user/productdetails', {
+    res.render('user/productDetails', {
       product,
       cart,
       total,
