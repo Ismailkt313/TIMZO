@@ -1,154 +1,386 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
-  <title>User Profile - Timzo Admin</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="icon" type="image/x-icon" href="/images/TIMZO.jpg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Timzo Admin - User Profile</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link rel="icon" type="image/x-icon" href="/images/TIMZO.jpg">
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <style>
+    .status-badge {
+      padding: 0.25rem 0.5rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
 
+    .status-active {
+      background-color: #dcfce7;
+      color: #166534;
+    }
 
+    .status-blocked {
+      background-color: #fee2e2;
+      color: #dc2626;
+    }
+
+    .profile-card {
+      animation: fadeIn 0.3s ease-out forwards;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .profile-image {
+        width: 120px !important;
+        height: 120px !important;
+      }
+
+      .profile-grid {
+        grid-template-columns: 1fr !important;
+      }
+
+      .action-buttons {
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+
+      .profile-details {
+        font-size: 0.875rem;
+      }
+
+      .card-title {
+        font-size: 1.25rem;
+      }
+    }
+
+    @media (max-width: 576px) {
+      .profile-image {
+        width: 100px !important;
+        height: 100px !important;
+      }
+
+      .btn {
+        font-size: 0.75rem;
+        padding: 0.5rem 0.75rem;
+      }
+
+      .profile-details h5 {
+        font-size: 0.875rem;
+      }
+
+      .profile-details p {
+        font-size: 0.75rem;
+      }
+    }
+  </style>
 </head>
-<style>
-  .sidebar {
-    width: 250px;
-    position: fixed;
-    top: 0;
-    left: 0;
-    height: 100%;
-    background-color: #1f2937;
-    color: white;
-    padding-top: 20px;
-    transition: transform 0.3s ease;
-  }
-
-  .sidebar.collapsed {
-    transform: translateX(-250px);
-  }
-</style>
-<aside class="sidebar">
-  <%- include('.././Partials/admin/adminsidebar', { activePage: 'orders' , admin: admin || {} }) %>
-
-</aside>
-
-<body class="bg-gray-100 pt-20">
-
-
-
-  <div class="flex min-h-screen">
-    <div class="w-64 bg-dark text-white">
-
-    </div>
-
-    <main class="flex-1 p-6">
-      <div class="bg-white p-6 rounded-xl shadow-md max-w-4xl mx-auto">
-        <h2 class="text-3xl font-bold mb-8 text-center">User Profile</h2>
-
-        <div class="flex flex-col md:flex-row items-center gap-8">
-          <div class="flex-shrink-0">
-            <img src="/images/th (2).jpeg" alt="" class="rounded-full w-40 h-40 object-cover shadow-md">
+<body class="bg-gray-50">
+  <!-- Sidebar -->
+  <div class="fixed inset-y-0 left-0 z-40 transition-all duration-300 transform -translate-x-full lg:translate-x-0" id="sidebar">
+    <div class="flex flex-col h-full w-72 bg-gradient-to-b from-slate-800 to-slate-900 text-white shadow-xl rounded-r-xl overflow-hidden">
+      <div class="p-5 flex items-center gap-3 border-b border-slate-700/50">
+        <img src="/images/TIMZO.jpg" alt="Timzo Logo" class="w-10 h-10 rounded-md">
+        <div class="text-xl font-bold tracking-wide bg-gradient-to-r from-amber-300 to-amber-500 bg-clip-text text-transparent">
+          Timzo Admin
+        </div>
+      </div>
+      <div class="px-4 py-5">
+        <div class="flex items-center gap-3 mb-2 px-2">
+          <div class="w-10 h-10 rounded-full bg-amber-500 flex items-center justify-center text-slate-900 font-bold">
+            <%= admin && admin.name ? admin.name.charAt(0).toUpperCase() : 'A' %>
           </div>
-
-          <div class="flex-1 w-full">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-
-              <div>
-                <h5 class="font-semibold text-gray-700">Name</h5>
-                <p class="text-gray-600">
-                  <%= user.fullname %>
-                </p>
-              </div>
-
-              <div>
-                <h5 class="font-semibold text-gray-700">Email</h5>
-                <p class="text-gray-600">
-                  <%= user.email %>
-                </p>
-              </div>
-
-              <div>
-                <h5 class="font-semibold text-gray-700">Phone Number</h5>
-                <p class="text-gray-600">
-                  <%= user.mobile %>
-                </p>
-              </div>
-
-              <div>
-                <h5 class="font-semibold text-gray-700">User ID</h5>
-                <p class="text-gray-600">
-                  <%= user._id %>
-                </p>
-              </div>
-
-              <div class="md:col-span-2">
-                <h5 class="font-semibold text-gray-700">Address</h5>
-                <p class="text-gray-600">
-                  <%= user.address %>
-                </p>
-              </div>
-
+          <div>
+            <div class="font-medium">
+              <%= admin && admin.name ? admin.name : 'Admin User' %>
             </div>
-
-            <div class="flex gap-4 mt-8">
-              <a href="/admin/update-user/<%= user._id %>" class="btn btn-primary flex-1">Update Profile</a>
-
-              <button class="btn btn-sm toggle-status-btn <%= user.isBlocked ? 'btn-danger' : 'btn-success' %>"
-                data-user-id="<%= user._id %>">
-                <%= user.isBlocked ? 'Blocked' : 'Active' %>
-              </button>
+            <div class="text-xs text-slate-400">
+              <%= admin && admin.email ? admin.email : 'admin@timzo.com' %>
             </div>
-
           </div>
         </div>
-
       </div>
-    </main>
+      <nav class="flex-1 px-4 space-y-1 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
+        <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider px-3 mb-2">Dashboard</div>
+        <a href="/admin/dashboard" class="flex items-center px-3 py-2.5 rounded-lg transition-all duration-200 group text-slate-300 hover:bg-slate-700/50 hover:text-white">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-slate-400 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+          </svg>
+          <span>Dashboard</span>
+        </a>
+        <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider px-3 mt-6 mb-2">Store Management</div>
+        <a href="/admin/getProduct" class="flex items-center px-3 py-2.5 rounded-lg transition-all duration-200 group text-slate-300 hover:bg-slate-700/50 hover:text-white">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-slate-400 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+          </svg>
+          <span>Products</span>
+        </a>
+        <a href="/admin/brand" class="flex items-center px-3 py-2.5 rounded-lg transition-all duration-200 group text-slate-300 hover:bg-slate-700/50 hover:text-white">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-slate-400 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+          </svg>
+          <span>Brands</span>
+        </a>
+        <a href="/admin/categories" class="flex items-center px-3 py-2.5 rounded-lg transition-all duration-200 group text-slate-300 hover:bg-slate-700/50 hover:text-white">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-slate-400 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+          </svg>
+          <span>Categories</span>
+        </a>
+        <a href="/admin/orders" class="flex items-center px-3 py-2.5 rounded-lg transition-all duration-200 group text-slate-300 hover:bg-slate-700/50 hover:text-white">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-slate-400 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+          </svg>
+          <span>Orders</span>
+        </a>
+        <a href="/admin/coupons" class="flex items-center px-3 py-2.5 rounded-lg transition-all duration-200 group text-slate-300 hover:bg-slate-700/50 hover:text-white">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-slate-400 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
+          </svg>
+          <span>Coupons</span>
+        </a>
+        <a href="/admin/sales-report" class="flex items-center px-3 py-2.5 rounded-lg transition-all duration-200 group text-slate-300 hover:bg-slate-700/50 hover:text-white">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-slate-400 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+          <span>Sales Report</span>
+        </a>
+        <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider px-3 mt-6 mb-2">User Management</div>
+        <a href="/admin/users" class="flex items-center px-3 py-2.5 rounded-lg transition-all duration-200 group bg-amber-500/10 text-amber-400">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+          </svg>
+          <span>Users</span>
+        </a>
+        <div class="py-10"></div>
+      </nav>
+      <div class="p-4 mt-auto border-t border-slate-700/50">
+        <a href="/admin/logout" class="flex items-center px-3 py-2.5 rounded-lg text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-all duration-200">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+          </svg>
+          <span>Logout</span>
+        </a>
+      </div>
+    </div>
   </div>
 
-  <%- include('.././Partials/admin/footer') %>
+  <!-- Sidebar Backdrop for Mobile -->
+  <div class="fixed inset-0 bg-black/50 z-30 lg:hidden transition-opacity duration-300 opacity-0 pointer-events-none" id="sidebarBackdrop"></div>
 
-</body>
+  <!-- Mobile Sidebar Toggle -->
+  <div class="fixed top-4 left-4 z-50 lg:hidden">
+    <button id="sidebarToggle" class="bg-amber-500 text-slate-900 rounded-lg p-2 shadow-lg flex items-center justify-center">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" id="menuIcon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+      </svg>
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 hidden" id="closeIcon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+  </div>
 
-</html>
+  <!-- Main Content -->
+  <main class="lg:ml-72 min-h-screen p-4 lg:p-6 pt-16 lg:pt-6">
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden profile-card">
+      <!-- Header -->
+      <div class="p-4 lg:p-6 border-b border-gray-200">
+        <h1 class="text-2xl lg:text-3xl font-bold text-gray-900 text-center">User Profile</h1>
+        <p class="text-gray-500 mt-1 text-center">View and manage user details</p>
+      </div>
+      <!-- Profile Details -->
+      <div class="p-4 lg:p-6">
+        <% if (user) { %>
+          <div class="flex flex-col lg:flex-row items-center gap-6 lg:gap-8">
+            <!-- Profile Image -->
+            <div class="flex-shrink-0">
+              <img src="<%= user.profileImage || '/images/th (2).jpeg' %>" alt="Profile Image" class="rounded-full profile-image w-32 h-32 lg:w-40 lg:h-40 object-cover shadow-md">
+            </div>
+            <!-- User Details -->
+            <div class="flex-1 w-full profile-details">
+              <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 profile-grid">
+                <div>
+                  <h5 class="font-semibold text-gray-700 text-sm lg:text-base">Name</h5>
+                  <p class="text-gray-600">
+                    <%= user.fullname || 'N/A' %>
+                  </p>
+                </div>
+                <div>
+                  <h5 class="font-semibold text-gray-700 text-sm lg:text-base">Email</h5>
+                  <p class="text-gray-600">
+                    <%= user.email || 'N/A' %>
+                  </p>
+                </div>
+                <div>
+                  <h5 class="font-semibold text-gray-700 text-sm lg:text-base">Phone Number</h5>
+                  <p class="text-gray-600">
+                    <%= user.mobile || 'N/A' %>
+                  </p>
+                </div>
+                <div>
+                  <h5 class="font-semibold text-gray-700 text-sm lg:text-base">User ID</h5>
+                  <p class="text-gray-600">
+                    <%= user._id || 'N/A' %>
+                  </p>
+                </div>
+                <div class="lg:col-span-2">
+                  <h5 class="font-semibold text-gray-700 text-sm lg:text-base">Address</h5>
+                  <p class="text-gray-600">
+                    <%= user.address || 'N/A' %>
+                  </p>
+                </div>
+                <div>
+                  <h5 class="font-semibold text-gray-700 text-sm lg:text-base">Status</h5>
+                  <span class="status-badge status-<%= user.isBlocked ? 'blocked' : 'active' %>">
+                    <%= user.isBlocked ? 'Blocked' : 'Active' %>
+                  </span>
+                </div>
+              </div>
+              <!-- Actions -->
+              <div class="flex gap-3 mt-6 action-buttons">
+                <a href="/admin/update-user/<%= user._id %>" class="btn btn-primary flex-1">
+                  <i class="bi bi-pencil-square me-1"></i> Update Profile
+                </a>
+                <button class="toggle-status-btn btn btn-sm btn-<%= user.isBlocked ? 'success' : 'danger' %>"
+                        data-user-id="<%= user._id %>"
+                        data-status="<%= user.isBlocked ? 'unblock' : 'block' %>">
+                  <i class="bi bi-<%= user.isBlocked ? 'check-circle' : 'x-circle' %> me-1"></i>
+                  <%= user.isBlocked ? 'Unblock' : 'Block' %>
+                </button>
+              </div>
+            </div>
+          </div>
+        <% } else { %>
+          <div class="text-center py-5 text-muted">
+            <i class="bi bi-person-x display-1 d-block mb-3 opacity-25"></i>
+            <h5>User Not Found</h5>
+            <p class="mb-0">No user data available.</p>
+          </div>
+        <% } %>
+      </div>
+    </div>
+  </main>
 
-<script>
-  document.querySelectorAll('.toggle-status-btn').forEach(button => {
-    button.addEventListener('click', async function () {
-      const userId = this.dataset.userId;
-      const btn = this;
+  <!-- Footer -->
+  <footer class="bg-gray-100 p-4 text-center text-gray-600 text-sm shadow-inner">
+    © <%= new Date().getFullYear() %> Timzo Admin Panel. All rights reserved.
+  </footer>
 
-      try {
-        const response = await fetch(`/admin/toggle-user-status/${userId}`, {
-          method: 'PATCH',
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Sidebar Toggle
+    const sidebar = document.getElementById('sidebar');
+    const sidebarBackdrop = document.getElementById('sidebarBackdrop');
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    const menuIcon = document.getElementById('menuIcon');
+    const closeIcon = document.getElementById('closeIcon');
+
+    function toggleSidebar() {
+      sidebar.classList.toggle('translate-x-0');
+      sidebarBackdrop.classList.toggle('opacity-0');
+      sidebarBackdrop.classList.toggle('pointer-events-none');
+      menuIcon.classList.toggle('hidden');
+      closeIcon.classList.toggle('hidden');
+    }
+
+    sidebarToggle.addEventListener('click', toggleSidebar);
+    sidebarBackdrop.addEventListener('click', toggleSidebar);
+
+    // Toggle Status
+    document.querySelectorAll('.toggle-status-btn').forEach(button => {
+      button.addEventListener('click', async function () {
+        const userId = this.dataset.userId;
+        const currentStatus = this.dataset.status;
+
+        const result = await Swal.fire({
+          title: `Are you sure?`,
+          text: `This will ${currentStatus === 'block' ? 'block' : 'unblock'} the user.`,
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonText: `Yes, ${currentStatus === 'block' ? 'Block' : 'Unblock'}`,
+          confirmButtonColor: '#0288d1',
+          cancelButtonColor: '#6c757d'
         });
 
-        const data = await response.json();
+        if (!result.isConfirmed) return;
 
-        if (data.success) {
-          const statusCell = btn.closest('tr').querySelector('td:nth-child(4)');
+        try {
+          const response = await fetch(`/admin/toggle-user-status/${userId}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' }
+          });
+          const data = await response.json();
 
-          if (data.isBlocked) {
-            btn.classList.remove('btn-success');
-            btn.classList.add('btn-danger');
-            btn.textContent = 'Blocked';
-            statusCell.innerHTML = '<span class="text-danger">Blocked</span>';
+          if (data.success) {
+            const isBlocked = data.isBlocked;
+            const statusBadge = document.querySelector('.status-badge');
+            const toggleBtn = this;
+
+            // Update Status Badge
+            if (statusBadge) {
+              statusBadge.textContent = isBlocked ? 'Blocked' : 'Active';
+              statusBadge.className = `status-badge status-${isBlocked ? 'blocked' : 'active'}`;
+            }
+
+            // Update Toggle Button
+            toggleBtn.dataset.status = isBlocked ? 'unblock' : 'block';
+            toggleBtn.className = `toggle-status-btn btn btn-sm btn-${isBlocked ? 'success' : 'danger'}`;
+            toggleBtn.innerHTML = `
+              <i class="bi bi-${isBlocked ? 'check-circle' : 'x-circle'} me-1"></i>
+              ${isBlocked ? 'Unblock' : 'Block'}
+            `;
+
+            Swal.fire({
+              title: 'Success!',
+              text: `User has been ${isBlocked ? 'blocked' : 'unblocked'}.`,
+              icon: 'success',
+              confirmButtonColor: '#0288d1'
+            });
           } else {
-            btn.classList.remove('btn-danger');
-            btn.classList.add('btn-success');
-            btn.textContent = 'Active';
-            statusCell.innerHTML = '<span class="text-success">Active</span>';
+            Swal.fire({
+              title: 'Failed',
+              text: data.message || 'Operation unsuccessful.',
+              icon: 'error',
+              confirmButtonColor: '#0288d1'
+            });
           }
-        } else {
-          alert('Failed to toggle status.');
+        } catch (error) {
+          console.error('Error toggling user status:', error);
+          Swal.fire({
+            title: 'Error',
+            text: 'Something went wrong!',
+            icon: 'error',
+            confirmButtonColor: '#0288d1'
+          });
         }
-      } catch (error) {
-        console.error(error);
-        swal('Something went wrong!');
+      });
+    });
+
+    // Close Sidebar on Resize
+    window.addEventListener('resize', () => {
+      if (window.innerWidth >= 1024) {
+        sidebar.classList.remove('translate-x-0');
+        sidebarBackdrop.classList.add('opacity-0', 'pointer-events-none');
+        menuIcon.classList.remove('hidden');
+        closeIcon.classList.add('hidden');
       }
     });
-  });
-</script>
+  </script>
+</body>
+</html>

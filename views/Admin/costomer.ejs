@@ -1,50 +1,83 @@
 <!DOCTYPE html>
-<html lang="en" class="h-full">
-
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Customer Management - Timzo Admin</title>
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Timzo Admin - Customer Management</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link rel="icon" type="image/x-icon" href="/images/TIMZO.jpg" />
+  <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-
-
-
   <style>
-    .sidebar {
-      width: 250px;
-      position: fixed;
-      top: 0;
-      left: 0;
-      height: 100%;
-      background-color: #1f2937;
-      color: white;
-      padding-top: 20px;
-      transition: transform 0.3s ease;
-    }
-
-    .sidebar.collapsed {
-      transform: translateX(-250px);
-    }
-
-    .scrollbar-thin::-webkit-scrollbar {
-      width: 8px;
+    .table-container::-webkit-scrollbar {
       height: 8px;
     }
-
-    .scrollbar-thin::-webkit-scrollbar-track {
-      background: transparent;
+    .table{
+      width: 1555px;
     }
 
-    .scrollbar-thin::-webkit-scrollbar-thumb {
-      background-color: rgba(203, 213, 225, 0.5);
+    .table-container::-webkit-scrollbar-track {
+      background: #f1f5f9;
       border-radius: 4px;
     }
 
-    .dark .scrollbar-thin::-webkit-scrollbar-thumb {
-      background-color: rgba(71, 85, 105, 0.5);
+    .table-container::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+    }
+
+    .table-container::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+
+    .status-badge {
+      padding: 0.25rem 0.5rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    .status-active {
+      background-color: #dcfce7;
+      color: #166534;
+    }
+
+    .status-blocked {
+      background-color: #fee2e2;
+      color: #dc2626;
+    }
+
+    .summary-box {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .summary-card {
+      background: #f8f9fa;
+      padding: 1rem;
+      border-radius: 0.625rem;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      animation: fadeIn 0.3s ease-out forwards;
+    }
+
+    .summary-card h3 {
+      font-size: 0.875rem;
+      color: #6c757d;
+      margin-bottom: 0.5rem;
+    }
+
+    .summary-card p {
+      font-size: 1.125rem;
+      font-weight: 600;
+      color: #212529;
     }
 
     @keyframes fadeIn {
@@ -52,764 +85,751 @@
         opacity: 0;
         transform: translateY(10px);
       }
-
       to {
         opacity: 1;
         transform: translateY(0);
       }
     }
 
-    .fade-in {
-      animation: fadeIn 0.3s ease-out forwards;
-    }
-
-    .badge-active {
-      background-color: #dcfce7;
-      color: #16a34a;
-    }
-
-    .badge-blocked {
-      background-color: #fee2e2;
-      color: #dc2626;
-    }
-
-    /* Responsive table */
     @media (max-width: 768px) {
-      .responsive-table-container {
-        overflow-x: auto;
+      .mobile-card {
+        display: block !important;
       }
-
-      .responsive-card {
+      
+      .desktop-table {
+        display: none !important;
+      }
+      
+      .mobile-actions {
         display: flex;
+        flex-wrap: wrap;
+        gap: 0.25rem;
+      }
+      
+      .controls-container {
         flex-direction: column;
-        margin-bottom: 1rem;
-        border-radius: 0.5rem;
-        overflow: hidden;
+        gap: 1rem;
       }
-
-      .responsive-card-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 0.75rem 1rem;
-        background-color: #f8fafc;
+      
+      .filter-group {
+        flex-direction: column;
+        gap: 0.5rem;
       }
-
-      .dark .responsive-card-header {
-        background-color: #334155;
+      
+      .pagination-container {
+        overflow-x: auto;
+        padding: 0.5rem 0;
       }
-
-      .responsive-card-body {
+      
+      .pagination {
+        white-space: nowrap;
+        margin: 0;
+      }
+      
+      .card-body {
         padding: 1rem;
       }
-
-      .responsive-card-row {
-        display: flex;
-        justify-content: space-between;
-        padding: 0.5rem 0;
-        border-bottom: 1px solid #e2e8f0;
+      
+      .table th, .table td {
+        font-size: 0.875rem;
       }
-
-      .dark .responsive-card-row {
-        border-bottom: 1px solid #475569;
+      
+      .summary-box {
+        grid-template-columns: 1fr;
       }
+    }
 
-      .responsive-card-label {
-        font-weight: 500;
-        color: #64748b;
+    @media (min-width: 769px) {
+      .mobile-card {
+        display: none !important;
       }
-
-      .dark .responsive-card-label {
-        color: #94a3b8;
+      
+      .desktop-table {
+        display: table !important;
       }
+    }
 
-      .responsive-card-actions {
-        display: flex;
-        justify-content: flex-end;
-        gap: 0.5rem;
-        padding-top: 0.75rem;
+    @media (max-width: 576px) {
+      .action-btn-group .btn {
+        font-size: 0.7rem;
+        padding: 0.2rem 0.4rem;
+      }
+      
+      .card-title {
+        font-size: 0.875rem;
+      }
+      
+      .badge, .status-badge {
+        font-size: 0.6875rem;
+      }
+      
+      .filter-group select, .filter-group input {
+        font-size: 0.875rem;
+      }
+      
+      .summary-card p {
+        font-size: 1rem;
       }
     }
   </style>
 </head>
-
-<body class="h-full bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 flex flex-col">
-  <aside class="sidebar">
-    <%- include('.././Partials/admin/adminsidebar', { activePage: 'users' , admin: admin || {} }) %>
-
-  </aside>
-
-  <main class="flex-1 ml-4 md:ml-80 mt-20 mb-4 mr-4 pb-6 px-4 md:px-8 transition-all duration-300">
-    <div class="max-w-7xl mx-auto">
-      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-        <div>
-          <h1 class="text-2xl font-bold text-slate-800 dark:text-white">Customer Management</h1>
-          <p class="text-slate-500 dark:text-slate-400 mt-1">View and manage your customer accounts</p>
-        </div>
-
-        <div class="flex items-center gap-3">
-          <button id="exportBtn"
-            class="px-4 py-2 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors flex items-center gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
-              stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            </svg>
-            Export
-          </button>
+<body class="bg-gray-50">
+  <!-- Sidebar -->
+  <div class="fixed inset-y-0 left-0 z-40 transition-all duration-300 transform -translate-x-full lg:translate-x-0" id="sidebar">
+    <div class="flex flex-col h-full w-72 bg-gradient-to-b from-slate-800 to-slate-900 text-white shadow-xl rounded-r-xl overflow-hidden">
+      <div class="p-5 flex items-center gap-3 border-b border-slate-700/50">
+        <img src="/images/TIMZO.jpg" alt="Timzo Logo" class="w-10 h-10 rounded-md">
+        <div class="text-xl font-bold tracking-wide bg-gradient-to-r from-amber-300 to-amber-500 bg-clip-text text-transparent">
+          Timzo Admin
         </div>
       </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <div
-          class="bg-white dark:bg-slate-800 rounded-xl shadow-md border border-slate-200 dark:border-slate-700 p-6 fade-in">
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-slate-500 dark:text-slate-400 text-base font-medium">Total Customers</p>
-              <h3 class="text-3xl font-bold mt-1 text-slate-800 dark:text-white">
-                <%= totalUsers || 0 %>
-              </h3>
-            </div>
-            <div class="bg-blue-100 dark:bg-blue-900/30 p-3 rounded-lg">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-blue-500 dark:text-blue-400" fill="none"
-                viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-              </svg>
-            </div>
+      <div class="px-4 py-5">
+        <div class="flex items-center gap-3 mb-2 px-2">
+          <div class="w-10 h-10 rounded-full bg-amber-500 flex items-center justify-center text-slate-900 font-bold">
+            <%= admin && admin.name ? admin.name.charAt(0).toUpperCase() : 'A' %>
           </div>
-          <div class="flex items-center mt-4">
-            <span class="text-green-500 text-base font-medium flex items-center">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24"
-                stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
-              </svg>
-              <%= newUsersPercent || 5 %>%
-            </span>
-            <span class="text-slate-500 dark:text-slate-400 text-base ml-2">vs last month</span>
-          </div>
-        </div>
-
-        <div
-          class="bg-white dark:bg-slate-800 rounded-xl shadow-md border border-slate-200 dark:border-slate-700 p-6 fade-in"
-          style="animation-delay: 0.1s;">
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-slate-500 dark:text-slate-400 text-base font-medium">Active Customers</p>
-              <h3 class="text-3xl font-bold mt-1 text-slate-800 dark:text-white">
-                <%= activeUsers || 0 %>
-              </h3>
+          <div>
+            <div class="font-medium">
+              <%= admin && admin.name ? admin.name : 'Admin User' %>
             </div>
-            <div class="bg-green-100 dark:bg-green-900/30 p-3 rounded-lg">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-green-500 dark:text-green-400" fill="none"
-                viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
+            <div class="text-xs text-slate-400">
+              <%= admin && admin.email ? admin.email : 'admin@timzo.com' %>
             </div>
-          </div>
-          <div class="flex items-center mt-4">
-            <span class="text-slate-500 dark:text-slate-400 text-base">
-              <%= activeUsersPercent || 85 %>% of total
-            </span>
-          </div>
-        </div>
-
-        <div
-          class="bg-white dark:bg-slate-800 rounded-xl shadow-md border border-slate-200 dark:border-slate-700 p-6 fade-in"
-          style="animation-delay: 0.2s;">
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-slate-500 dark:text-slate-400 text-base font-medium">Blocked Customers</p>
-              <h3 class="text-3xl font-bold mt-1 text-slate-800 dark:text-white">
-                <%= blockedUsers || 0 %>
-              </h3>
-            </div>
-            <div class="bg-red-100 dark:bg-red-900/30 p-3 rounded-lg">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-red-500 dark:text-red-400" fill="none"
-                viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
-              </svg>
-            </div>
-          </div>
-          <div class="flex items-center mt-4">
-            <span class="text-slate-500 dark:text-slate-400 text-base">
-              <%= blockedUsersPercent || 15 %>% of total
-            </span>
-          </div>
-        </div>
-
-        <div
-          class="bg-white dark:bg-slate-800 rounded-xl shadow-md border border-slate-200 dark:border-slate-700 p-6 fade-in"
-          style="animation-delay: 0.3s;">
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-slate-500 dark:text-slate-400 text-base font-medium">New This Month</p>
-              <h3 class="text-3xl font-bold mt-1 text-slate-800 dark:text-white">
-                <%= newUsers || 0 %>
-              </h3>
-            </div>
-            <div class="bg-purple-100 dark:bg-purple-900/30 p-3 rounded-lg">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-purple-500 dark:text-purple-400" fill="none"
-                viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-              </svg>
-            </div>
-          </div>
-          <div class="flex items-center mt-4">
-            <span class="text-green-500 text-base font-medium flex items-center">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24"
-                stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
-              </svg>
-              <%= newUsersGrowth || 12 %>%
-            </span>
-            <span class="text-slate-500 dark:text-slate-400 text-base ml-2">growth rate</span>
           </div>
         </div>
       </div>
+      <nav class="flex-1 px-4 space-y-1 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
+        <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider px-3 mb-2">Dashboard</div>
+        <a href="/admin/dashboard" class="flex items-center px-3 py-2.5 rounded-lg transition-all duration-200 group text-slate-300 hover:bg-slate-700/50 hover:text-white">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-slate-400 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+          </svg>
+          <span>Dashboard</span>
+        </a>
+        <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider px-3 mt-6 mb-2">Store Management</div>
+        <a href="/admin/getProduct" class="flex items-center px-3 py-2.5 rounded-lg transition-all duration-200 group text-slate-300 hover:bg-slate-700/50 hover:text-white">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-slate-400 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+          </svg>
+          <span>Products</span>
+        </a>
+        <a href="/admin/brand" class="flex items-center px-3 py-2.5 rounded-lg transition-all duration-200 group text-slate-300 hover:bg-slate-700/50 hover:text-white">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-slate-400 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+          </svg>
+          <span>Brands</span>
+        </a>
+        <a href="/admin/categories" class="flex items-center px-3 py-2.5 rounded-lg transition-all duration-200 group text-slate-300 hover:bg-slate-700/50 hover:text-white">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-slate-400 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+          </svg>
+          <span>Categories</span>
+        </a>
+        <a href="/admin/orders" class="flex items-center px-3 py-2.5 rounded-lg transition-all duration-200 group text-slate-300 hover:bg-slate-700/50 hover:text-white">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-slate-400 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+          </svg>
+          <span>Orders</span>
+        </a>
+        <a href="/admin/coupons" class="flex items-center px-3 py-2.5 rounded-lg transition-all duration-200 group text-slate-300 hover:bg-slate-700/50 hover:text-white">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-slate-400 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
+          </svg>
+          <span>Coupons</span>
+        </a>
+        <a href="/admin/sales-report" class="flex items-center px-3 py-2.5 rounded-lg transition-all duration-200 group text-slate-300 hover:bg-slate-700/50 hover:text-white">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-slate-400 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+          <span>Sales Report</span>
+        </a>
+        <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider px-3 mt-6 mb-2">User Management</div>
+        <a href="/admin/users" class="flex items-center px-3 py-2.5 rounded-lg transition-all duration-200 group bg-amber-500/10 text-amber-400">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+          </svg>
+          <span>Users</span>
+        </a>
+        <div class="py-10"></div>
+      </nav>
+      <div class="p-4 mt-auto border-t border-slate-700/50">
+        <a href="/admin/logout" class="flex items-center px-3 py-2.5 rounded-lg text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-all duration-200">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+          </svg>
+          <span>Logout</span>
+        </a>
+      </div>
+    </div>
+  </div>
 
-      <div
-        class="bg-white dark:bg-slate-800 rounded-xl shadow-md border border-slate-200 dark:border-slate-700 overflow-hidden fade-in"
-        style="animation-delay: 0.4s;">
-        <div class="p-6 border-b border-slate-200 dark:border-slate-700">
-          <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div class="flex space-x-6 overflow-x-auto pb-2 md:pb-0">
-              <button class="text-base font-medium py-2 tab-active" data-filter="all">All Customers (<%= totalUsers || 0
-                  %>)</button>
-              <button
-                class="text-base font-medium py-2 text-slate-600 dark:text-slate-400 hover:text-amber-500 dark:hover:text-amber-400"
-                data-filter="active">Active (<%= activeUsers || 0 %>)</button>
-              <button
-                class="text-base font-medium py-2 text-slate-600 dark:text-slate-400 hover:text-amber-500 dark:hover:text-amber-400"
-                data-filter="blocked">Blocked (<%= blockedUsers || 0 %>)</button>
-            </div>
+  <!-- Sidebar Backdrop for Mobile -->
+  <div class="fixed inset-0 bg-black/50 z-30 lg:hidden transition-opacity duration-300 opacity-0 pointer-events-none" id="sidebarBackdrop"></div>
 
-            <div class="relative">
-              <input type="text" id="searchInput" placeholder="Search customers..."
-                class="w-full md:w-64 bg-slate-100 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg py-2 pl-10 pr-4 text-base focus:outline-none focus:ring-2 focus:ring-amber-500">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-slate-400 absolute left-3 top-2.5" fill="none"
-                viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-            </div>
+  <!-- Mobile Sidebar Toggle -->
+  <div class="fixed top-4 left-4 z-50 lg:hidden">
+    <button id="sidebarToggle" class="bg-amber-500 text-slate-900 rounded-lg p-2 shadow-lg flex items-center justify-center">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" id="menuIcon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+      </svg>
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 hidden" id="closeIcon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+  </div>
+
+  <!-- Main Content -->
+  <main class="lg:ml-72 min-h-screen p-4 lg:p-6 pt-16 lg:pt-6">
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+      <!-- Header -->
+      <div class="p-4 lg:p-6 border-b border-gray-200">
+        <div class="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-4 controls-container">
+          <div>
+            <h1 class="text-2xl lg:text-3xl font-bold text-gray-900">Customer Management</h1>
+            <p class="text-gray-500 mt-1">View and manage your customer accounts</p>
+          </div>
+          <div class="flex gap-2">
+            <button id="exportBtn" class="btn btn-info">
+              <i class="bi bi-file-earmark-arrow-down me-1"></i> Export
+            </button>
           </div>
         </div>
-
-        <div class="hidden md:block responsive-table-container">
-          <table class="w-full">
-            <thead>
-              <tr class="bg-slate-50 dark:bg-slate-700/50 border-b border-slate-200 dark:border-slate-700">
-                <th
-                  class="py-3 px-6 text-left text-sm font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-                  <div class="flex items-center">
-                    <input type="checkbox" id="selectAllUsers"
-                      class="rounded border-slate-300 dark:border-slate-600 text-amber-500 focus:ring-amber-500 dark:bg-slate-700">
-                  </div>
+      </div>
+      <!-- Filters -->
+      <div class="p-4 border-b border-gray-200">
+        <div class="flex flex-col md:flex-row gap-3 filter-group">
+          <div class="flex gap-3 overflow-x-auto">
+            <button class="btn btn-sm <%= activeClass === 'all' ? 'btn-primary' : 'btn-outline-primary' %>" data-filter="all">All Customers (<%= totalUsers || 0 %>)</button>
+            <button class="btn btn-sm <%= activeClass === 'active' ? 'btn-primary' : 'btn-outline-primary' %>" data-filter="active">Active (<%= activeUsers || 0 %>)</button>
+            <button class="btn btn-sm <%= activeClass === 'blocked' ? 'btn-primary' : 'btn-outline-primary' %>" data-filter="blocked">Blocked (<%= blockedUsers || 0 %>)</button>
+          </div>
+          <div class="relative flex-grow">
+            <input type="text" id="searchInput" placeholder="Search customers..." class="form-control" value="<%= searchQuery || '' %>">
+            <i class="bi bi-search absolute top-1/2 left-3 transform -translate-y-1/2 text-gray-400"></i>
+          </div>
+        </div>
+      </div>
+      <!-- Summary Cards -->
+      <div class="p-4">
+        <div class="summary-box">
+          <div class="summary-card" style="animation-delay: 0s;">
+            <h3>Total Customers</h3>
+            <p><%= totalUsers || 0 %></p>
+            <p class="text-sm text-gray-500 mt-1">
+              <span class="text-green-500 font-medium">
+                <i class="bi bi-arrow-up me-1"></i><%= newUsersPercent || 0 %>%
+              </span> vs last month
+            </p>
+          </div>
+          <div class="summary-card" style="animation-delay: 0.1s;">
+            <h3>Active Customers</h3>
+            <p><%= activeUsers || 0 %></p>
+            <p class="text-sm text-gray-500 mt-1">
+              <%= activeUsersPercent || 0 %>% of total
+            </p>
+          </div>
+          <div class="summary-card" style="animation-delay: 0.2s;">
+            <h3>Blocked Customers</h3>
+            <p><%= blockedUsers || 0 %></p>
+            <p class="text-sm text-gray-500 mt-1">
+              <%= blockedUsersPercent || 0 %>% of total
+            </p>
+          </div>
+          <div class="summary-card" style="animation-delay: 0.3s;">
+            <h3>New This Month</h3>
+            <p><%= newUsers || 0 %></p>
+            <p class="text-sm text-gray-500 mt-1">
+              <span class="text-green-500 font-medium">
+                <i class="bi bi-arrow-up me-1"></i><%= newUsersGrowth || 0 %>%
+              </span> growth rate
+            </p>
+          </div>
+        </div>
+      </div>
+      <!-- Desktop Table -->
+      <div class="desktop-table">
+        <div class="table-container" style="overflow-x: auto;">
+          <p class="text-sm text-gray-600 mb-2 px-4">
+            Showing <%= (currentPage - 1) * 10 + 1 %> to <%= Math.min(currentPage * 10, totalUsers) %> of <%= totalUsers %> customers
+          </p>
+          <table class="table table-hover mb-0">
+            <thead class="table-dark">
+              <tr>
+                <th class="text-center">
+                  <input type="checkbox" id="selectAllUsers" class="form-check-input">
                 </th>
-                <th
-                  class="py-3 px-6 text-left text-sm font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-                  <div class="flex items-center cursor-pointer" data-sort="name">
-                    Customer
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24"
-                      stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
-                    </svg>
-                  </div>
-                </th>
-                <th
-                  class="py-3 px-6 text-left text-sm font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-                  Email</th>
-                <th
-                  class="py-3 px-6 text-left text-sm font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-                  Status</th>
-                <th
-                  class="py-3 px-6 text-left text-sm font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-                  Joined Date</th>
-                <th
-                  class="py-3 px-6 text-right text-sm font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-                  Actions</th>
+                <th>Customer</th>
+                <th>Email</th>
+                <th class="text-center">Status</th>
+                <th>Joined Date</th>
+                <th class="text-end">Actions</th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-slate-200 dark:divide-slate-700" id="userTableBody">
-              <% if (users && users.length> 0) { %>
-                <% users.forEach((user, index)=> { %>
-                  <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/25 transition-colors"
-                    data-user-id="<%= user._id %>" data-status="<%= user.isBlocked ? 'blocked' : 'active' %>">
-                    <td class="py-4 px-6">
-                      <input type="checkbox"
-                        class="user-checkbox rounded border-slate-300 dark:border-slate-600 text-amber-500 focus:ring-amber-500 dark:bg-slate-700"
-                        value="<%= user._id %>">
+            <tbody id="userTableBody">
+              <% if (users && users.length > 0) { %>
+                <% users.forEach((user, index) => { %>
+                  <tr data-user-id="<%= user._id %>" data-status="<%= user.isBlocked ? 'blocked' : 'active' %>">
+                    <td class="text-center">
+                      <input type="checkbox" class="user-checkbox form-check-input" value="<%= user._id %>">
                     </td>
-                    <td class="py-4 px-6">
+                    <td>
                       <div class="flex items-center">
-                        <div
-                          class="w-10 h-10 rounded-full bg-amber-500 flex items-center justify-center text-slate-900 font-bold mr-3">
+                        <div class="w-10 h-10 rounded-full bg-amber-500 flex items-center justify-center text-slate-900 font-bold me-3">
                           <%= user.fullname ? user.fullname.charAt(0).toUpperCase() : 'U' %>
                         </div>
                         <div>
-                          <div class="font-medium text-slate-800 dark:text-white">
-                            <%= user.fullname %>
-                          </div>
-                          <div class="text-sm text-slate-500 dark:text-slate-400">ID: <%= (currentPage - 1) * 10 + index
-                              + 1 %>
-                          </div>
+                          <div class="fw-medium"><%= user.fullname || 'N/A' %></div>
+                          <div class="text-sm text-gray-500">ID: <%= (currentPage - 1) * 10 + index + 1 %></div>
                         </div>
                       </div>
                     </td>
-                    <td class="py-4 px-6 text-slate-800 dark:text-white">
-                      <%= user.email %>
+                    <td>
+                      <span class="badge bg-light text-dark"><%= user.email || 'N/A' %></span>
                     </td>
-                    <td class="py-4 px-6">
-                      <span
-                        class="px-2.5 py-1 rounded-full text-xs font-medium <%= user.isBlocked ? 'badge-blocked' : 'badge-active' %>">
+                    <td class="text-center">
+                      <span class="status-badge status-<%= user.isBlocked ? 'blocked' : 'active' %>">
                         <%= user.isBlocked ? 'Blocked' : 'Active' %>
                       </span>
                     </td>
-                    <td class="py-4 px-6 text-slate-800 dark:text-white">
-                      <%= user.createdAt.toDateString() %>
+                    <td>
+                      <%= user.createdAt ? new Date(user.createdAt).toLocaleDateString('en-IN') : 'N/A' %>
                     </td>
-                    <td class="py-4 px-6 text-right">
-                      <div class="flex items-center justify-end space-x-2">
-                        <a href="/admin/userprofile/<%= user._id %>"
-                          class="p-1.5 text-slate-500 hover:text-amber-500 dark:text-slate-400 dark:hover:text-amber-400 transition-colors">
-                          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
-                            stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                          </svg>
+                    <td class="text-end">
+                      <div class="action-btn-group">
+                        <a href="/admin/userprofile/<%= user._id %>" class="btn btn-sm btn-outline-primary" title="View Profile">
+                          <i class="bi bi-eye"></i>
                         </a>
-                        <button
-                          class="toggle-status-btn p-1.5 text-slate-500 hover:text-<%= user.isBlocked ? 'green' : 'red' %>-500 dark:text-slate-400 dark:hover:text-<%= user.isBlocked ? 'green' : 'red' %>-400 transition-colors"
-                          data-user-id="<%= user._id %>" data-status="<%= user.isBlocked ? 'unblock' : 'block' %>">
-                          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
-                            stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="<%= user.isBlocked ? 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z' : 'M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636' %>" />
-                          </svg>
+                        <button class="toggle-status-btn btn btn-sm btn-outline-<%= user.isBlocked ? 'success' : 'danger' %>" 
+                                data-user-id="<%= user._id %>" 
+                                data-status="<%= user.isBlocked ? 'unblock' : 'block' %>"
+                                title="<%= user.isBlocked ? 'Unblock' : 'Block' %>">
+                          <i class="bi bi-<%= user.isBlocked ? 'check-circle' : 'x-circle' %>"></i>
                         </button>
                       </div>
                     </td>
                   </tr>
-                  <% }); %>
-                    <% } else { %>
-                      <tr>
-                        <td colspan="6" class="py-4 px-6 text-center text-slate-500 dark:text-slate-400">No customers
-                          found.</td>
-                      </tr>
-                      <% } %>
+                <% }) %>
+              <% } else { %>
+                <tr>
+                  <td colspan="6" class="text-center py-5 text-muted">
+                    <i class="bi bi-inbox display-1 d-block mb-3 opacity-25"></i>
+                    <h5>No customers found</h5>
+                    <p class="mb-0">Try adjusting the filters or search query.</p>
+                  </td>
+                </tr>
+              <% } %>
             </tbody>
           </table>
         </div>
-
-        <!-- Mobile Card View -->
-        <div class="md:hidden" id="userCardContainer">
-          <% if (users && users.length> 0) { %>
-            <% users.forEach((user, index)=> { %>
-              <div
-                class="responsive-card bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 mx-2 my-3"
-                data-user-id="<%= user._id %>" data-status="<%= user.isBlocked ? 'blocked' : 'active' %>">
-                <div class="responsive-card-header bg-slate-50 dark:bg-slate-700">
-                  <div class="flex items-center">
-                    <div
-                      class="w-8 h-8 rounded-full bg-amber-500 flex items-center justify-center text-slate-900 font-bold mr-2">
-                      <%= user.fullname ? user.fullname.charAt(0).toUpperCase() : 'U' %>
-                    </div>
-                    <div class="font-medium text-slate-800 dark:text-white">
-                      <%= user.fullname %>
+      </div>
+      <!-- Mobile Cards -->
+      <div class="mobile-card p-3">
+        <% if (users && users.length > 0) { %>
+          <% users.forEach((user, index) => { %>
+            <div class="card mb-3" data-user-id="<%= user._id %>" data-status="<%= user.isBlocked ? 'blocked' : 'active' %>">
+              <div class="card-body p-3">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                  <div class="flex-grow-1">
+                    <h6 class="card-title mb-1 fw-bold">
+                      #<%= (currentPage - 1) * 10 + index + 1 %> - <%= user.fullname || 'N/A' %>
+                    </h6>
+                    <div class="d-flex gap-2 mb-2">
+                      <span class="badge bg-light text-dark">
+                        <%= user.email || 'N/A' %>
+                      </span>
                     </div>
                   </div>
-                  <span
-                    class="px-2 py-0.5 rounded-full text-xs font-medium <%= user.isBlocked ? 'badge-blocked' : 'badge-active' %>">
+                  <span class="status-badge status-<%= user.isBlocked ? 'blocked' : 'active' %>">
                     <%= user.isBlocked ? 'Blocked' : 'Active' %>
                   </span>
                 </div>
-                <div class="responsive-card-body">
-                  <div class="responsive-card-row">
-                    <span class="responsive-card-label">Email:</span>
-                    <span class="text-slate-800 dark:text-white">
-                      <%= user.email %>
+                <div class="row g-2 mb-3">
+                  <div class="col-6">
+                    <small class="text-muted d-block">Joined</small>
+                    <span>
+                      <%= user.createdAt ? new Date(user.createdAt).toLocaleDateString('en-IN') : 'N/A' %>
                     </span>
                   </div>
-                  <div class="responsive-card-row">
-                    <span class="responsive-card-label">Joined:</span>
-                    <span class="text-slate-800 dark:text-white">
-                      <%= user.createdAt.toDateString() %>
-                    </span>
-                  </div>
-                  <div class="responsive-card-row">
-                    <span class="responsive-card-label">ID:</span>
-                    <span class="text-slate-800 dark:text-white">
+                  <div class="col-6">
+                    <small class="text-muted d-block">ID</small>
+                    <span class="fw-bold">
                       <%= (currentPage - 1) * 10 + index + 1 %>
                     </span>
                   </div>
-                  <div class="responsive-card-actions">
-                    <a href="/admin/userprofile/<%= user._id %>"
-                      class="px-3 py-1.5 bg-amber-500 text-white rounded-lg text-sm">
-                      View Profile
-                    </a>
-                    <button
-                      class="toggle-status-btn px-3 py-1.5 bg-<%= user.isBlocked ? 'green' : 'red' %>-500 text-white rounded-lg text-sm"
-                      data-user-id="<%= user._id %>" data-status="<%= user.isBlocked ? 'unblock' : 'block' %>">
-                      <%= user.isBlocked ? 'Unblock' : 'Block' %>
-                    </button>
-                  </div>
+                </div>
+                <div class="mobile-actions">
+                  <a href="/admin/userprofile/<%= user._id %>" class="btn btn-sm btn-primary">
+                    View Profile
+                  </a>
+                  <button class="toggle-status-btn btn btn-sm btn-<%= user.isBlocked ? 'success' : 'danger' %>" 
+                          data-user-id="<%= user._id %>" 
+                          data-status="<%= user.isBlocked ? 'unblock' : 'block' %>">
+                    <%= user.isBlocked ? 'Unblock' : 'Block' %>
+                  </button>
                 </div>
               </div>
-              <% }); %>
-                <% } else { %>
-                  <div class="p-6 text-center text-slate-500 dark:text-slate-400">
-                    No customers found.
-                  </div>
-                  <% } %>
-        </div>
-
-        <!-- Pagination -->
-        <div
-          class="px-6 py-4 border-t border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row sm:items-center justify-between">
-          <div class="text-sm text-slate-500 dark:text-slate-400 mb-4 sm:mb-0">
-            Showing <span class="font-medium text-slate-700 dark:text-slate-300">
-              <%= ((currentPage - 1) * 10) + 1 %>
-            </span> to <span class="font-medium text-slate-700 dark:text-slate-300">
-              <%= Math.min((currentPage * 10), totalUsers) %>
-            </span> of <span class="font-medium text-slate-700 dark:text-slate-300">
-              <%= totalUsers %>
-            </span> customers
+            </div>
+          <% }) %>
+        <% } else { %>
+          <div class="text-center py-5 text-muted">
+            <i class="bi bi-inbox display-1 d-block mb-3 opacity-25"></i>
+            <h5>No customers found</h5>
+            <p class="mb-0">Try adjusting the filters or search query.</p>
           </div>
-
-          <div class="flex items-center justify-center space-x-2">
-            <% if (currentPage> 1) { %>
-              <a href="/admin/users?page=<%= currentPage - 1 %>"
-                class="px-3 py-1.5 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-600 rounded-md hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
-                Previous
-              </a>
-              <% } else { %>
-                <button disabled
-                  class="px-3 py-1.5 bg-white dark:bg-slate-800 text-slate-400 dark:text-slate-600 border border-slate-300 dark:border-slate-600 rounded-md opacity-50 cursor-not-allowed">
-                  Previous
-                </button>
-                <% } %>
-
-                  <% const startPage=Math.max(1, currentPage - 2); const endPage=Math.min(totalPages, startPage + 4);
-                    for (let i=startPage; i <=endPage; i++) { %>
-                    <a href="/admin/users?page=<%= i %>"
-                      class="px-3 py-1.5 <%= currentPage === i ? 'bg-amber-500 text-white' : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700' %> rounded-md transition-colors">
-                      <%= i %>
-                    </a>
-                    <% } %>
-
-                      <% if (currentPage < totalPages) { %>
-                        <a href="/admin/users?page=<%= currentPage + 1 %>"
-                          class="px-3 py-1.5 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-600 rounded-md hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
-                          Next
-                        </a>
-                        <% } else { %>
-                          <button disabled
-                            class="px-3 py-1.5 bg-white dark:bg-slate-800 text-slate-400 dark:text-slate-600 border border-slate-300 dark:border-slate-600 rounded-md opacity-50 cursor-not-allowed">
-                            Next
-                          </button>
-                          <% } %>
-          </div>
-        </div>
+        <% } %>
+      </div>
+      <!-- Pagination -->
+      <div class="d-flex justify-content-between align-items-center p-4 pagination-container">
+        <span>Showing <%= (currentPage - 1) * 10 + 1 %> to <%= Math.min(currentPage * 10, totalUsers) %> of <%= totalUsers %> customers</span>
+        <nav aria-label="Page navigation">
+          <ul class="pagination">
+            <% if (currentPage > 1) { %>
+              <li class="page-item">
+                <a class="page-link" href="/admin/users?page=<%= currentPage - 1 %>">Previous</a>
+              </li>
+            <% } else { %>
+              <li class="page-item disabled">
+                <a class="page-link" href="#">Previous</a>
+              </li>
+            <% } %>
+            <% const startPage = Math.max(1, currentPage - 2); %>
+            <% const endPage = Math.min(totalPages, startPage + 4); %>
+            <% for (let i = startPage; i <= endPage; i++) { %>
+              <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+                <a class="page-link" href="/admin/users?page=<%= i %>">
+                  <%= i %>
+                </a>
+              </li>
+            <% } %>
+            <% if (currentPage < totalPages) { %>
+              <li class="page-item">
+                <a class="page-link" href="/admin/users?page=<%= currentPage + 1 %>">Next</a>
+              </li>
+            <% } else { %>
+              <li class="page-item disabled">
+                <a class="page-link" href="#">Next</a>
+              </li>
+            <% } %>
+          </ul>
+        </nav>
       </div>
     </div>
   </main>
 
-  <%- include('.././Partials/admin/footer') %>
+  <footer class="bg-gray-100 p-4 text-center text-gray-600 text-sm shadow-inner">
+    © <%= new Date().getFullYear() %> Timzo Admin Panel. All rights reserved.
+  </footer>
 
-    <script>
-      function debounce(func, delay) {
-        let timeoutId;
-        return function (...args) {
-          clearTimeout(timeoutId);
-          timeoutId = setTimeout(() => func.apply(this, args), delay);
-        };
-      }
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Sidebar Toggle
+    const sidebar = document.getElementById('sidebar');
+    const sidebarBackdrop = document.getElementById('sidebarBackdrop');
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    const menuIcon = document.getElementById('menuIcon');
+    const closeIcon = document.getElementById('closeIcon');
 
-      function attachToggleListeners() {
-        document.querySelectorAll('.toggle-status-btn').forEach(button => {
-          button.addEventListener('click', async function () {
-            const userId = this.dataset.userId;
-            const currentStatus = this.dataset.status;
-            const btn = this;
+    function toggleSidebar() {
+      sidebar.classList.toggle('translate-x-0');
+      sidebarBackdrop.classList.toggle('opacity-0');
+      sidebarBackdrop.classList.toggle('pointer-events-none');
+      menuIcon.classList.toggle('hidden');
+      closeIcon.classList.toggle('hidden');
+    }
 
-            const result = await Swal.fire({
-              text: `This will ${currentStatus === 'block' ? 'block' : 'unblock'} the user.`,
-              title: `Are you sure?`,
-              icon: 'warning',
-              showCancelButton: true,
-              confirmButtonText: `Yes, ${currentStatus}`,
-              confirmButtonColor: '#f59e0b',
-              cancelButtonText: 'Cancel'
+    sidebarToggle.addEventListener('click', toggleSidebar);
+    sidebarBackdrop.addEventListener('click', toggleSidebar);
+
+    // Debounce Function
+    function debounce(func, delay) {
+      let timeoutId;
+      return function (...args) {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => func.apply(this, args), delay);
+      };
+    }
+
+    // Toggle Status
+    function attachToggleListeners() {
+      document.querySelectorAll('.toggle-status-btn').forEach(button => {
+        button.addEventListener('click', async function () {
+          const userId = this.dataset.userId;
+          const currentStatus = this.dataset.status;
+
+          const result = await Swal.fire({
+            title: `Are you sure?`,
+            text: `This will ${currentStatus === 'block' ? 'block' : 'unblock'} the user.`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: `Yes, ${currentStatus}`,
+            confirmButtonColor: '#0288d1',
+            cancelButtonText: 'Cancel'
+          });
+
+          if (!result.isConfirmed) return;
+
+          try {
+            const response = await fetch(`/admin/toggle-user-status/${userId}`, {
+              method: 'PATCH',
+              headers: { 'Content-Type': 'application/json' }
             });
+            const data = await response.json();
 
-            if (!result.isConfirmed) return;
+            if (data.success) {
+              const isBlocked = data.isBlocked;
 
-            try {
-              const response = await fetch(`/admin/toggle-user-status/${userId}`, {
-                method: 'PATCH',
-                headers: {
-                  'Content-Type': 'application/json'
+              // Update Table Row
+              const row = document.querySelector(`tr[data-user-id="${userId}"]`);
+              if (row) {
+                row.dataset.status = isBlocked ? 'blocked' : 'active';
+                const statusBadge = row.querySelector('.status-badge');
+                if (statusBadge) {
+                  statusBadge.textContent = isBlocked ? 'Blocked' : 'Active';
+                  statusBadge.className = `status-badge status-${isBlocked ? 'blocked' : 'active'}`;
                 }
-              });
-
-              const data = await response.json();
-
-              if (data.success) {
-                const isBlocked = data.isBlocked;
-
-                const row = document.querySelector(`tr[data-user-id="${userId}"]`);
-                if (row) {
-                  const statusCell = row.querySelector('td:nth-child(4) span');
-                  if (statusCell) {
-                    statusCell.textContent = isBlocked ? 'Blocked' : 'Active';
-                    statusCell.className = `px-2.5 py-1 rounded-full text-xs font-medium ${isBlocked ? 'badge-blocked' : 'badge-active'}`;
-                  }
-
-                  const actionBtn = row.querySelector('.toggle-status-btn');
-                  if (actionBtn) {
-                    actionBtn.dataset.status = isBlocked ? 'unblock' : 'block';
-                    actionBtn.className = `toggle-status-btn p-1.5 text-slate-500 hover:text-${isBlocked ? 'green' : 'red'}-500 dark:text-slate-400 dark:hover:text-${isBlocked ? 'green' : 'red'}-400 transition-colors`;
-
-                    const svg = actionBtn.querySelector('svg');
-                    if (svg) {
-                      const path = svg.querySelector('path');
-                      if (path) {
-                        path.setAttribute('d', isBlocked ? 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z' : 'M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636');
-                      }
-                    }
-                  }
+                const actionBtn = row.querySelector('.toggle-status-btn');
+                if (actionBtn) {
+                  actionBtn.dataset.status = isBlocked ? 'unblock' : 'block';
+                  actionBtn.className = `toggle-status-btn btn btn-sm btn-outline-${isBlocked ? 'success' : 'danger'}`;
+                  actionBtn.innerHTML = `<i class="bi bi-${isBlocked ? 'check-circle' : 'x-circle'}"></i>`;
+                  actionBtn.title = isBlocked ? 'Unblock' : 'Block';
                 }
-
-                const card = document.querySelector(`.responsive-card[data-user-id="${userId}"]`);
-                if (card) {
-                  const statusBadge = card.querySelector('.responsive-card-header span');
-                  if (statusBadge) {
-                    statusBadge.textContent = isBlocked ? 'Blocked' : 'Active';
-                    statusBadge.className = `px-2 py-0.5 rounded-full text-xs font-medium ${isBlocked ? 'badge-blocked' : 'badge-active'}`;
-                  }
-
-                  const actionBtn = card.querySelector('.toggle-status-btn');
-                  if (actionBtn) {
-                    actionBtn.textContent = isBlocked ? 'Unblock' : 'Block';
-                    actionBtn.className = `toggle-status-btn px-3 py-1.5 bg-${isBlocked ? 'green' : 'red'}-500 text-white rounded-lg text-sm`;
-                    actionBtn.dataset.status = isBlocked ? 'unblock' : 'block';
-                  }
-
-                  card.dataset.status = isBlocked ? 'blocked' : 'active';
-                }
-
-                Swal.fire({
-                  title: 'Success!',
-                  text: `User has been ${isBlocked ? 'blocked' : 'unblocked'}.`,
-                  icon: 'success',
-                  confirmButtonColor: '#f59e0b'
-                });
-              } else {
-                Swal.fire({
-                  title: 'Failed',
-                  text: 'Operation unsuccessful.',
-                  icon: 'error',
-                  confirmButtonColor: '#f59e0b'
-                });
               }
-            } catch (error) {
-              console.error(error);
+
+              // Update Mobile Card
+              const card = document.querySelector(`.card[data-user-id="${userId}"]`);
+              if (card) {
+                card.dataset.status = isBlocked ? 'blocked' : 'active';
+                const statusBadge = card.querySelector('.status-badge');
+                if (statusBadge) {
+                  statusBadge.textContent = isBlocked ? 'Blocked' : 'Active';
+                  statusBadge.className = `status-badge status-${isBlocked ? 'blocked' : 'active'}`;
+                }
+                const actionBtn = card.querySelector('.toggle-status-btn');
+                if (actionBtn) {
+                  actionBtn.dataset.status = isBlocked ? 'unblock' : 'block';
+                  actionBtn.className = `toggle-status-btn btn btn-sm btn-${isBlocked ? 'success' : 'danger'}`;
+                  actionBtn.textContent = isBlocked ? 'Unblock' : 'Block';
+                }
+              }
+
               Swal.fire({
-                title: 'Error',
-                text: 'Something went wrong!',
+                title: 'Success!',
+                text: `User has been ${isBlocked ? 'blocked' : 'unblocked'}.`,
+                icon: 'success',
+                confirmButtonColor: '#0288d1'
+              });
+            } else {
+              Swal.fire({
+                title: 'Failed',
+                text: data.message || 'Operation unsuccessful.',
                 icon: 'error',
-                confirmButtonColor: '#f59e0b'
+                confirmButtonColor: '#0288d1'
               });
             }
-          });
+          } catch (error) {
+            console.error('Error toggling user status:', error);
+            Swal.fire({
+              title: 'Error',
+              text: 'Something went wrong!',
+              icon: 'error',
+              confirmButtonColor: '#0288d1'
+            });
+          }
         });
-      }
+      });
+    }
 
-      const updateTable = debounce(async (query) => {
-        try {
-          const response = await fetch(`/admin/search-users?query=${encodeURIComponent(query)}`, {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json'
-            }
-          });
+    // Search Functionality
+    const updateTable = debounce(async (query) => {
+      try {
+        const response = await fetch(`/admin/search-users?query=${encodeURIComponent(query)}`, {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' }
+        });
+        const data = await response.json();
 
-          const data = await response.json();
+        if (data.success && data.users) {
+          const tbody = document.getElementById('userTableBody');
+          const cardContainer = document.querySelector('.mobile-card');
+          tbody.innerHTML = '';
+          cardContainer.innerHTML = '';
 
-          if (data.success) {
-            const tbody = document.getElementById('userTableBody');
-            tbody.innerHTML = '';
-
-            const cardContainer = document.getElementById('userCardContainer');
-            cardContainer.innerHTML = '';
-
-            if (data.users.length > 0) {
-              data.users.forEach((user, index) => {
-                const row = document.createElement('tr');
-                row.className = 'hover:bg-slate-50 dark:hover:bg-slate-700/25 transition-colors';
-                row.dataset.userId = user._id;
-                row.dataset.status = user.isBlocked ? 'blocked' : 'active';
-
-                row.innerHTML = `
-                <td class="py-4 px-6">
-                  <input type="checkbox" class="user-checkbox rounded border-slate-300 dark:border-slate-600 text-amber-500 focus:ring-amber-500 dark:bg-slate-700" value="${user._id}">
+          if (data.users.length > 0) {
+            data.users.forEach((user, index) => {
+              // Table Row
+              const row = document.createElement('tr');
+              row.dataset.userId = user._id;
+              row.dataset.status = user.isBlocked ? 'blocked' : 'active';
+              row.innerHTML = `
+                <td class="text-center">
+                  <input type="checkbox" class="user-checkbox form-check-input" value="${user._id}">
                 </td>
-                <td class="py-4 px-6">
+                <td>
                   <div class="flex items-center">
-                    <div class="w-10 h-10 rounded-full bg-amber-500 flex items-center justify-center text-slate-900 font-bold mr-3">
+                    <div class="w-10 h-10 rounded-full bg-amber-500 flex items-center justify-center text-slate-900 font-bold me-3">
                       ${user.fullname ? user.fullname.charAt(0).toUpperCase() : 'U'}
                     </div>
                     <div>
-                      <div class="font-medium text-slate-800 dark:text-white">${user.fullname}</div>
-                      <div class="text-sm text-slate-500 dark:text-slate-400">ID: ${(data.currentPage - 1) * 10 + index + 1}</div>
+                      <div class="fw-medium">${user.fullname || 'N/A'}</div>
+                      <div class="text-sm text-gray-500">ID: ${(data.currentPage - 1) * 10 + index + 1}</div>
                     </div>
                   </div>
                 </td>
-                <td class="py-4 px-6 text-slate-800 dark:text-white">
-                  ${user.email}
+                <td>
+                  <span class="badge bg-light text-dark">${user.email || 'N/A'}</span>
                 </td>
-                <td class="py-4 px-6">
-                  <span class="px-2.5 py-1 rounded-full text-xs font-medium ${user.isBlocked ? 'badge-blocked' : 'badge-active'}">
+                <td class="text-center">
+                  <span class="status-badge status-${user.isBlocked ? 'blocked' : 'active'}">
                     ${user.isBlocked ? 'Blocked' : 'Active'}
                   </span>
                 </td>
-                <td class="py-4 px-6 text-slate-800 dark:text-white">
-                  ${new Date(user.createdAt).toDateString()}
+                <td>
+                  ${user.createdAt ? new Date(user.createdAt).toLocaleDateString('en-IN') : 'N/A'}
                 </td>
-                <td class="py-4 px-6 text-right">
-                  <div class="flex items-center justify-end space-x-2">
-                    <a href="/admin/userprofile/${user._id}" class="p-1.5 text-slate-500 hover:text-amber-500 dark:text-slate-400 dark:hover:text-amber-400 transition-colors">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                      </svg>
+                <td class="text-end">
+                  <div class="action-btn-group">
+                    <a href="/admin/userprofile/${user._id}" class="btn btn-sm btn-outline-primary" title="View Profile">
+                      <i class="bi bi-eye"></i>
                     </a>
-                    <button class="toggle-status-btn p-1.5 text-slate-500 hover:text-${user.isBlocked ? 'green' : 'red'}-500 dark:text-slate-400 dark:hover:text-${user.isBlocked ? 'green' : 'red'}-400 transition-colors" data-user-id="${user._id}" data-status="${user.isBlocked ? 'unblock' : 'block'}">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${user.isBlocked ? 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z' : 'M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636'}" />
-                      </svg>
+                    <button class="toggle-status-btn btn btn-sm btn-outline-${user.isBlocked ? 'success' : 'danger'}" 
+                            data-user-id="${user._id}" 
+                            data-status="${user.isBlocked ? 'unblock' : 'block'}"
+                            title="${user.isBlocked ? 'Unblock' : 'Block'}">
+                      <i class="bi bi-${user.isBlocked ? 'check-circle' : 'x-circle'}"></i>
                     </button>
                   </div>
                 </td>
               `;
+              tbody.appendChild(row);
 
-                tbody.appendChild(row);
-
-                const card = document.createElement('div');
-                card.className = 'responsive-card bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 mx-2 my-3';
-                card.dataset.userId = user._id;
-                card.dataset.status = user.isBlocked ? 'blocked' : 'active';
-
-                card.innerHTML = `
-                <div class="responsive-card-header bg-slate-50 dark:bg-slate-700">
-                  <div class="flex items-center">
-                    <div class="w-8 h-8 rounded-full bg-amber-500 flex items-center justify-center text-slate-900 font-bold mr-2">
-                      ${user.fullname ? user.fullname.charAt(0).toUpperCase() : 'U'}
+              // Mobile Card
+              const card = document.createElement('div');
+              card.className = 'card mb-3';
+              card.dataset.userId = user._id;
+              card.dataset.status = user.isBlocked ? 'blocked' : 'active';
+              card.innerHTML = `
+                <div class="card-body p-3">
+                  <div class="d-flex justify-content-between align-items-start mb-2">
+                    <div class="flex-grow-1">
+                      <h6 class="card-title mb-1 fw-bold">
+                        #${(data.currentPage - 1) * 10 + index + 1} - ${user.fullname || 'N/A'}
+                      </h6>
+                      <div class="d-flex gap-2 mb-2">
+                        <span class="badge bg-light text-dark">
+                          ${user.email || 'N/A'}
+                        </span>
+                      </div>
                     </div>
-                    <div class="font-medium text-slate-800 dark:text-white">${user.fullname}</div>
+                    <span class="status-badge status-${user.isBlocked ? 'blocked' : 'active'}">
+                      ${user.isBlocked ? 'Blocked' : 'Active'}
+                    </span>
                   </div>
-                  <span class="px-2 py-0.5 rounded-full text-xs font-medium ${user.isBlocked ? 'badge-blocked' : 'badge-active'}">
-                    ${user.isBlocked ? 'Blocked' : 'Active'}
-                  </span>
-                </div>
-                <div class="responsive-card-body">
-                  <div class="responsive-card-row">
-                    <span class="responsive-card-label">Email:</span>
-                    <span class="text-slate-800 dark:text-white">${user.email}</span>
+                  <div class="row g-2 mb-3">
+                    <div class="col-6">
+                      <small class="text-muted d-block">Joined</small>
+                      <span>
+                        ${user.createdAt ? new Date(user.createdAt).toLocaleDateString('en-IN') : 'N/A'}
+                      </span>
+                    </div>
+                    <div class="col-6">
+                      <small class="text-muted d-block">ID</small>
+                      <span class="fw-bold">
+                        ${(data.currentPage - 1) * 10 + index + 1}
+                      </span>
+                    </div>
                   </div>
-                  <div class="responsive-card-row">
-                    <span class="responsive-card-label">Joined:</span>
-                    <span class="text-slate-800 dark:text-white">${new Date(user.createdAt).toDateString()}</span>
-                  </div>
-                  <div class="responsive-card-row">
-                    <span class="responsive-card-label">ID:</span>
-                    <span class="text-slate-800 dark:text-white">${(data.currentPage - 1) * 10 + index + 1}</span>
-                  </div>
-                  <div class="responsive-card-actions">
-                    <a href="/admin/userprofile/${user._id}" class="px-3 py-1.5 bg-amber-500 text-white rounded-lg text-sm">
+                  <div class="mobile-actions">
+                    <a href="/admin/userprofile/${user._id}" class="btn btn-sm btn-primary">
                       View Profile
                     </a>
-                    <button class="toggle-status-btn px-3 py-1.5 bg-${user.isBlocked ? 'green' : 'red'}-500 text-white rounded-lg text-sm" data-user-id="${user._id}" data-status="${user.isBlocked ? 'unblock' : 'block'}">
+                    <button class="toggle-status-btn btn btn-sm btn-${user.isBlocked ? 'success' : 'danger'}" 
+                            data-user-id="${user._id}" 
+                            data-status="${user.isBlocked ? 'unblock' : 'block'}">
                       ${user.isBlocked ? 'Unblock' : 'Block'}
                     </button>
                   </div>
                 </div>
               `;
-
-                cardContainer.appendChild(card);
-              });
-            } else {
-              tbody.innerHTML = '<tr><td colspan="6" class="py-4 px-6 text-center text-slate-500 dark:text-slate-400">No customers found.</td></tr>';
-              cardContainer.innerHTML = '<div class="p-6 text-center text-slate-500 dark:text-slate-400">No customers found.</div>';
-            }
-
-            attachToggleListeners();
-
+              cardContainer.appendChild(card);
+            });
           } else {
-            console.error('Error fetching search results:', data.message);
+            tbody.innerHTML = `
+              <tr>
+                <td colspan="6" class="text-center py-5 text-muted">
+                  <i class="bi bi-inbox display-1 d-block mb-3 opacity-25"></i>
+                  <h5>No customers found</h5>
+                  <p class="mb-0">Try adjusting the filters or search query.</p>
+                </td>
+              </tr>
+            `;
+            cardContainer.innerHTML = `
+              <div class="text-center py-5 text-muted">
+                <i class="bi bi-inbox display-1 d-block mb-3 opacity-25"></i>
+                <h5>No customers found</h5>
+                <p class="mb-0">Try adjusting the filters or search query.</p>
+              </div>
+            `;
           }
-        } catch (error) {
-          console.error('Error fetching search results:', error);
+
+          attachToggleListeners();
+        } else {
           Swal.fire({
             title: 'Error',
-            text: 'Failed to fetch search results.',
+            text: data.message || 'Failed to fetch search results.',
             icon: 'error',
-            confirmButtonColor: '#f59e0b'
+            confirmButtonColor: '#0288d1'
           });
         }
-      }, 300);
-
-      document.querySelectorAll('[data-filter]').forEach(tab => {
-        tab.addEventListener('click', function () {
-          document.querySelectorAll('[data-filter]').forEach(t => {
-            t.classList.remove('tab-active');
-            t.classList.add('text-slate-600', 'dark:text-slate-400', 'hover:text-amber-500', 'dark:hover:text-amber-400');
-          });
-          this.classList.add('tab-active');
-          this.classList.remove('text-slate-600', 'dark:text-slate-400', 'hover:text-amber-500', 'dark:hover:text-amber-400');
-
-          const filter = this.dataset.filter;
-
-          const rows = document.querySelectorAll('#userTableBody tr');
-          rows.forEach(row => {
-            if (filter === 'all' || row.dataset.status === filter) {
-              row.classList.remove('hidden');
-            } else {
-              row.classList.add('hidden');
-            }
-          });
-
-          const cards = document.querySelectorAll('.responsive-card');
-          cards.forEach(card => {
-            if (filter === 'all' || card.dataset.status === filter) {
-              card.classList.remove('hidden');
-            } else {
-              card.classList.add('hidden');
-            }
-          });
-        });
-      });
-
-      const selectAllCheckbox = document.getElementById('selectAllUsers');
-      if (selectAllCheckbox) {
-        selectAllCheckbox.addEventListener('change', function () {
-          const checkboxes = document.querySelectorAll('.user-checkbox');
-          checkboxes.forEach(checkbox => {
-            checkbox.checked = this.checked;
-          });
+      } catch (error) {
+        console.error('Error fetching search results:', error);
+        Swal.fire({
+          title: 'Error',
+          text: 'Failed to fetch search results.',
+          icon: 'error',
+          confirmButtonColor: '#0288d1'
         });
       }
+    }, 300);
 
-      document.getElementById('exportBtn').addEventListener('click', function () {
-        Swal.fire({
-          title: 'Export Customers',
-          html: `
+    // Filter Tabs
+    document.querySelectorAll('[data-filter]').forEach(tab => {
+      tab.addEventListener('click', function () {
+        document.querySelectorAll('[data-filter]').forEach(t => {
+          t.classList.remove('btn-primary');
+          t.classList.add('btn-outline-primary');
+        });
+        this.classList.add('btn-primary');
+        this.classList.remove('btn-outline-primary');
+
+        const filter = this.dataset.filter;
+        const rows = document.querySelectorAll('#userTableBody tr');
+        const cards = document.querySelectorAll('.card');
+
+        rows.forEach(row => {
+          row.classList.toggle('d-none', filter !== 'all' && row.dataset.status !== filter);
+        });
+        cards.forEach(card => {
+          card.classList.toggle('d-none', filter !== 'all' && card.dataset.status !== filter);
+        });
+      });
+    });
+
+    // Select All Checkbox
+    const selectAllCheckbox = document.getElementById('selectAllUsers');
+    if (selectAllCheckbox) {
+      selectAllCheckbox.addEventListener('change', function () {
+        document.querySelectorAll('.user-checkbox').forEach(checkbox => {
+          checkbox.checked = this.checked;
+        });
+      });
+    }
+
+    // Export Button
+    document.getElementById('exportBtn').addEventListener('click', function () {
+      Swal.fire({
+        title: 'Export Customers',
+        html: `
           <div class="text-left">
             <p class="mb-4">Select export format:</p>
             <div class="flex items-center mb-3">
@@ -826,34 +846,50 @@
             </div>
           </div>
         `,
-          showCancelButton: true,
-          confirmButtonText: 'Export',
-          confirmButtonColor: '#f59e0b',
-          cancelButtonColor: '#64748b',
-          preConfirm: () => {
-            return document.querySelector('input[name="exportFormat"]:checked').value;
-          }
-        }).then((result) => {
-          if (result.isConfirmed) {
-            Swal.fire({
-              icon: 'success',
-              title: 'Export Started',
-              text: `Your customer data is being exported as ${result.value.toUpperCase()}.`,
-              confirmButtonColor: '#f59e0b'
-            });
-          }
-        });
+        showCancelButton: true,
+        confirmButtonText: 'Export',
+        confirmButtonColor: '#0288d1',
+        cancelButtonColor: '#6c757d',
+        preConfirm: () => document.querySelector('input[name="exportFormat"]:checked').value
+      }).then((result) => {
+        if (result.isConfirmed) {
+          Swal.fire({
+            icon: 'success',
+            title: 'Export Started',
+            text: `Your customer data is being exported as ${result.value.toUpperCase()}.`,
+            confirmButtonColor: '#0288d1'
+          });
+          // TODO: Implement actual export by redirecting to backend endpoint
+          // window.location.href = `/admin/export-users?format=${result.value}`;
+        }
       });
+    });
 
-      document.getElementById('searchInput').addEventListener('input', function (e) {
-        const query = e.target.value.trim();
-        updateTable(query);
-      });
+    // Search Input
+    document.getElementById('searchInput').addEventListener('input', function (e) {
+      updateTable(e.target.value.trim());
+    });
 
-      document.addEventListener('DOMContentLoaded', function () {
-        attachToggleListeners();
-      });
-    </script>
+    // Initialize Toggle Listeners
+    document.addEventListener('DOMContentLoaded', function () {
+      attachToggleListeners();
+      // Trigger initial filter based on activeClass
+      const activeFilter = '<%= activeClass %>';
+      if (activeFilter !== 'all') {
+        const filterBtn = document.querySelector(`[data-filter="${activeFilter}"]`);
+        if (filterBtn) filterBtn.click();
+      }
+    });
+
+    // Close Sidebar on Resize
+    window.addEventListener('resize', () => {
+      if (window.innerWidth >= 1024) {
+        sidebar.classList.remove('translate-x-0');
+        sidebarBackdrop.classList.add('opacity-0', 'pointer-events-none');
+        menuIcon.classList.remove('hidden');
+        closeIcon.classList.add('hidden');
+      }
+    });
+  </script>
 </body>
-
 </html>

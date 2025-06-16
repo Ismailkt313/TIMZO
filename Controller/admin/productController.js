@@ -168,7 +168,7 @@ const getProduct = async (req, res) => {
     try {
         const search = req.query.query ? req.query.query.trim() : '';
         const page = parseInt(req.query.page) || 1;
-        const limit = 5;
+        const limit = 12;
         const showDeleted = req.query.showDeleted === 'true';
 
         if (page < 1) {

@@ -64,6 +64,7 @@ const loadaddcategory = async (req, res) => {
             .limit(itemsPerPage);
 
         res.render('Admin/addCategory', {
+            search:req.query.search || '',
             categories,
             currentPage: page,
             totalPages,
@@ -292,19 +293,36 @@ const permanentlyDeleteCategory = async (req, res) => {
 const loadeditcategory = async (req, res) => {
     try {
         const id = req.params.id;
-        const category = await Category.findOne({ _id: id, isDeleted: false });
+        const page = parseInt(req.query.page) || 1;
+        const limit = 10;
+        const skip = (page - 1) * limit;
+        const showDeleted = req.query.showDeleted === 'true';
 
-        if (!category) {
+        const query = {};
+        query.isDeleted = showDeleted;
+
+        let categories = await Category.find(query)
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(limit);
+
+        const totalcategories = await Category.countDocuments(query);
+        const totalPages = Math.ceil(totalcategories / limit);
+
+        if (!categories) {
             return res.redirect('/error404');
         }
 
         res.render("Admin/editcategory", {
-            category,
+            currentPage: page,
+            totalPages,
+            search:req.query.search || '',
+            categories,
             error: null
         });
     } catch (error) {
         console.error(error);
-        res.redirect('/error404');
+        res.render('error404');
     }
 };
 const editcategory = async (req, res) => {

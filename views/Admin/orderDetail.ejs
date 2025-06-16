@@ -1,318 +1,520 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Order Details - Timzo Admin</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="icon" type="image/x-icon" href="/images/TIMZO.jpg">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        .sidebar {
-            width: 250px;
-            position: fixed;
-            top: 0;
-            left: 0;
-            height: 100%;
-            background-color: #1f2937;
-            color: white;
-            padding-top: 20px;
-            transition: transform 0.3s ease;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Timzo Admin - Order Details</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link rel="icon" type="image/x-icon" href="/images/TIMZO.jpg">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <style>
+    .status-badge {
+      padding: 0.25rem 0.5rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
 
-        .sidebar.collapsed {
-            transform: translateX(-250px);
-        }
+    .status-processing {
+      background-color: #fef3c7;
+      color: #b45309;
+    }
 
-        .section-divider {
-            border-top: 1px solid #e5e7eb;
-            margin: 1.5rem 0;
-        }
+    .status-shipped {
+      background-color: #bfdbfe;
+      color: #1e40af;
+    }
 
-        .table-container {
-            overflow-x: auto;
-        }
+    .status-delivered {
+      background-color: #dcfce7;
+      color: #166534;
+    }
 
-        .table-container::-webkit-scrollbar {
-            height: 8px;
-        }
+    .status-cancelled, .status-returned {
+      background-color: #fee2e2;
+      color: #dc2626;
+    }
 
-        .table-container::-webkit-scrollbar-thumb {
-            background-color: #6b7280;
-            border-radius: 4px;
-        }
+    .section-card {
+      animation: fadeIn 0.3s ease-out forwards;
+    }
 
-        .table-container::-webkit-scrollbar-track {
-            background-color: #e5e7eb;
-        }
-    </style>
+    .table-container::-webkit-scrollbar {
+      height: 8px;
+    }
+
+    .table-container::-webkit-scrollbar-track {
+      background: #f1f5f9;
+      border-radius: 4px;
+    }
+
+    .table-container::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+    }
+
+    .table-container::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .section-card {
+        padding: 1rem !important;
+      }
+
+      .table th, .table td {
+        font-size: 0.875rem;
+        padding: 0.5rem;
+      }
+
+      .product-image {
+        width: 40px !important;
+        height: 40px !important;
+      }
+
+      .status-select {
+        width: 100%;
+        margin-bottom: 0.5rem;
+      }
+
+      .update-status-btn {
+        width: 100%;
+      }
+
+      .section-title {
+        font-size: 1rem;
+      }
+
+      .section-content {
+        font-size: 0.875rem;
+      }
+    }
+
+    @media (max-width: 576px) {
+      .table th, .table td {
+        font-size: 0.75rem;
+        padding: 0.4rem;
+      }
+
+      .product-image {
+        width: 32px !important;
+        height: 32px !important;
+      }
+
+      .btn {
+        font-size: 0.75rem;
+        padding: 0.5rem 0.75rem;
+      }
+
+      .status-badge {
+        font-size: 0.6875rem;
+      }
+    }
+  </style>
 </head>
-
-<body class="bg-gray-100">
-    <!-- Navbar -->
-
-
-    <div class="flex">
-        <!-- Sidebar -->
-        <div class="h-screen w-64 bg-gray-800 text-white fixed top-0 left-0 shadow-lg flex flex-col">
-            <!-- Include the sidebar -->
-            <aside class="sidebar">
-                <%- include('.././Partials/admin/adminsidebar', { activePage: 'orders' , admin: admin || {} }) %>
-
-            </aside>
-            <!-- Include the navbar -->
+<body class="bg-gray-50">
+  <!-- Sidebar -->
+  <div class="fixed inset-y-0 left-0 z-40 transition-all duration-300 transform -translate-x-full lg:translate-x-0" id="sidebar">
+    <div class="flex flex-col h-full w-72 bg-gradient-to-b from-slate-800 to-slate-900 text-white shadow-xl rounded-r-xl overflow-hidden">
+      <div class="p-5 flex items-center gap-3 border-b border-slate-700/50">
+        <img src="/images/TIMZO.jpg" alt="Timzo Logo" class="w-10 h-10 rounded-md">
+        <div class="text-xl font-bold tracking-wide bg-gradient-to-r from-amber-300 to-amber-500 bg-clip-text text-transparent">
+          Timzo Admin
         </div>
-
-        <!-- Main Content -->
-        <div class="ml-64 mt-16 p-6 flex-1">
-            <div class="flex justify-between items-center mb-6">
-                <h1 class="text-2xl font-bold text-gray-800">Order Details - <%= order.orderId %>
-                </h1>
-                <a href="/admin/orders"
-                    class="bg-gray-800 text-white px-4 py-2 rounded hover:bg-gray-700 transition flex items-center gap-2">
-                    <i class="fa-solid fa-arrow-left"></i> Back to Orders
-                </a>
+      </div>
+      <div class="px-4 py-5">
+        <div class="flex items-center gap-3 mb-2 px-2">
+          <div class="w-10 h-10 rounded-full bg-amber-500 flex items-center justify-center text-slate-900 font-bold">
+            <%= admin && admin.name ? admin.name.charAt(0).toUpperCase() : 'A' %>
+          </div>
+          <div>
+            <div class="font-medium">
+              <%= admin && admin.name ? admin.name : 'Admin User' %>
             </div>
-
-            <% if (!order) { %>
-                <div class="text-center text-gray-600">
-                    <p>Order not found.</p>
-                </div>
-                <% } else { %>
-                    <div class="bg-white shadow-lg rounded-lg p-6">
-                        <!-- Order Information -->
-                        <div class="mb-6">
-                            <h2 class="text-lg font-semibold text-gray-700 mb-2">Order Information</h2>
-                            <p class="text-gray-600">Order ID: <%= order.orderId %>
-                            </p>
-                            <p class="text-gray-600">Placed on: <%= new
-                                    Date(order.orderDate).toLocaleDateString('en-US', { year: 'numeric' , month: 'long'
-                                    , day: 'numeric' , hour: '2-digit' , minute: '2-digit' }) %>
-                            </p>
-                            <p class="text-gray-600">Status:
-                                <span class="<%= 
-                                order.orderStatus === 'Delivered' ? 'text-green-600' :
-                                order.orderStatus === 'Cancelled' ? 'text-red-600' :
-                                order.orderStatus === 'Shipped' ? 'text-blue-600' :
-                                'text-yellow-600' %> font-semibold">
-                                    <%= order.orderStatus %>
-                                </span>
-                            </p>
-                            <p class="text-gray-600">Estimated Delivery: <%= order.estimatedDelivery ? new
-                                    Date(order.estimatedDelivery).toLocaleDateString('en-US', { year: 'numeric' ,
-                                    month: 'long' , day: 'numeric' }) : 'N/A' %>
-                            </p>
-                        </div>
-
-                        <div class="section-divider"></div>
-
-                        <!-- Customer Information -->
-                        <div class="mb-6">
-                            <h2 class="text-lg font-semibold text-gray-700 mb-2">Customer Information</h2>
-                            <p class="text-gray-600">Name: <%= order.user?.fullname || 'Unknown User' %>
-                            </p>
-                            <p class="text-gray-600">Email: <%= order.user?.email || 'N/A' %>
-                            </p>
-                        </div>
-
-                        <div class="section-divider"></div>
-
-                        <!-- Shipping Address -->
-                        <div class="mb-6">
-                            <h2 class="text-lg font-semibold text-gray-700 mb-2">Shipping Address</h2>
-                            <p class="text-gray-600">
-                                <%= order.shippingAddress?.fullName || 'N/A' %><br>
-                                    <%= order.shippingAddress?.addressLine1 || '' %>
-                                        <%= order.shippingAddress?.addressLine2 ? ', ' +
-                                            order.shippingAddress.addressLine2 : '' %><br>
-                                            <%= order.shippingAddress?.city || '' %>, <%= order.shippingAddress?.state
-                                                    || '' %>
-                                                    <%= order.shippingAddress?.postalCode || '' %><br>
-                                                        <%= order.shippingAddress?.country || '' %><br>
-                                                            Phone: <%= order.shippingAddress?.phone || 'N/A' %>
-                            </p>
-                        </div>
-
-                        <div class="section-divider"></div>
-
-                        <!-- Payment Details -->
-                        <div class="mb-6">
-                            <h2 class="text-lg font-semibold text-gray-700 mb-2">Payment Details</h2>
-                            <p class="text-gray-600">Method: <%= order.paymentMethod || 'N/A' %>
-                            </p>
-                            <p class="text-gray-600">Status: <%= order.paymentStatus || 'N/A' %>
-                            </p>
-                        </div>
-
-                        <div class="section-divider"></div>
-
-                        <!-- Ordered Items -->
-                        <div class="mb-6">
-                            <h2 class="text-lg font-semibold text-gray-700 mb-2">Ordered Items</h2>
-                            <div class="table-container">
-                                <table class="w-full text-gray-600 border-collapse">
-                                    <thead>
-                                        <tr class="bg-gray-100">
-                                            <th class="p-3 text-left border-b">Product</th>
-                                            <th class="p-3 text-left border-b">Quantity</th>
-                                            <th class="p-3 text-left border-b">Price</th>
-                                            <th class="p-3 text-left border-b">Total</th>
-                                            <th class="p-3 text-left border-b">Status</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <% if (order.items?.length) { %>
-                                            <% order.items.forEach(item=> { %>
-                                                <tr class="border-b hover:bg-gray-50">
-                                                    <td class="p-3 flex items-center">
-                                                        <img src="<%= item.productId?.images?.[0] || '/images/default-watch.jpg' %>"
-                                                            alt="<%= item.productName || 'Product' %>"
-                                                            class="w-16 h-16 object-cover rounded mr-3">
-                                                        <span>
-                                                            <%= item.productName || 'Unknown Product' %>
-                                                        </span>
-                                                    </td>
-                                                    <td class="p-3">
-                                                        <%= item.quantity || 0 %>
-                                                    </td>
-                                                    <td class="p-3">₹<%= item.price?.toFixed(2) || '0.00' %>
-                                                    </td>
-                                                    <td class="p-3">₹<%= (item.quantity * (item.price || 0)).toFixed(2)
-                                                            %>
-                                                    </td>
-                                                    <td class="p-3">
-                                                        <span class="<%= 
-                                                        item.status === 'Delivered' ? 'text-green-600' :
-                                                        item.status === 'Cancelled' ? 'text-red-600' :
-                                                        item.status === 'Returned' ? 'text-red-600' :
-                                                        'text-yellow-600' %> font-semibold">
-                                                            <%= item.status %>
-                                                        </span>
-                                                    </td>
-                                                    <td class="p-3">
-                                                        <% if (item.status==='Returned' ) { %>
-                                                            <p>Reason: <%= item.returnReason %>
-                                                            </p>
-                                                            <p>Date: <%= new
-                                                                    Date(item.returnDate).toLocaleDateString('en-US', {
-                                                                    month: 'short' , day: 'numeric' , year: 'numeric' })
-                                                                    %>
-                                                            </p>
-                                                            <% } else if (item.status==='Cancelled' ) { %>
-                                                                <p>Cancelled on <%= new
-                                                                        Date(item.cancelDate).toLocaleDateString('en-US',
-                                                                        { month: 'short' , day: 'numeric' ,
-                                                                        year: 'numeric' }) %>
-                                                                </p>
-                                                                <% } %>
-                                                    </td>
-                                                </tr>
-                                                <% }); %>
-                                                    <% } else { %>
-                                                        <tr>
-                                                            <td colspan="6" class="p-3 text-center">No items found</td>
-                                                        </tr>
-                                                        <% } %>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-
-                        <div class="section-divider"></div>
-
-                        <!-- Order Summary -->
-                        <div class="mb-6">
-                            <h2 class="text-lg font-semibold text-gray-700 mb-2">Order Summary</h2>
-                            <p class="text-gray-600">Subtotal: ₹<%= order.subtotal?.toFixed(2) || '0.00' %>
-                            </p>
-                            <% if (order.discount> 0) { %>
-                                <p class="text-gray-600">Discount: -₹<%= order.discount.toFixed(2) %>
-                                </p>
-                                <% } %>
-                                    <p class="text-gray-600">Shipping Fee: ₹<%= order.shippingFee?.toFixed(2) || '0.00'
-                                            %>
-                                    </p>
-                                    <p class="text-gray-600">Tax: ₹<%= order.tax?.toFixed(2) || '0.00' %>
-                                    </p>
-                                    <p class="text-gray-600 font-bold">Total: ₹<%= order.totalAmount?.toFixed(2)
-                                            || '0.00' %>
-                                    </p>
-                        </div>
-
-                        <% if (order.statusHistory?.length) { %>
-                            <div class="section-divider"></div>
-                            <div class="mb-6">
-                                <h2 class="text-lg font-semibold text-gray-700 mb-2">Status History</h2>
-                                <ul class="list-disc pl-5 text-gray-600">
-                                    <% order.statusHistory.forEach(entry=> { %>
-                                        <li>
-                                            <%= entry.status %> - <%= new Date(entry.date).toLocaleDateString('en-US', {
-                                                    year: 'numeric' , month: 'short' , day: 'numeric' , hour: '2-digit'
-                                                    , minute: '2-digit' }) %>
-                                                    <% if (entry.current) { %>(Current)<% } %>
-                                        </li>
-                                        <% }); %>
-                                </ul>
-                            </div>
-                            <% } %>
-
-                                <!-- Update Status -->
-                                <% if (order.orderStatus !=='Delivered' && order.orderStatus !=='Cancelled' ) { %>
-                                    <div class="section-divider"></div>
-                                    <div class="mb-6">
-                                        <h2 class="text-lg font-semibold text-gray-700 mb-2">Update Order Status</h2>
-                                        <select id="statusSelect" class="border rounded p-2 text-gray-600">
-                                            <option value="" disabled selected>Select Status</option>
-                                            <option value="Processing">Processing</option>
-                                            <option value="Shipped">Shipped</option>
-                                            <option value="Delivered">Delivered</option>
-                                            <option value="Cancelled">Cancelled</option>
-                                        </select>
-                                        <button onclick="updateStatus('<%= order._id %>')"
-                                            class="bg-gray-800 text-white px-4 py-2 rounded hover:bg-gray-700 transition ml-2">
-                                            Update
-                                        </button>
-                                    </div>
-                                    <% } %>
-                    </div>
-                    <% } %>
+            <div class="text-xs text-slate-400">
+              <%= admin && admin.email ? admin.email : 'admin@timzo.com' %>
+            </div>
+          </div>
         </div>
+      </div>
+      <nav class="flex-1 px-4 space-y-1 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
+        <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider px-3 mb-2">Dashboard</div>
+        <a href="/admin/dashboard" class="flex items-center px-3 py-2.5 rounded-lg transition-all duration-200 group text-slate-300 hover:bg-slate-700/50 hover:text-white">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-slate-400 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+          </svg>
+          <span>Dashboard</span>
+        </a>
+        <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider px-3 mt-6 mb-2">Store Management</div>
+        <a href="/admin/getProduct" class="flex items-center px-3 py-2.5 rounded-lg transition-all duration-200 group text-slate-300 hover:bg-slate-700/50 hover:text-white">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-slate-400 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+          </svg>
+          <span>Products</span>
+        </a>
+        <a href="/admin/brand" class="flex items-center px-3 py-2.5 rounded-lg transition-all duration-200 group text-slate-300 hover:bg-slate-700/50 hover:text-white">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-slate-400 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+          </svg>
+          <span>Brands</span>
+        </a>
+        <a href="/admin/categories" class="flex items-center px-3 py-2.5 rounded-lg transition-all duration-200 group text-slate-300 hover:bg-slate-700/50 hover:text-white">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-slate-400 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+          </svg>
+          <span>Categories</span>
+        </a>
+        <a href="/admin/orders" class="flex items-center px-3 py-2.5 rounded-lg transition-all duration-200 group bg-amber-500/10 text-amber-400">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+          </svg>
+          <span>Orders</span>
+        </a>
+        <a href="/admin/coupons" class="flex items-center px-3 py-2.5 rounded-lg transition-all duration-200 group text-slate-300 hover:bg-slate-700/50 hover:text-white">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-slate-400 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
+          </svg>
+          <span>Coupons</span>
+        </a>
+        <a href="/admin/sales-report" class="flex items-center px-3 py-2.5 rounded-lg transition-all duration-200 group text-slate-300 hover:bg-slate-700/50 hover:text-white">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-slate-400 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+          <span>Sales Report</span>
+        </a>
+        <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider px-3 mt-6 mb-2">User Management</div>
+        <a href="/admin/users" class="flex items-center px-3 py-2.5 rounded-lg transition-all duration-200 group text-slate-300 hover:bg-slate-700/50 hover:text-white">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-slate-400 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+          </svg>
+          <span>Users</span>
+        </a>
+        <div class="py-10"></div>
+      </nav>
+      <div class="p-4 mt-auto border-t border-slate-700/50">
+        <a href="/admin/logout" class="flex items-center px-3 py-2.5 rounded-lg text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-all duration-200">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+          </svg>
+          <span>Logout</span>
+        </a>
+      </div>
     </div>
+  </div>
 
-    <!-- Footer -->
-    <footer class="bg-gray-100 p-4 text-center text-gray-600 text-sm shadow-inner">
-        © <%= new Date().getFullYear() %> Timzo Admin Panel. All rights reserved.
-    </footer>
+  <!-- Sidebar Backdrop for Mobile -->
+  <div class="fixed inset-0 bg-black/50 z-30 lg:hidden transition-opacity duration-300 opacity-0 pointer-events-none" id="sidebarBackdrop"></div>
 
-    <script>
-        async function updateStatus(orderId) {
-            const status = document.getElementById('statusSelect').value;
-            if (!status) {
-                alert('Please select a status');
-                return;
-            }
-            try {
-                const response = await fetch(`/admin/orders/update/${orderId}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ status })
-                });
-                const data = await response.json();
-                if (data.success) {
-                    alert('Order status updated successfully');
-                    window.location.reload();
-                } else {
-                    alert(data.message || 'Failed to update status');
-                }
-            } catch (error) {
-                console.error('Error updating status:', error);
-                alert('An error occurred while updating status');
-            }
+  <!-- Mobile Sidebar Toggle -->
+  <div class="fixed top-4 left-4 z-50 lg:hidden">
+    <button id="sidebarToggle" class="bg-amber-500 text-slate-900 rounded-lg p-2 shadow-lg flex items-center justify-center">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" id="menuIcon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+      </svg>
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 hidden" id="closeIcon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+  </div>
+
+  <!-- Main Content -->
+  <main class="lg:ml-72 min-h-screen p-4 lg:p-6 pt-16 lg:pt-6">
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden section-card">
+      <!-- Header -->
+      <div class="p-4 lg:p-6 border-b border-gray-200">
+        <div class="flex flex-col lg:flex-row justify-between items-center gap-4">
+          <div>
+            <h1 class="text-2xl lg:text-3xl font-bold text-gray-900">Order Details - <%= order && order.orderId ? order.orderId : 'N/A' %></h1>
+            <p class="text-gray-500 mt-1">View and manage order information</p>
+          </div>
+          <a href="/admin/orders" class="btn btn-dark">
+            <i class="bi bi-arrow-left me-1"></i> Back to Orders
+          </a>
+        </div>
+      </div>
+      <!-- Order Content -->
+      <div class="p-4 lg:p-6">
+        <% if (!order) { %>
+          <div class="text-center py-5 text-muted">
+            <i class="bi bi-cart-x display-1 d-block mb-3 opacity-25"></i>
+            <h5>Order Not Found</h5>
+            <p class="mb-0">No order data available.</p>
+          </div>
+        <% } else { %>
+          <!-- Order Information -->
+          <div class="mb-6 section-card">
+            <h2 class="text-lg font-semibold text-gray-700 mb-2 section-title">Order Information</h2>
+            <div class="section-content">
+              <p class="text-gray-600">Order ID: <%= order.orderId || 'N/A' %></p>
+              <p class="text-gray-600">Placed on: <%= order.orderDate ? new Date(order.orderDate).toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'N/A' %></p>
+              <p class="text-gray-600">Status: 
+                <span class="status-badge status-<%= order.orderStatus ? order.orderStatus.toLowerCase() : 'processing' %>">
+                  <%= order.orderStatus || 'N/A' %>
+                </span>
+              </p>
+              <p class="text-gray-600">Estimated Delivery: <%= order.estimatedDelivery ? new Date(order.estimatedDelivery).toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' }) : 'N/A' %></p>
+            </div>
+          </div>
+
+          <!-- Customer Information -->
+          <div class="mb-6 section-card">
+            <h2 class="text-lg font-semibold text-gray-700 mb-2 section-title">Customer Information</h2>
+            <div class="section-content">
+              <p class="text-gray-600">Name: <%= order.user && order.user.fullname ? order.user.fullname : 'Unknown User' %></p>
+              <p class="text-gray-600">Email: <%= order.user && order.user.email ? order.user.email : 'N/A' %></p>
+            </div>
+          </div>
+
+          <!-- Shipping Address -->
+          <div class="mb-6 section-card">
+            <h2 class="text-lg font-semibold text-gray-700 mb-2 section-title">Shipping Address</h2>
+            <div class="section-content">
+              <p class="text-gray-600">
+                <%= order.shippingAddress && order.shippingAddress.fullName ? order.shippingAddress.fullName : 'N/A' %><br>
+                <%= order.shippingAddress && order.shippingAddress.addressLine1 ? order.shippingAddress.addressLine1 : '' %>
+                <%= order.shippingAddress && order.shippingAddress.addressLine2 ? ', ' + order.shippingAddress.addressLine2 : '' %><br>
+                <%= order.shippingAddress && order.shippingAddress.city ? order.shippingAddress.city + ', ' : '' %>
+                <%= order.shippingAddress && order.shippingAddress.state ? order.shippingAddress.state : '' %>
+                <%= order.shippingAddress && order.shippingAddress.postalCode ? order.shippingAddress.postalCode : '' %><br>
+                <%= order.shippingAddress && order.shippingAddress.country ? order.shippingAddress.country : '' %><br>
+                Phone: <%= order.shippingAddress && order.shippingAddress.phone ? order.shippingAddress.phone : 'N/A' %>
+              </p>
+            </div>
+          </div>
+
+          <!-- Payment Details -->
+          <div class="mb-6 section-card">
+            <h2 class="text-lg font-semibold text-gray-700 mb-2 section-title">Payment Details</h2>
+            <div class="section-content">
+              <p class="text-gray-600">Method: <%= order.paymentMethod || 'N/A' %></p>
+              <p class="text-gray-600">Status: <%= order.paymentStatus || 'N/A' %></p>
+            </div>
+          </div>
+
+          <!-- Ordered Items -->
+          <div class="mb-6 section-card">
+            <h2 class="text-lg font-semibold text-gray-700 mb-2 section-title">Ordered Items</h2>
+            <div class="table-container">
+              <table class="table table-hover mb-0">
+                <thead class="table-dark">
+                  <tr>
+                    <th class="p-3 text-left">Product</th>
+                    <th class="p-3 text-left">Quantity</th>
+                    <th class="p-3 text-left">Price</th>
+                    <th class="p-3 text-left">Total</th>
+                    <th class="p-3 text-left">Status</th>
+                    <th class="p-3 text-left">Details</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% if (order.items && order.items.length > 0) { %>
+                    <% order.items.forEach(item => { %>
+                      <tr class="hover:bg-gray-50">
+                        <td class="p-3 flex items-center">
+                          <img src="<%= item.productId && item.productId.images && item.productId.images[0] ? item.productId.images[0] : '/images/default-watch.jpg' %>"
+                               alt="<%= item.productName || 'Product' %>"
+                               class="product-image w-12 h-12 object-cover rounded mr-3">
+                          <span><%= item.productName || 'Unknown Product' %></span>
+                        </td>
+                        <td class="p-3"><%= item.quantity || 0 %></td>
+                        <td class="p-3">₹<%= item.price ? item.price.toFixed(2) : '0.00' %></td>
+                        <td class="p-3">₹<%= item.quantity && item.price ? (item.quantity * item.price).toFixed(2) : '0.00' %></td>
+                        <td class="p-3">
+                          <span class="status-badge status-<%= item.status ? item.status.toLowerCase() : 'processing' %>">
+                            <%= item.status || 'N/A' %>
+                          </span>
+                        </td>
+                        <td class="p-3">
+                          <% if (item.status === 'Returned') { %>
+                            <p class="text-sm text-gray-600">Reason: <%= item.returnReason || 'N/A' %></p>
+                            <p class="text-sm text-gray-600">Date: <%= item.returnDate ? new Date(item.returnDate).toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric' }) : 'N/A' %></p>
+                          <% } else if (item.status === 'Cancelled') { %>
+                            <p class="text-sm text-gray-600">Cancelled on: <%= item.cancelDate ? new Date(item.cancelDate).toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric' }) : 'N/A' %></p>
+                          <% } %>
+                        </td>
+                      </tr>
+                    <% }); %>
+                  <% } else { %>
+                    <tr>
+                      <td colspan="6" class="p-3 text-center text-muted">
+                        <i class="bi bi-box-seam display-6 d-block mb-2 opacity-25"></i>
+                        No items found
+                      </td>
+                    </tr>
+                  <% } %>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Order Summary -->
+          <div class="mb-6 section-card">
+            <h2 class="text-lg font-semibold text-gray-700 mb-2 section-title">Order Summary</h2>
+            <div class="section-content">
+              <p class="text-gray-600">Subtotal: ₹<%= order.subtotal ? order.subtotal.toFixed(2) : '0.00' %></p>
+              <% if (order.discount && order.discount > 0) { %>
+                <p class="text-gray-600">Discount: -₹<%= order.discount.toFixed(2) %></p>
+              <% } %>
+              <p class="text-gray-600">Shipping Fee: ₹<%= order.shippingFee ? order.shippingFee.toFixed(2) : '0.00' %></p>
+              <p class="text-gray-600">Tax: ₹<%= order.tax ? order.tax.toFixed(2) : '0.00' %></p>
+              <p class="text-gray-600 font-bold">Total: ₹<%= order.totalAmount ? order.totalAmount.toFixed(2) : '0.00' %></p>
+            </div>
+          </div>
+
+          <!-- Status History -->
+          <% if (order.statusHistory && order.statusHistory.length > 0) { %>
+            <div class="mb-6 section-card">
+              <h2 class="text-lg font-semibold text-gray-700 mb-2 section-title">Status History</h2>
+              <div class="section-content">
+                <ul class="list-disc pl-5 text-gray-600">
+                  <% order.statusHistory.forEach(entry => { %>
+                    <li>
+                      <%= entry.status || 'N/A' %> - <%= entry.date ? new Date(entry.date).toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'N/A' %>
+                      <% if (entry.current) { %><span class="text-primary font-semibold">(Current)</span><% } %>
+                    </li>
+                  <% }); %>
+                </ul>
+              </div>
+            </div>
+          <% } %>
+
+          <!-- Update Status -->
+          <% if (order.orderStatus !== 'Delivered' && order.orderStatus !== 'Cancelled') { %>
+            <div class="mb-6 section-card">
+              <h2 class="text-lg font-semibold text-gray-700 mb-2 section-title">Update Order Status</h2>
+              <div class="flex flex-col lg:flex-row gap-3">
+                <select id="statusSelect" class="form-select status-select">
+                  <option value="" disabled selected>Select Status</option>
+                  <option value="Processing">Processing</option>
+                  <option value="Shipped">Shipped</option>
+                  <option value="Delivered">Delivered</option>
+                  <option value="Cancelled">Cancelled</option>
+                </select>
+                <button onclick="updateStatus('<%= order._id %>')" class="btn btn-primary update-status-btn">
+                  <i class="bi bi-arrow-repeat me-1"></i> Update Status
+                </button>
+              </div>
+            </div>
+          <% } %>
+        <% } %>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-gray-100 p-4 text-center text-gray-600 text-sm shadow-inner">
+    © <%= new Date().getFullYear() %> Timzo Admin Panel. All rights reserved.
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Sidebar Toggle
+    const sidebar = document.getElementById('sidebar');
+    const sidebarBackdrop = document.getElementById('sidebarBackdrop');
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    const menuIcon = document.getElementById('menuIcon');
+    const closeIcon = document.getElementById('closeIcon');
+
+    function toggleSidebar() {
+      sidebar.classList.toggle('translate-x-0');
+      sidebarBackdrop.classList.toggle('opacity-0');
+      sidebarBackdrop.classList.toggle('pointer-events-none');
+      menuIcon.classList.toggle('hidden');
+      closeIcon.classList.toggle('hidden');
+    }
+
+    sidebarToggle.addEventListener('click', toggleSidebar);
+    sidebarBackdrop.addEventListener('click', toggleSidebar);
+
+    // Update Status
+    async function updateStatus(orderId) {
+      const statusSelect = document.getElementById('statusSelect');
+      const status = statusSelect.value;
+
+      if (!status) {
+        Swal.fire({
+          title: 'Error',
+          text: 'Please select a status.',
+          icon: 'error',
+          confirmButtonColor: '#0288d1'
+        });
+        return;
+      }
+
+      const result = await Swal.fire({
+        title: 'Update Order Status',
+        text: `Are you sure you want to change the order status to "${status}"?`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, Update',
+        confirmButtonColor: '#0288d1',
+        cancelButtonColor: '#6c757d'
+      });
+
+      if (!result.isConfirmed) return;
+
+      try {
+        const response = await fetch(`/admin/orders/update/${orderId}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status })
+        });
+        const data = await response.json();
+
+        if (data.success) {
+          Swal.fire({
+            title: 'Success',
+            text: 'Order status updated successfully.',
+            icon: 'success',
+            confirmButtonColor: '#0288d1'
+          }).then(() => {
+            window.location.reload();
+          });
+        } else {
+          Swal.fire({
+            title: 'Failed',
+            text: data.message || 'Failed to update status.',
+            icon: 'error',
+            confirmButtonColor: '#0288d1'
+          });
         }
-    </script>
-</body>
+      } catch (error) {
+        console.error('Error updating status:', error);
+        Swal.fire({
+          title: 'Error',
+          text: 'An error occurred while updating status.',
+          icon: 'error',
+          confirmButtonColor: '#0288d1'
+        });
+      }
+    }
 
+    // Close Sidebar on Resize
+    window.addEventListener('resize', () => {
+      if (window.innerWidth >= 1024) {
+        sidebar.classList.remove('translate-x-0');
+        sidebarBackdrop.classList.add('opacity-0', 'pointer-events-none');
+        menuIcon.classList.remove('hidden');
+        closeIcon.classList.add('hidden');
+      }
+    });
+  </script>
+</body>
 </html>

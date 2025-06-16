@@ -1,409 +1,767 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
-  <title>Timzo Admin - Categories</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Timzo Admin - Categories</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <style>
-    .deleted-row {
-      background-color: #f8d7da;
+    .deleted-row, .deleted-card {
+      background-color: #fee2e2;
+      border-left: 4px solid #ef4444;
+    }
+
+    .unlisted-row, .unlisted-card {
+      background-color: #fef3c7;
+      border-left: 4px solid #f59e0b;
+    }
+
+    .table-container::-webkit-scrollbar {
+      height: 8px;
+    }
+
+    .table-container::-webkit-scrollbar-track {
+      background: #f1f5f9;
+      border-radius: 4px;
+    }
+
+    .table-container::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+    }
+
+    .table-container::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+
+    .status-badge {
+      padding: 0.25rem 0.5rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+
+    .status-listed {
+      background-color: #dcfce7;
+      color: #166534;
+    }
+
+    .status-unlisted {
+      background-color: #fee2e2;
+      color: #dc2626;
+    }
+
+    .offer-badge {
+      background: linear-gradient(45deg, #f59e0b, #d97706);
+      color: white;
+      padding: 0.125rem 0.375rem;
+      border-radius: 0.25rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .action-btn-group {
+      display: flex;
+      gap: 0.25rem;
+      flex-wrap: wrap;
+    }
+    .table{
+      width: 1570px;
+    }
+
+    @media (max-width: 768px) {
+      .mobile-card {
+        display: block !important;
+      }
+      
+      .desktop-table {
+        display: none !important;
+      }
+      
+      .mobile-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.25rem;
+      }
+      
+      .mobile-actions .btn {
+        font-size: 0.75rem;
+        padding: 0.25rem 0.5rem;
+      }
+      
+      .controls-container {
+        flex-direction: column;
+        gap: 1rem;
+      }
+      
+      .pagination-container {
+        overflow-x: auto;
+        padding: 0.5rem 0;
+      }
+      
+      .pagination {
+        white-space: nowrap;
+        margin: 0;
+      }
+      
+      .card-body {
+        padding: 1rem;
+      }
+      
+      .table th, .table td {
+        font-size: 0.875rem;
+      }
+    }
+
+    @media (min-width: 769px) {
+      .mobile-card {
+        display: none !important;
+      }
+      
+      .desktop-table {
+        display: table !important;
+      }
+    }
+
+    @media (max-width: 576px) {
+      .action-btn-group .btn {
+        font-size: 0.7rem;
+        padding: 0.2rem 0.4rem;
+      }
+      
+      .card-title {
+        font-size: 0.875rem;
+      }
+      
+      .badge, .offer-badge {
+        font-size: 0.6875rem;
+      }
     }
   </style>
 </head>
-
-<body class="bg-gray-100">
-
-  <%- include('.././Partials/admin/adminsidebar', { activePage: 'categories' , admin: admin || {} }) %>
-
-
-    <div class="flex min-h-screen">
-      <div class="w-64 bg-dark text-white">
+<body class="bg-gray-50">
+  <!-- Sidebar -->
+  <div class="fixed inset-y-0 left-0 z-40 transition-all duration-300 transform -translate-x-full lg:translate-x-0" id="sidebar">
+    <div class="flex flex-col h-full w-72 bg-gradient-to-b from-slate-800 to-slate-900 text-white shadow-xl rounded-r-xl overflow-hidden">
+      <div class="p-5 flex items-center gap-3 border-b border-slate-700/50">
+        <img src="/images/TIMZO.jpg" alt="Timzo Logo" class="w-10 h-10 rounded-md">
+        <div class="text-xl font-bold tracking-wide bg-gradient-to-r from-amber-300 to-amber-500 bg-clip-text text-transparent">
+          Timzo Admin
+        </div>
       </div>
-      <style>
-        body {
-          padding-top: 70px;
-        }
-      </style>
-      <main class="flex-1 p-6">
-        <div class="bg-white p-4 rounded-xl shadow-md overflow-auto">
-          <div class="flex justify-between items-center mb-6">
-            <h1 class="text-2xl font-bold">Categories</h1>
-            <div class="d-flex align-items-center gap-2">
-              <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="showDeleted" <%=showDeleted ? 'checked' : '' %>
-                onchange="toggleDeletedView()">
-                <label class="form-check-label" for="showDeleted">Show Deleted Categories</label>
-              </div>
-              <a href="/admin/addcategories" class="btn btn-primary">+ Add Category</a>
+      <div class="px-4 py-5">
+        <div class="flex items-center gap-3 mb-2 px-2">
+          <div class="w-10 h-10 rounded-full bg-amber-500 flex items-center justify-center text-slate-900 font-bold">
+            <%= admin && admin.name ? admin.name.charAt(0).toUpperCase() : 'A' %>
+          </div>
+          <div>
+            <div class="font-medium">
+              <%= admin && admin.name ? admin.name : 'Admin User' %>
+            </div>
+            <div class="text-xs text-slate-400">
+              <%= admin && admin.email ? admin.email : 'admin@timzo.com' %>
             </div>
           </div>
+        </div>
+      </div>
+      <nav class="flex-1 px-4 space-y-1 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
+        <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider px-3 mb-2">Dashboard</div>
+        <a href="/admin/dashboard" class="flex items-center px-3 py-2.5 rounded-lg transition-all duration-200 group text-slate-300 hover:bg-slate-700/50 hover:text-white">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-slate-400 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+          </svg>
+          <span>Dashboard</span>
+        </a>
+        <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider px-3 mt-6 mb-2">Store Management</div>
+        <a href="/admin/getProduct" class="flex items-center px-3 py-2.5 rounded-lg transition-all duration-200 group text-slate-300 hover:bg-slate-700/50 hover:text-white">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-slate-400 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+          </svg>
+          <span>Products</span>
+        </a>
+        <a href="/admin/brand" class="flex items-center px-3 py-2.5 rounded-lg transition-all duration-200 group text-slate-300 hover:bg-slate-700/50 hover:text-white">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-slate-400 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+          </svg>
+          <span>Brands</span>
+        </a>
+        <a href="/admin/categories" class="flex items-center px-3 py-2.5 rounded-lg transition-all duration-200 group bg-amber-500/10 text-amber-400">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+          </svg>
+          <span>Categories</span>
+        </a>
+        <a href="/admin/orders" class="flex items-center px-3 py-2.5 rounded-lg transition-all duration-200 group text-slate-300 hover:bg-slate-700/50 hover:text-white">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-slate-400 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+          </svg>
+          <span>Orders</span>
+        </a>
+        <a href="/admin/coupons" class="flex items-center px-3 py-2.5 rounded-lg transition-all duration-200 group text-slate-300 hover:bg-slate-700/50 hover:text-white">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-slate-400 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
+          </svg>
+          <span>Coupons</span>
+        </a>
+        <a href="/admin/sales-report" class="flex items-center px-3 py-2.5 rounded-lg transition-all duration-200 group text-slate-300 hover:bg-slate-700/50 hover:text-white">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-slate-400 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+          <span>Sales Report</span>
+        </a>
+        <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider px-3 mt-6 mb-2">User Management</div>
+        <a href="/admin/users" class="flex items-center px-3 py-2.5 rounded-lg transition-all duration-200 group text-slate-300 hover:bg-slate-700/50 hover:text-white">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-slate-400 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+          </svg>
+          <span>Users</span>
+        </a>
+        <div class="py-10"></div>
+      </nav>
+      <div class="p-4 mt-auto border-t border-slate-700/50">
+        <a href="/admin/logout" class="flex items-center px-3 py-2.5 rounded-lg text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-all duration-200">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+          </svg>
+          <span>Logout</span>
+        </a>
+      </div>
+    </div>
+  </div>
 
-          <table class="table table-bordered table-hover text-center">
+  <!-- Sidebar Backdrop for Mobile -->
+  <div class="fixed inset-0 bg-black/50 z-30 lg:hidden transition-opacity duration-300 opacity-0 pointer-events-none" id="sidebarBackdrop"></div>
+
+  <!-- Mobile Sidebar Toggle -->
+  <div class="fixed top-4 left-4 z-50 lg:hidden">
+    <button id="sidebarToggle" class="bg-amber-500 text-slate-900 rounded-lg p-2 shadow-lg flex items-center justify-center">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" id="menuIcon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+      </svg>
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 hidden" id="closeIcon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+  </div>
+
+  <!-- Main Content -->
+  <main class="lg:ml-72 min-h-screen p-4 lg:p-6 pt-16 lg:pt-6">
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+      <!-- Header -->
+      <div class="p-4 lg:p-6 border-b border-gray-200">
+        <div class="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-4 controls-container">
+          <h1 class="text-2xl lg:text-3xl font-bold text-gray-900">Categories Management</h1>
+          <div class="flex gap-2 align-items-center">
+            <div class="form-check d-flex align-items-center">
+              <input class="form-check-input me-2" type="checkbox" id="showDeleted" <%= showDeleted ? 'checked' : '' %> onchange="toggleDeletedView()">
+              <label class="form-check-label text-sm text-nowrap" for="showDeleted">Show Deleted</label>
+            </div>
+            <a href="/admin/addcategories" class="btn btn-primary">
+              <i class="bi bi-plus-circle me-1"></i>
+              <span class="d-none d-sm-inline">Add Category</span>
+              <span class="d-sm-none">Add</span>
+            </a>
+          </div>
+        </div>
+      </div>
+      <!-- Desktop Table -->
+      <div class="desktop-table">
+        <div class="table-container" style="overflow-x: auto;">
+          <table class="table table-hover mb-0">
             <thead class="table-dark">
               <tr>
-                <th>#</th>
+                <th class="text-center">#</th>
                 <th>Name</th>
-                <th>Offer (%)</th>
+                <th class="text-center">Offer</th>
                 <th>Description</th>
-                <th>Sales</th>
-                <th>Stock</th>
-                <th>Status</th>
-                <th>Actions</th>
+                <th class="text-center">Sales</th>
+                <th class="text-center">Stock</th>
+                <th class="text-center">Status</th>
+                <th class="text-center">Actions</th>
               </tr>
             </thead>
             <tbody>
-              <% if (categories.length> 0) { %>
-                <% categories.forEach((category, index)=> { %>
-                  <tr class="<%= category.isDeleted ? 'deleted-row' : '' %>">
+              <% if (categories && categories.length > 0) { %>
+                <% categories.forEach((category, index) => { %>
+                  <tr class="<%= category.isDeleted ? 'deleted-row' : !category.isListed ? 'unlisted-row' : '' %>">
+                    <td class="text-center fw-medium"><%= (currentpage - 1) * 5 + index + 1 %></td>
                     <td>
-                      <%= index + 1 %>
+                      <div class="fw-medium text-truncate" style="max-width: 200px;" title="<%= category.name %>">
+                        <%= category.name || 'N/A' %>
+                      </div>
+                    </td>
+                    <td class="text-center">
+                      <% if (category.categoryOffer && category.categoryOffer > 0) { %>
+                        <div class="d-flex align-items-center justify-content-center gap-2">
+                          <span class="offer-badge"><%= category.categoryOffer %>%</span>
+                          <button class="btn btn-warning btn-sm remove-offer-btn" data-id="<%= category._id %>" title="Remove Offer">
+                            <i class="bi bi-x"></i>
+                          </button>
+                        </div>
+                      <% } else { %>
+                        <button class="btn btn-info btn-sm add-offer-btn" data-id="<%= category._id %>" title="Add Offer">
+                          <i class="bi bi-plus"></i> Offer
+                        </button>
+                      <% } %>
                     </td>
                     <td>
-                      <%= category.name %>
+                      <div class="text-truncate" style="max-width: 200px;" title="<%= category.description %>">
+                        <%= category.description || '-' %>
+                      </div>
                     </td>
-                    <td>
-                      <% if (category.categoryOffer && category.categoryOffer> 0) { %>
-                        <span>
-                          <%= category.categoryOffer %>%
-                        </span>
-                        <button class="btn btn-warning btn-sm ms-2 remove-offer-btn"
-                          data-id="<%= category._id %>">Remove Offer</button>
-                        <% } else { %>
-                          <span>0%</span>
-                          <button class="btn btn-info btn-sm ms-2 add-offer-btn" data-id="<%= category._id %>">Add
-                            Offer</button>
-                          <% } %>
+                    <td class="text-center">
+                      <span class="badge bg-secondary"><%= category.sales || 0 %></span>
                     </td>
-                    <td>
-                      <%= category.description || '-' %>
+                    <td class="text-center">
+                      <span class="badge <%= category.stock > 10 ? 'bg-success' : category.stock > 0 ? 'bg-warning' : 'bg-danger' %>">
+                        <%= category.stock || 0 %>
+                      </span>
                     </td>
-                    <td>
-                      <%= category.sales || 0 %>
-                    </td>
-                    <td>
-                      <%= category.stock || 0 %>
-                    </td>
-                    <td>
-                      <span class="category-status text-<%= category.isListed ? 'success' : 'danger' %>">
+                    <td class="text-center">
+                      <span class="status-badge <%= category.isListed ? 'status-listed' : 'status-unlisted' %>">
                         <%= category.isListed ? 'Listed' : 'Unlisted' %>
                       </span>
                     </td>
-                    <td class="flex gap-2 justify-center">
-                      <a href="/admin/editcategory/<%= category._id %>" class="btn btn-sm btn-outline-warning"
-                        title="Edit">
-                        <i class="bi bi-pencil-square"></i>
-                      </a>
-                      <button class="btn btn-sm toggle-category-btn btn-<%= category.isListed ? 'danger' : 'success' %>"
-                        data-id="<%= category._id %>" data-action="<%= category.isListed ? 'unlist' : 'list' %>">
-                        <%= category.isListed ? 'Unlist' : 'List' %>
-                      </button>
-                      <% if (category.isDeleted) { %>
-                        <div class="d-flex gap-2">
-                          <button class="btn btn-sm btn-success undo-delete-btn" data-id="<%= category._id %>">
+                    <td class="text-center">
+                      <div class="action-btn-group justify-content-center">
+                        <a href="/admin/editcategory/<%= category._id %>" class="btn btn-sm btn-outline-warning" title="Edit">
+                          <i class="bi bi-pencil-square"></i>
+                        </a>
+                        <button class="btn btn-sm toggle-category-btn btn-<%= category.isListed ? 'danger' : 'success' %>" 
+                                data-id="<%= category._id %>" 
+                                data-action="<%= category.isListed ? 'unlist' : 'list' %>"
+                                title="<%= category.isListed ? 'Unlist' : 'List' %>">
+                          <i class="bi bi-<%= category.isListed ? 'dash-circle' : 'check-circle' %>"></i>
+                        </button>
+                        <% if (category.isDeleted) { %>
+                          <button class="btn btn-sm btn-success undo-delete-btn" data-id="<%= category._id %>" title="Restore">
                             <i class="bi bi-arrow-counterclockwise"></i>
                           </button>
-                          <button class="btn btn-sm btn-danger permanently-delete-btn" data-id="<%= category._id %>">
+                          <button class="btn btn-sm btn-danger permanently-delete-btn" data-id="<%= category._id %>" title="Delete Permanently">
                             <i class="bi bi-trash-fill"></i>
                           </button>
-                        </div>
                         <% } else { %>
-                          <button class="btn btn-sm btn-outline-danger soft-delete-btn" data-id="<%= category._id %>">
+                          <button class="btn btn-sm btn-outline-danger soft-delete-btn" data-id="<%= category._id %>" title="Delete">
                             <i class="bi bi-trash"></i>
                           </button>
-                          <% } %>
+                        <% } %>
+                      </div>
                     </td>
                   </tr>
-                  <% }); %>
-                    <% } else { %>
-                      <tr>
-                        <td colspan="8">No categories found.</td>
-                      </tr>
-                      <% } %>
+                <% }) %>
+              <% } else { %>
+                <tr>
+                  <td colspan="8" class="text-center py-5 text-muted">
+                    <i class="bi bi-inbox display-1 d-block mb-3 opacity-25"></i>
+                    <h5>No categories found</h5>
+                    <p class="mb-0">Try adjusting your filter or add a new category.</p>
+                  </td>
+                </tr>
+              <% } %>
             </tbody>
           </table>
-          <div class="d-flex justify-content-center">
-            <nav aria-label="Page navigation">
-              <ul class="pagination">
-                <% if (currentpage> 1) { %>
-                  <li class="page-item">
-                    <a class="page-link"
-                      href="/admin/categories?page=<%= currentpage - 1 %>&showDeleted=<%= showDeleted ? 'true' : 'false' %>">Previous</a>
-                  </li>
-                  <% } else { %>
-                    <li class="page-item disabled">
-                      <a class="page-link" href="#">Previous</a>
-                    </li>
-                    <% } %>
-
-                      <% for (let i=1; i <=totalPage; i++) { %>
-                        <li class="page-item <%= currentpage === i ? 'active' : '' %>">
-                          <a class="page-link"
-                            href="/admin/categories?page=<%= i %>&showDeleted=<%= showDeleted ? 'true' : 'false' %>">
-                            <%= i %>
-                          </a>
-                        </li>
-                        <% } %>
-
-                          <% if (currentpage < totalPage) { %>
-                            <li class="page-item">
-                              <a class="page-link"
-                                href="/admin/categories?page=<%= currentpage + 1 %>&showDeleted=<%= showDeleted ? 'true' : 'false' %>">Next</a>
-                            </li>
-                            <% } else { %>
-                              <li class="page-item disabled">
-                                <a class="page-link" href="#">Next</a>
-                              </li>
-                              <% } %>
-              </ul>
-            </nav>
-          </div>
         </div>
-      </main>
+      </div>
+      <!-- Mobile Cards -->
+      <div class="mobile-card p-3">
+        <% if (categories && categories.length > 0) { %>
+          <% categories.forEach((category, index) => { %>
+            <div class="card mb-3 <%= category.isDeleted ? 'deleted-card' : !category.isListed ? 'unlisted-card' : '' %>">
+              <div class="card-body p-3">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                  <div class="flex-grow-1">
+                    <h6 class="card-title mb-1 fw-bold">
+                      #<%= (currentpage - 1) * 5 + index + 1 %> - <%= category.name || 'N/A' %>
+                    </h6>
+                  </div>
+                  <span class="status-badge <%= category.isListed ? 'status-listed' : 'status-unlisted' %>">
+                    <%= category.isListed ? 'Listed' : 'Unlisted' %>
+                  </span>
+                </div>
+                <div class="row g-2 mb-3">
+                  <div class="col-12">
+                    <small class="text-muted d-block">Description</small>
+                    <span><%= category.description || '-' %></span>
+                  </div>
+                  <div class="col-6">
+                    <small class="text-muted d-block">Sales</small>
+                    <span class="badge bg-secondary"><%= category.sales || 0 %></span>
+                  </div>
+                  <div class="col-6">
+                    <small class="text-muted d-block">Stock</small>
+                    <span class="badge <%= category.stock > 10 ? 'bg-success' : category.stock > 0 ? 'bg-warning' : 'bg-danger' %>">
+                      <%= category.stock || 0 %>
+                    </span>
+                  </div>
+                  <div class="col-12">
+                    <small class="text-muted d-block">Offer</small>
+                    <% if (category.categoryOffer && category.categoryOffer > 0) { %>
+                      <div class="d-flex align-items-center gap-1">
+                        <span class="offer-badge"><%= category.categoryOffer %>%</span>
+                        <button class="btn btn-warning btn-sm remove-offer-btn" data-id="<%= category._id %>">
+                          <i class="bi bi-x"></i>
+                        </button>
+                      </div>
+                    <% } else { %>
+                      <button class="btn btn-info btn-sm add-offer-btn" data-id="<%= category._id %>">
+                        <i class="bi bi-plus"></i> Add
+                      </button>
+                    <% } %>
+                  </div>
+                </div>
+                <div class="mobile-actions">
+                  <a href="/admin/editcategory/<%= category._id %>" class="btn btn-outline-warning btn-sm">
+                    <i class="bi bi-pencil-square"></i> Edit
+                  </a>
+                  <button class="btn btn-sm toggle-category-btn btn-<%= category.isListed ? 'danger' : 'success' %>" 
+                          data-id="<%= category._id %>" 
+                          data-action="<%= category.isListed ? 'unlist' : 'list' %>">
+                    <i class="bi bi-<%= category.isListed ? 'dash-circle' : 'check-circle' %>"></i>
+                    <%= category.isListed ? 'Unlist' : 'List' %>
+                  </button>
+                  <% if (category.isDeleted) { %>
+                    <button class="btn btn-sm btn-success undo-delete-btn" data-id="<%= category._id %>">
+                      <i class="bi bi-arrow-counterclockwise"></i> Restore
+                    </button>
+                    <button class="btn btn-sm btn-danger permanently-delete-btn" data-id="<%= category._id %>">
+                      <i class="bi bi-trash-fill"></i> Delete
+                    </button>
+                  <% } else { %>
+                    <button class="btn btn-sm btn-outline-danger soft-delete-btn" data-id="<%= category._id %>">
+                      <i class="bi bi-trash"></i> Delete
+                    </button>
+                  <% } %>
+                </div>
+              </div>
+            </div>
+          <% }) %>
+        <% } else { %>
+          <div class="text-center py-5 text-muted">
+            <i class="bi bi-inbox display-1 d-block mb-3 opacity-25"></i>
+            <h5>No categories found</h5>
+            <p class="mb-0">Try adjusting your filter or add a new category.</p>
+          </div>
+        <% } %>
+      </div>
+      <!-- Pagination -->
+      <div class="d-flex justify-content-center p-4 pagination-container">
+        <nav aria-label="Page navigation">
+          <ul class="pagination">
+            <% if (currentpage > 1) { %>
+              <li class="page-item">
+                <a class="page-link" href="/admin/categories?page=<%= currentpage - 1 %>&showDeleted=<%= showDeleted ? 'true' : 'false' %>">Previous</a>
+              </li>
+            <% } else { %>
+              <li class="page-item disabled">
+                <a class="page-link" href="#">Previous</a>
+              </li>
+            <% } %>
+            <% for (let i = 1; i <= totalPage; i++) { %>
+              <li class="page-item <%= currentpage === i ? 'active' : '' %>">
+                <a class="page-link" href="/admin/categories?page=<%= i %>&showDeleted=<%= showDeleted ? 'true' : 'false' %>">
+                  <%= i %>
+                </a>
+              </li>
+            <% } %>
+            <% if (currentpage < totalPage) { %>
+              <li class="page-item">
+                <a class="page-link" href="/admin/categories?page=<%= currentpage + 1 %>&showDeleted=<%= showDeleted ? 'true' : 'false' %>">Next</a>
+              </li>
+            <% } else { %>
+              <li class="page-item disabled">
+                <a class="page-link" href="#">Next</a>
+              </li>
+            <% } %>
+          </ul>
+        </nav>
+      </div>
     </div>
+  </main>
 
-    <%- include('.././Partials/admin/footer') %>
+  <%- include('../Partials/admin/footer') %>
 
-      <script>
-        function toggleDeletedView() {
-          const showDeleted = document.getElementById('showDeleted').checked;
-          const currentUrl = new URL(window.location.href);
-          currentUrl.searchParams.set('showDeleted', showDeleted.toString());
-          window.location.href = currentUrl.toString();
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Sidebar Toggle
+    const sidebar = document.getElementById('sidebar');
+    const sidebarBackdrop = document.getElementById('sidebarBackdrop');
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    const menuIcon = document.getElementById('menuIcon');
+    const closeIcon = document.getElementById('closeIcon');
+
+    function toggleSidebar() {
+      sidebar.classList.toggle('translate-x-0');
+      sidebarBackdrop.classList.toggle('opacity-0');
+      sidebarBackdrop.classList.toggle('pointer-events-none');
+      menuIcon.classList.toggle('hidden');
+      closeIcon.classList.toggle('hidden');
+    }
+
+    sidebarToggle.addEventListener('click', toggleSidebar);
+    sidebarBackdrop.addEventListener('click', toggleSidebar);
+
+    // Toggle Deleted View
+    function toggleDeletedView() {
+      const showDeleted = document.getElementById('showDeleted').checked;
+      const query = new URLSearchParams(window.location.search);
+      query.set('showDeleted', showDeleted.toString());
+      window.location.href = `/admin/categories?${query.toString()}`;
+    }
+
+    // Toggle Category (List/Unlist)
+    document.querySelectorAll('.toggle-category-btn').forEach(button => {
+      button.addEventListener('click', async () => {
+        const categoryId = button.dataset.id;
+        const action = button.dataset.action;
+
+        const result = await Swal.fire({
+          title: `Are you sure?`,
+          text: `This will ${action === 'list' ? 'list' : 'unlist'} the category.`,
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonText: `Yes, ${action}`,
+          cancelButtonText: 'Cancel'
+        });
+
+        if (!result.isConfirmed) return;
+
+        try {
+          const response = await fetch(`/admin/${action}category?id=${categoryId}`, {
+            method: 'PATCH'
+          });
+          const data = await response.json();
+
+          if (data.success) {
+            button.classList.toggle('btn-success');
+            button.classList.toggle('btn-danger');
+            button.innerHTML = `<i class="bi bi-${action === 'list' ? 'dash-circle' : 'check-circle'}"></i> ${action === 'list' ? 'Unlist' : 'List'}`;
+            button.dataset.action = action === 'list' ? 'unlist' : 'list';
+
+            const statusSpan = button.closest('tr')?.querySelector('.status-badge') || button.closest('.card')?.querySelector('.status-badge');
+            if (statusSpan) {
+              statusSpan.textContent = action === 'list' ? 'Listed' : 'Unlisted';
+              statusSpan.classList.remove('status-listed', 'status-unlisted');
+              statusSpan.classList.add(action === 'list' ? 'status-listed' : 'status-unlisted');
+            }
+
+            const row = button.closest('tr');
+            const card = button.closest('.card');
+            if (row) {
+              row.classList.toggle('unlisted-row');
+            }
+            if (card) {
+              card.classList.toggle('unlisted-card');
+            }
+
+            Swal.fire('Success!', `Category ${action === 'list' ? 'listed' : 'unlisted'} successfully.`, 'success');
+          } else {
+            Swal.fire('Failed!', 'Operation failed.', 'error');
+          }
+        } catch (err) {
+          console.error(err);
+          Swal.fire('Error!', 'Something went wrong.', 'error');
         }
+      });
+    });
 
-        document.querySelectorAll('.toggle-category-btn').forEach(button => {
-          button.addEventListener('click', async () => {
-            const categoryId = button.dataset.id;
-            const action = button.dataset.action;
+    // Soft Delete
+    document.querySelectorAll('.soft-delete-btn').forEach(button => {
+      button.addEventListener('click', async () => {
+        const categoryId = button.dataset.id;
 
-            const result = await Swal.fire({
-              title: `Are you sure?`,
-              text: `This will ${action === 'list' ? 'list' : 'unlist'} the category.`,
-              icon: 'warning',
-              showCancelButton: true,
-              confirmButtonText: `Yes, ${action}`,
-              cancelButtonText: 'Cancel'
-            });
-
-            if (!result.isConfirmed) return;
-
-            try {
-              const response = await fetch(`/admin/${action}category?id=${categoryId}`, {
-                method: 'PATCH'
-              });
-
-              const data = await response.json();
-
-              if (data.success) {
-                button.classList.toggle('btn-success');
-                button.classList.toggle('btn-danger');
-                button.textContent = action === 'list' ? 'Unlist' : 'List';
-                button.dataset.action = action === 'list' ? 'unlist' : 'list';
-
-                const statusSpan = button.closest('tr').querySelector('.category-status');
-                if (statusSpan) {
-                  statusSpan.textContent = action === 'list' ? 'Listed' : 'Unlisted';
-                  statusSpan.classList.remove('text-success', 'text-danger');
-                  statusSpan.classList.add(action === 'list' ? 'text-success' : 'text-danger');
-                }
-
-                Swal.fire('Success!', `Category ${action === 'list' ? 'listed' : 'unlisted'} successfully.`, 'success');
-              } else {
-                Swal.fire('Failed!', 'Operation failed.', 'error');
-              }
-            } catch (err) {
-              console.error(err);
-              Swal.fire('Error!', 'Something went wrong.', 'error');
-            }
-          });
+        const result = await Swal.fire({
+          title: 'Are you sure?',
+          text: 'This will soft-delete the category. You can restore it later.',
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonText: 'Yes, delete it!',
+          cancelButtonText: 'Cancel'
         });
 
-        document.querySelectorAll('.soft-delete-btn').forEach(button => {
-          button.addEventListener('click', async () => {
-            const categoryId = button.dataset.id;
+        if (!result.isConfirmed) return;
 
-            const result = await Swal.fire({
-              title: 'Are you sure?',
-              text: 'This will soft-delete the category. You can restore it later.',
-              icon: 'warning',
-              showCancelButton: true,
-              confirmButtonText: 'Yes, delete it!',
-              cancelButtonText: 'Cancel'
-            });
-
-            if (!result.isConfirmed) return;
-
-            try {
-              const response = await fetch(`/admin/softDeleteCategory?id=${categoryId}`, {
-                method: 'POST'
-              });
-
-              const data = await response.json();
-
-              if (data.success) {
-                Swal.fire('Deleted!', data.message, 'success').then(() => {
-                  location.reload();
-                });
-              } else {
-                Swal.fire('Failed!', data.message || 'Category deletion failed.', 'error');
-              }
-            } catch (err) {
-              console.error(err);
-              Swal.fire('Error!', 'Something went wrong.', 'error');
-            }
+        try {
+          const response = await fetch(`/admin/softDeleteCategory?id=${categoryId}`, {
+            method: 'POST'
           });
+          const data = await response.json();
+
+          if (data.success) {
+            Swal.fire('Deleted!', data.message, 'success').then(() => {
+              location.reload();
+            });
+          } else {
+            Swal.fire('Failed!', data.message || 'Category deletion failed.', 'error');
+          }
+        } catch (err) {
+          console.error(err);
+          Swal.fire('Error!', 'Something went wrong.', 'error');
+        }
+      });
+    });
+
+    // Undo Delete
+    document.querySelectorAll('.undo-delete-btn').forEach(button => {
+      button.addEventListener('click', async () => {
+        const categoryId = button.dataset.id;
+
+        const result = await Swal.fire({
+          title: 'Are you sure?',
+          text: 'This will restore the category.',
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonText: 'Yes, restore it!',
+          cancelButtonText: 'Cancel'
         });
 
-        document.querySelectorAll('.undo-delete-btn').forEach(button => {
-          button.addEventListener('click', async () => {
-            const categoryId = button.dataset.id;
+        if (!result.isConfirmed) return;
 
-            const result = await Swal.fire({
-              title: 'Are you sure?',
-              text: 'This will restore the category.',
-              icon: 'warning',
-              showCancelButton: true,
-              confirmButtonText: 'Yes, restore it!',
-              cancelButtonText: 'Cancel'
-            });
-
-            if (!result.isConfirmed) return;
-
-            try {
-              const response = await fetch(`/admin/undoDeleteCategory?id=${categoryId}`, {
-                method: 'POST'
-              });
-
-              const data = await response.json();
-
-              if (data.success) {
-                Swal.fire('Restored!', data.message, 'success').then(() => {
-                  location.reload();
-                });
-              } else {
-                Swal.fire('Failed!', data.message || 'Category restoration failed.', 'error');
-              }
-            } catch (err) {
-              console.error(err);
-              Swal.fire('Error!', 'Something went wrong.', 'error');
-            }
+        try {
+          const response = await fetch(`/admin/undoDeleteCategory?id=${categoryId}`, {
+            method: 'POST'
           });
+          const data = await response.json();
+
+          if (data.success) {
+            Swal.fire('Restored!', data.message, 'success').then(() => {
+              location.reload();
+            });
+          } else {
+            Swal.fire('Failed!', data.message || 'Category restoration failed.', 'error');
+          }
+        } catch (err) {
+          console.error(err);
+          Swal.fire('Error!', 'Something went wrong.', 'error');
+        }
+      });
+    });
+
+    // Permanently Delete
+    document.querySelectorAll('.permanently-delete-btn').forEach(button => {
+      button.addEventListener('click', async () => {
+        const categoryId = button.dataset.id;
+
+        const result = await Swal.fire({
+          title: 'Are you sure?',
+          text: 'This will permanently delete the category and cannot be undone!',
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonText: 'Yes, permanently delete it!',
+          confirmButtonColor: '#dc3545',
+          cancelButtonText: 'Cancel'
         });
 
-        document.querySelectorAll('.permanently-delete-btn').forEach(button => {
-          button.addEventListener('click', async () => {
-            const categoryId = button.dataset.id;
+        if (!result.isConfirmed) return;
 
-            const result = await Swal.fire({
-              title: 'Are you sure?',
-              text: 'This will permanently delete the category and cannot be undone!',
-              icon: 'warning',
-              showCancelButton: true,
-              confirmButtonText: 'Yes, permanently delete it!',
-              cancelButtonText: 'Cancel',
-              confirmButtonColor: '#dc3545'
-            });
-
-            if (!result.isConfirmed) return;
-
-            try {
-              const response = await fetch(`/admin/permanentlyDeleteCategory?id=${categoryId}`, {
-                method: 'POST'
-              });
-
-              const data = await response.json();
-
-              if (data.success) {
-                Swal.fire('Deleted!', data.message, 'success').then(() => {
-                  button.closest('tr').remove();
-                });
-              } else {
-                Swal.fire('Failed!', data.message || 'Category deletion failed.', 'error');
-              }
-            } catch (err) {
-              console.error(err);
-              Swal.fire('Error!', 'Something went wrong.', 'error');
-            }
+        try {
+          const response = await fetch(`/admin/permanentlyDeleteCategory?id=${categoryId}`, {
+            method: 'POST'
           });
+          const data = await response.json();
+
+          if (data.success) {
+            Swal.fire('Deleted!', data.message, 'success').then(() => {
+              button.closest('tr')?.remove();
+              button.closest('.card')?.remove();
+            });
+          } else {
+            Swal.fire('Failed!', data.message || 'Category deletion failed.', 'error');
+          }
+        } catch (err) {
+          console.error(err);
+          Swal.fire('Error!', 'Something went wrong.', 'error');
+        }
+      });
+    });
+
+    // Add Offer
+    document.querySelectorAll('.add-offer-btn').forEach(button => {
+      button.addEventListener('click', async () => {
+        const categoryId = button.dataset.id;
+
+        const { value: percentage } = await Swal.fire({
+          title: 'Add Offer',
+          input: 'number',
+          inputLabel: 'Offer Percentage',
+          inputPlaceholder: 'Enter percentage',
+          showCancelButton: true,
+          inputValidator: (value) => {
+            if (!value || value <= 0 || value > 100) {
+              return 'Please enter a valid percentage (1-100)';
+            }
+          }
         });
 
-        document.querySelectorAll('.add-offer-btn').forEach(button => {
-          button.addEventListener('click', async () => {
-            const categoryId = button.dataset.id;
-
-            const { value: percentage } = await Swal.fire({
-              title: 'Add Offer',
-              input: 'number',
-              inputLabel: 'Offer Percentage',
-              inputPlaceholder: 'Enter percentage',
-              showCancelButton: true,
-              inputValidator: (value) => {
-                if (!value || value <= 0 || value > 100) {
-                  return 'Please enter a valid percentage (1-100)';
-                }
-              }
+        if (percentage) {
+          try {
+            const response = await fetch('/admin/addcategoryOffer', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ categoryId, percentage })
             });
+            const data = await response.json();
 
-            if (percentage) {
-              try {
-                const response = await fetch('/admin/addcategoryOffer', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({ categoryId, percentage })
-                });
-
-                const data = await response.json();
-                if (data.status) {
-                  Swal.fire('Success', data.message, 'success').then(() => location.reload());
-                } else {
-                  Swal.fire('Error', data.message || 'Failed to add offer', 'error');
-                }
-              } catch (error) {
-                Swal.fire('Error', 'An error occurred while adding the offer', 'error');
-              }
+            if (data.status) {
+              Swal.fire('Success', data.message, 'success').then(() => location.reload());
+            } else {
+              Swal.fire('Error', data.message || 'Failed to add offer', 'error');
             }
-          });
+          } catch (err) {
+            console.error(err);
+            Swal.fire('Error', 'An error occurred while adding the offer', 'error');
+          }
+        }
+      });
+    });
+
+    // Remove Offer
+    document.querySelectorAll('.remove-offer-btn').forEach(button => {
+      button.addEventListener('click', async () => {
+        const categoryId = button.dataset.id;
+
+        const result = await Swal.fire({
+          title: 'Are you sure?',
+          text: 'This will remove the offer from the category and reset associated product prices.',
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonText: 'Yes, remove it!',
+          cancelButtonText: 'Cancel'
         });
 
-        document.querySelectorAll('.remove-offer-btn').forEach(button => {
-          button.addEventListener('click', async () => {
-            const categoryId = button.dataset.id;
-
-            const result = await Swal.fire({
-              title: 'Are you sure?',
-              text: 'This will remove the offer from the category and reset associated product prices.',
-              icon: 'warning',
-              showCancelButton: true,
-              confirmButtonText: 'Yes, remove it!',
-              cancelButtonText: 'Cancel'
+        if (result.isConfirmed) {
+          try {
+            const response = await fetch('/admin/removeCategoryOffer', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ categoryId })
             });
+            const data = await response.json();
 
-            if (result.isConfirmed) {
-              try {
-                const response = await fetch('/admin/removeCategoryOffer', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({ categoryId })
-                });
-
-                const data = await response.json();
-                if (data.status) {
-                  Swal.fire('Success', data.message, 'success').then(() => location.reload());
-                } else {
-                  Swal.fire('Error', data.message || 'Failed to remove offer', 'error');
-                }
-              } catch (error) {
-                Swal.fire('Error', 'An error occurred while removing the offer', 'error');
-              }
+            if (data.status) {
+              Swal.fire('Success', data.message, 'success').then(() => location.reload());
+            } else {
+              Swal.fire('Error', data.message || 'Failed to remove offer', 'error');
             }
-          });
-        });
-      </script>
+          } catch (err) {
+            console.error(err);
+            Swal.fire('Error', 'An error occurred while removing the offer', 'error');
+          }
+        }
+      });
+    });
+
+    // Close Sidebar on Large Screens
+    window.addEventListener('resize', () => {
+      if (window.innerWidth >= 1024) {
+        sidebar.classList.remove('translate-x-0');
+        sidebarBackdrop.classList.add('opacity-0', 'pointer-events-none');
+        menuIcon.classList.remove('hidden');
+        closeIcon.classList.add('hidden');
+      }
+    });
+  </script>
 </body>
-
 </html>

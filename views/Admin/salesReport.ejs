@@ -1,454 +1,642 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Sales Report - Timzo</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        body {
-            background: linear-gradient(135deg, #f0f4f8, #d9e2ec);
-            font-family: 'Poppins', sans-serif;
-            margin: 0;
-            overflow-x: hidden;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Timzo Admin - Sales Report</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <link rel="icon" type="image/x-icon" href="/images/TIMZO.jpg" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    .table-container::-webkit-scrollbar {
+      height: 8px;
+    }
+    .table{
+      width: 1570px;
+    }
 
-        .sales-report-section {
-            max-width: 1200px;
-            margin: auto;
-            padding: 1.5rem;
-        }
+    .table-container::-webkit-scrollbar-track {
+      background: #f1f5f9;
+      border-radius: 4px;
+    }
 
-        .sales-report-card {
-            background: #ffffff;
-            border-radius: 1.25rem;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
-            padding: 2rem;
-            position: relative;
-            overflow: hidden;
-        }
+    .table-container::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+    }
 
-        .sales-report-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 4px;
-            background: linear-gradient(90deg, #28a745, #34c759);
-        }
+    .table-container::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
 
-        .filter-form {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-            background: #f8f9fa;
-            padding: 1rem;
-            border-radius: 0.625rem;
-            align-items: center;
-        }
+    .status-badge {
+      padding: 0.25rem 0.5rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
 
-        .filter-form select,
-        .filter-form input {
-            padding: 0.5rem 0.75rem;
-            border: 1px solid #d1d5db;
-            border-radius: 0.375rem;
-            font-size: 0.875rem;
-            min-width: 120px;
-        }
+    .status-delivered {
+      background-color: #dcfce7;
+      color: #166534;
+    }
 
-        .filter-form button {
-            background: linear-gradient(90deg, #212529, #343a40);
-            color: #ffffff;
-            padding: 0.5rem 1rem;
-            border-radius: 9999px;
-            font-weight: 500;
-            transition: all 0.3s ease;
-        }
+    .status-cancelled {
+      background-color: #fee2e2;
+      color: #dc2626;
+    }
 
-        .filter-form button:hover {
-            background: linear-gradient(90deg, #28a745, #34c759);
-        }
+    .status-pending {
+      background-color: #fef3c7;
+      color: #d97706;
+    }
 
-        .filter-form .download-btn {
-            background: linear-gradient(90deg, #2563eb, #3b82f6);
-        }
+    .summary-box {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
 
-        .filter-form .download-btn:hover {
-            background: linear-gradient(90deg, #1e40af, #2563eb);
-        }
+    .summary-card {
+      background: #f8f9fa;
+      padding: 1rem;
+      border-radius: 0.625rem;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
 
-        .summary-box {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-        }
+    .summary-card h3 {
+      font-size: 0.875rem;
+      color: #6c757d;
+      margin-bottom: 0.5rem;
+    }
 
-        .summary-card {
-            background: #f8f9fa;
-            padding: 1rem;
-            border-radius: 0.625rem;
-            text-align: center;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-        }
+    .summary-card p {
+      font-size: 1.125rem;
+      font-weight: 600;
+      color: #212529;
+    }
 
-        .summary-card h3 {
-            font-size: 1rem;
-            color: #6c757d;
-            margin-bottom: 0.5rem;
-        }
+    .discount-value {
+      color: #28a745;
+    }
 
-        .summary-card p {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: #212529;
-        }
+    .chart-container {
+      margin: 2rem 0;
+      padding: 1.5rem;
+      background: #ffffff;
+      border-radius: 0.625rem;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
 
-        .sales-table {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 0;
-            margin-top: 1rem;
-        }
+    @media (max-width: 768px) {
+      .mobile-card {
+        display: block !important;
+      }
+      
+      .desktop-table {
+        display: none !important;
+      }
+      
+      .mobile-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.25rem;
+      }
+      
+      .controls-container {
+        flex-direction: column;
+        gap: 1rem;
+      }
+      
+      .filter-group {
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+      
+      .pagination-container {
+        overflow-x: auto;
+        padding: 0.5rem 0;
+      }
+      
+      .pagination {
+        white-space: nowrap;
+        margin: 0;
+      }
+      
+      .card-body {
+        padding: 1rem;
+      }
+      
+      .table th, .table td {
+        font-size: 0.875rem;
+      }
+      
+      .summary-box {
+        grid-template-columns: 1fr;
+      }
+      
+      .chart-container {
+        padding: 1rem;
+      }
+    }
 
-        .sales-table th,
-        .sales-table td {
-            padding: 0.75rem 1rem;
-            text-align: left;
-            border-bottom: 1px solid #e9ecef;
-            font-size: 0.875rem;
-        }
+    @media (min-width: 769px) {
+      .mobile-card {
+        display: none !important;
+      }
+      
+      .desktop-table {
+        display: table !important;
+      }
+    }
 
-        .sales-table th {
-            background: #f1f3f5;
-            color: #343a40;
-            font-weight: 600;
-        }
-
-        .discount-row {
-            color: #28a745;
-            font-weight: 500;
-        }
-
-        .chart-container {
-            margin: 2rem auto;
-            padding: 1.5rem;
-            background: #ffffff;
-            border-radius: 0.625rem;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-            max-width: 1000px;
-        }
-
-        .pagination {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-top: 1.5rem;
-        }
-
-        .pagination a {
-            padding: 0.5rem 0.75rem;
-            margin: 0 0.25rem;
-            border: 1px solid #d1d5db;
-            border-radius: 0.375rem;
-            text-decoration: none;
-            color: #343a40;
-            transition: all 0.3s ease;
-        }
-
-        .pagination a:hover {
-            background-color: #28a745;
-            color: #ffffff;
-            border-color: #28a745;
-        }
-
-        .pagination a.disabled {
-            pointer-events: none;
-            color: #6c757d;
-            border-color: #d1d5db;
-            background-color: #f8f9fa;
-        }
-
-        .pagination a.active {
-            background-color: #28a745;
-            color: #ffffff;
-            border-color: #28a745;
-        }
-
-        @media (max-width: 767px) {
-            .sales-report-section {
-                padding: 1rem;
-            }
-
-            .filter-form {
-                flex-direction: column;
-                align-items: stretch;
-            }
-
-            .summary-box {
-                grid-template-columns: 1fr;
-            }
-
-            .sales-table th,
-            .sales-table td {
-                font-size: 0.75rem;
-                padding: 0.5rem;
-            }
-
-            .chart-container {
-                padding: 1rem;
-            }
-        }
-    </style>
+    @media (max-width: 576px) {
+      .action-btn-group .btn {
+        font-size: 0.7rem;
+        padding: 0.2rem 0.4rem;
+      }
+      
+      .card-title {
+        font-size: 0.875rem;
+      }
+      
+      .badge, .status-badge {
+        font-size: 0.6875rem;
+      }
+      
+      .filter-group select, .filter-group input {
+        font-size: 0.875rem;
+      }
+      
+      .summary-card p {
+        font-size: 1rem;
+      }
+    }
+  </style>
 </head>
-
-<body>
-    <div class="container-fluid min-h-screen flex">
-        <%- include('.././Partials/admin/adminsidebar', { activePage: 'sales-report' , admin: admin || {} }) %>
-        <div class="flex-1 p-6 mt-16">
-                <div class="sales-report-section">
-                    <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">Admin Sales Report</h1>
-                    <div class="sales-report-card">
-                        <!-- Filter Form -->
-                        <form class="filter-form" method="GET" action="/admin/sales-report"
-                            onsubmit="updateReportType()">
-                            <div class="flex flex-col">
-                                <label for="reportType" class="text-sm font-medium text-gray-700">Report Type:</label>
-                                <select name="reportType" id="reportType" onchange="toggleDateFields()">
-                                    <option value="daily" <%=reportType==='daily' ? 'selected' : '' %>>Daily</option>
-                                    <option value="weekly" <%=reportType==='weekly' ? 'selected' : '' %>>Weekly</option>
-                                    <option value="last-week" <%=reportType==='last-week' ? 'selected' : '' %>>Last Week
-                                    </option>
-                                    <option value="yearly" <%=reportType==='yearly' ? 'selected' : '' %>>Yearly</option>
-                                    <option value="custom" <%=reportType==='custom' ? 'selected' : '' %>>Custom Range
-                                    </option>
-                                </select>
-                                <input type="hidden" name="reportTypeHidden" id="reportTypeHidden">
-                            </div>
-                            <div id="customDateFields"
-                                class="<%= reportType === 'custom' ? '' : 'hidden' %> flex flex-col sm:flex-row gap-4">
-                                <div>
-                                    <label for="startDate" class="text-sm font-medium text-gray-700">Start Date:</label>
-                                    <input type="date" name="startDate" id="startDate" value="<%= startDate %>">
-                                </div>
-                                <div>
-                                    <label for="endDate" class="text-sm font-medium text-gray-700">End Date:</label>
-                                    <input type="date" name="endDate" id="endDate" value="<%= endDate %>">
-                                </div>
-                            </div>
-                            <div class="flex gap-2">
-                                <button type="submit">Generate Report</button>
-                                <button type="button" class="download-btn" onclick="downloadReport('pdf')">Download
-                                    PDF</button>
-                                <button type="button" class="download-btn" onclick="downloadReport('excel')">Download
-                                    Excel</button>
-                            </div>
-                        </form>
-
-                        <!-- Summary Cards -->
-                        <div class="summary-box">
-                            <div class="summary-card">
-                                <h3>Overall Sales Count</h3>
-                                <p>
-                                    <%= report.totalOrders %>
-                                </p>
-                            </div>
-                            <div class="summary-card">
-                                <h3>Overall Order Amount</h3>
-                                <p>₹<%= report.totalAmount.toFixed(2) %>
-                                </p>
-                            </div>
-                            <div class="summary-card">
-                                <h3>Overall Discount</h3>
-                                <p class="discount-row">₹<%= report.totalDiscount.toFixed(2) %>
-                                </p>
-                            </div>
-                        </div>
-
-                        <!-- Sales Table -->
-                        <div class="overflow-x-auto">
-                            <!-- Display current range -->
-                            <p class="text-sm text-gray-600 mb-2">
-                                Showing <%= (currentPage - 1) * 10 + 1 %> to <%= Math.min(currentPage * 10, totalOrders)
-                                        %> of <%= totalOrders %> orders
-                            </p>
-                            <table class="sales-table">
-                                <thead>
-                                    <tr>
-                                        <th>Order ID</th>
-                                        <th>User</th>
-                                        <th>Date</th>
-                                        <th>Items</th>
-                                        <th>Subtotal</th>
-                                        <th>Discount</th>
-                                        <th>Total Amount</th>
-                                        <th>Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <% if (orders.length> 0) { %>
-                                        <% orders.forEach(order=> { %>
-                                            <tr>
-                                                <td>
-                                                    <%= order.orderId %>
-                                                </td>
-                                                <td>
-                                                    <%= order.user ? order.user.email : 'N/A' %>
-                                                </td>
-                                                <td>
-                                                    <%= new Date(order.orderDate).toLocaleDateString('en-IN') %>
-                                                </td>
-                                                <td>
-                                                    <% order.items.forEach(item=> { %>
-                                                        <p>
-                                                            <%= item.productName %> (Qty: <%= item.quantity %>)
-                                                        </p>
-                                                        <% }) %>
-                                                </td>
-                                                <td>₹<%= order.subtotal.toFixed(2) %>
-                                                </td>
-                                                <td class="discount-row">₹<%= order.discount.toFixed(2) %>
-                                                </td>
-                                                <td>₹<%= order.totalAmount.toFixed(2) %>
-                                                </td>
-                                                <td>
-                                                    <span
-                                                        class="badge <%= order.orderStatus === 'Delivered' ? 'bg-green-500' : order.orderStatus === 'Cancelled' ? 'bg-red-500' : 'bg-yellow-500' %> text-white">
-                                                        <%= order.orderStatus %>
-                                                    </span>
-                                                </td>
-                                            </tr>
-                                            <% }) %>
-                                                <% } else { %>
-                                                    <tr>
-                                                        <td colspan="8" class="text-center text-gray-600">No orders
-                                                            found for the selected period.</td>
-                                                    </tr>
-                                                    <% } %>
-                                </tbody>
-                            </table>
-
-                            <!-- Pagination Controls -->
-                            <% if (totalPages> 1) { %>
-                                <div class="pagination">
-                                    <!-- Previous Button -->
-                                    <a href="/admin/sales-report?reportType=<%= reportType %>&startDate=<%= startDate %>&endDate=<%= endDate %>&page=<%= currentPage - 1 %>"
-                                        class="<%= currentPage === 1 ? 'disabled' : '' %>">
-                                        Previous
-                                    </a>
-
-                                    <!-- Page Numbers -->
-                                    <% for (let i=1; i <=totalPages; i++) { %>
-                                        <a href="/admin/sales-report?reportType=<%= reportType %>&startDate=<%= startDate %>&endDate=<%= endDate %>&page=<%= i %>"
-                                            class="<%= currentPage === i ? 'active' : '' %>">
-                                            <%= i %>
-                                        </a>
-                                        <% } %>
-
-                                            <!-- Next Button -->
-                                            <a href="/admin/sales-report?reportType=<%= reportType %>&startDate=<%= startDate %>&endDate=<%= endDate %>&page=<%= currentPage + 1 %>"
-                                                class="<%= currentPage === totalPages ? 'disabled' : '' %>">
-                                                Next
-                                            </a>
-                                </div>
-                                <% } %>
-                        </div>
-
-                        <!-- Chart -->
-                        <div class="chart-container">
-                            <canvas id="salesChart"></canvas>
-                        </div>
-                    </div>
-                </div>
+<body class="bg-gray-50">
+  <!-- Sidebar -->
+  <div class="fixed inset-y-0 left-0 z-40 transition-all duration-300 transform -translate-x-full lg:translate-x-0" id="sidebar">
+    <div class="flex flex-col h-full w-72 bg-gradient-to-b from-slate-800 to-slate-900 text-white shadow-xl rounded-r-xl overflow-hidden">
+      <div class="p-5 flex items-center gap-3 border-b border-slate-700/50">
+        <img src="/images/TIMZO.jpg" alt="Timzo Logo" class="w-10 h-10 rounded-md">
+        <div class="text-xl font-bold tracking-wide bg-gradient-to-r from-amber-300 to-amber-500 bg-clip-text text-transparent">
+          Timzo Admin
+        </div>
+      </div>
+      <div class="px-4 py-5">
+        <div class="flex items-center gap-3 mb-2 px-2">
+          <div class="w-10 h-10 rounded-full bg-amber-500 flex items-center justify-center text-slate-900 font-bold">
+            <%= admin && admin.name ? admin.name.charAt(0).toUpperCase() : 'A' %>
+          </div>
+          <div>
+            <div class="font-medium">
+              <%= admin && admin.name ? admin.name : 'Admin User' %>
             </div>
+            <div class="text-xs text-slate-400">
+              <%= admin && admin.email ? admin.email : 'admin@timzo.com' %>
+            </div>
+          </div>
+        </div>
+      </div>
+      <nav class="flex-1 px-4 space-y-1 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
+        <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider px-3 mb-2">Dashboard</div>
+        <a href="/admin/dashboard" class="flex items-center px-3 py-2.5 rounded-lg transition-all duration-200 group text-slate-300 hover:bg-slate-700/50 hover:text-white">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-slate-400 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+          </svg>
+          <span>Dashboard</span>
+        </a>
+        <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider px-3 mt-6 mb-2">Store Management</div>
+        <a href="/admin/getProduct" class="flex items-center px-3 py-2.5 rounded-lg transition-all duration-200 group text-slate-300 hover:bg-slate-700/50 hover:text-white">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-slate-400 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+          </svg>
+          <span>Products</span>
+        </a>
+        <a href="/admin/brand" class="flex items-center px-3 py-2.5 rounded-lg transition-all duration-200 group text-slate-300 hover:bg-slate-700/50 hover:text-white">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-slate-400 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+          </svg>
+          <span>Brands</span>
+        </a>
+        <a href="/admin/categories" class="flex items-center px-3 py-2.5 rounded-lg transition-all duration-200 group text-slate-300 hover:bg-slate-700/50 hover:text-white">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-slate-400 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+          </svg>
+          <span>Categories</span>
+        </a>
+        <a href="/admin/orders" class="flex items-center px-3 py-2.5 rounded-lg transition-all duration-200 group text-slate-300 hover:bg-slate-700/50 hover:text-white">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-slate-400 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+          </svg>
+          <span>Orders</span>
+        </a>
+        <a href="/admin/coupons" class="flex items-center px-3 py-2.5 rounded-lg transition-all duration-200 group text-slate-300 hover:bg-slate-700/50 hover:text-white">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-slate-400 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
+          </svg>
+          <span>Coupons</span>
+        </a>
+        <a href="/admin/sales-report" class="flex items-center px-3 py-2.5 rounded-lg transition-all duration-200 group bg-amber-500/10 text-amber-400">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+          <span>Sales Report</span>
+        </a>
+        <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider px-3 mt-6 mb-2">User Management</div>
+        <a href="/admin/users" class="flex items-center px-3 py-2.5 rounded-lg transition-all duration-200 group text-slate-300 hover:bg-slate-700/50 hover:text-white">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-slate-400 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+          </svg>
+          <span>Users</span>
+        </a>
+        <div class="py-10"></div>
+      </nav>
+      <div class="p-4 mt-auto border-t border-slate-700/50">
+        <a href="/admin/logout" class="flex items-center px-3 py-2.5 rounded-lg text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-all duration-200">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+          </svg>
+          <span>Logout</span>
+        </a>
+      </div>
     </div>
+  </div>
 
-    <footer class="bg-white p-4 text-center text-gray-600 text-sm shadow-inner mt-6">
-        © <%= new Date().getFullYear() %> Timzo. All rights reserved.
-    </footer>
+  <!-- Sidebar Backdrop for Mobile -->
+  <div class="fixed inset-0 bg-black/50 z-30 lg:hidden transition-opacity duration-300 opacity-0 pointer-events-none" id="sidebarBackdrop"></div>
 
-    <script>
-        function toggleDateFields() {
-            const reportType = document.getElementById('reportType').value;
-            const customDateFields = document.getElementById('customDateFields');
-            customDateFields.classList.toggle('hidden', reportType !== 'custom');
-        }
+  <!-- Mobile Sidebar Toggle -->
+  <div class="fixed top-4 left-4 z-50 lg:hidden">
+    <button id="sidebarToggle" class="bg-amber-500 text-slate-900 rounded-lg p-2 shadow-lg flex items-center justify-center">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" id="menuIcon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+      </svg>
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 hidden" id="closeIcon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+  </div>
 
-        function updateReportType() {
-            const reportType = document.getElementById('reportType').value;
-            document.getElementById('reportTypeHidden').value = reportType;
-        }
+  <!-- Main Content -->
+  <main class="lg:ml-72 min-h-screen p-4 lg:p-6 pt-16 lg:pt-6">
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+      <!-- Header -->
+      <div class="p-4 lg:p-6 border-b border-gray-200">
+        <div class="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-4 controls-container">
+          <h1 class="text-2xl lg:text-3xl font-bold text-gray-900">Sales Report</h1>
+        </div>
+      </div>
+      <!-- Filters -->
+      <div class="p-4 border-b border-gray-200">
+        <form class="flex flex-col md:flex-row gap-3 filter-group" method="GET" action="/admin/sales-report"
+              onsubmit="updateReportType()">
+          <select name="reportType" id="reportType" class="form-select" style="width: 150px;" onchange="toggleDateFields()">
+            <option value="daily" <%= reportType === 'daily' ? 'selected' : '' %>>Daily</option>
+            <option value="weekly" <%= reportType === 'weekly' ? 'selected' : '' %>>Weekly</option>
+            <option value="last-week" <%= reportType === 'last-week' ? 'selected' : '' %>>Last Week</option>
+            <option value="yearly" <%= reportType === 'yearly' ? 'selected' : '' %>>Yearly</option>
+            <option value="custom" <%= reportType === 'custom' ? 'selected' : '' %>>Custom Range</option>
+          </select>
+          <input type="hidden" name="reportTypeHidden" id="reportTypeHidden">
+          <div id="customDateFields" class="<%= reportType === 'custom' ? 'd-flex' : 'd-none' %> flex gap-3">
+            <input type="date" name="startDate" id="startDate" class="form-control" style="width: 150px;" value="<%= startDate %>">
+            <input type="date" name="endDate" id="endDate" class="form-control" style="width: 150px;" value="<%= endDate %>">
+          </div>
+          <button type="submit" class="btn btn-primary">Generate Report</button>
+          <button type="button" class="btn btn-info" onclick="downloadReport('pdf')">
+            <i class="bi bi-file-earmark-pdf me-1"></i> PDF
+          </button>
+          <button type="button" class="btn btn-success" onclick="downloadReport('excel')">
+            <i class="bi bi-file-earmark-excel me-1"></i> Excel
+          </button>
+        </form>
+      </div>
+      <!-- Summary Cards -->
+      <div class="p-4">
+        <div class="summary-box">
+          <div class="summary-card">
+            <h3>Overall Sales Count</h3>
+            <p><%= report && report.totalOrders ? report.totalOrders : 0 %></p>
+          </div>
+          <div class="summary-card">
+            <h3>Overall Order Amount</h3>
+            <p>₹<%= report && report.totalAmount ? report.totalAmount.toFixed(2) : '0.00' %></p>
+          </div>
+          <div class="summary-card">
+            <h3>Overall Discount</h3>
+            <p class="discount-value">₹<%= report && report.totalDiscount ? report.totalDiscount.toFixed(2) : '0.00' %></p>
+          </div>
+        </div>
+      </div>
+      <!-- Desktop Table -->
+      <div class="desktop-table">
+        <div class="table-container" style="overflow-x: auto;">
+          <p class="text-sm text-gray-600 mb-2 px-4">
+            Showing <%= (currentPage - 1) * 10 + 1 %> to <%= Math.min(currentPage * 10, totalOrders) %> of <%= totalOrders %> orders
+          </p>
+          <table class="table table-hover mb-0">
+            <thead class="table-dark">
+              <tr>
+                <th class="text-center">#</th>
+                <th>Order ID</th>
+                <th>User</th>
+                <th>Date</th>
+                <th>Items</th>
+                <th class="text-end">Subtotal</th>
+                <th class="text-end">Discount</th>
+                <th class="text-end">Total</th>
+                <th class="text-center">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% if (orders && orders.length > 0) { %>
+                <% orders.forEach((order, index) => { %>
+                  <tr>
+                    <td class="text-center fw-medium"><%= (currentPage - 1) * 10 + index + 1 %></td>
+                    <td>
+                      <div class="fw-medium text-truncate" style="max-width: 150px;" title="<%= order.orderId %>">
+                        <%= order.orderId || 'N/A' %>
+                      </div>
+                    </td>
+                    <td>
+                      <span class="badge bg-light text-dark">
+                        <%= order.user && order.user.email ? order.user.email : 'N/A' %>
+                      </span>
+                    </td>
+                    <td>
+                      <%= order.orderDate ? new Date(order.orderDate).toLocaleDateString('en-IN') : 'N/A' %>
+                    </td>
+                    <td>
+                      <% if (order.items && order.items.length > 0) { %>
+                        <% order.items.forEach(item => { %>
+                          <p class="mb-1 text-truncate" style="max-width: 200px;" title="<%= item.productName %> (Qty: <%= item.quantity %>)">
+                            <%= item.productName || 'N/A' %> (Qty: <%= item.quantity || 0 %>)
+                          </p>
+                        <% }) %>
+                      <% } else { %>
+                        <p>N/A</p>
+                      <% } %>
+                    </td>
+                    <td class="text-end fw-medium">
+                      ₹<%= order.subtotal ? order.subtotal.toFixed(2) : '0.00' %>
+                    </td>
+                    <td class="text-end fw-medium discount-value">
+                      ₹<%= order.discount ? order.discount.toFixed(2) : '0.00' %>
+                    </td>
+                    <td class="text-end fw-medium">
+                      ₹<%= order.totalAmount ? order.totalAmount.toFixed(2) : '0.00' %>
+                    </td>
+                    <td class="text-center">
+                      <span class="status-badge status-<%= order.orderStatus ? order.orderStatus.toLowerCase() : 'pending' %>">
+                        <%= order.orderStatus || 'Pending' %>
+                      </span>
+                    </td>
+                  </tr>
+                <% }) %>
+              <% } else { %>
+                <tr>
+                  <td colspan="9" class="text-center py-5 text-muted">
+                    <i class="bi bi-inbox display-1 d-block mb-3 opacity-25"></i>
+                    <h5>No orders found</h5>
+                    <p class="mb-0">Select a different period or generate a new report.</p>
+                  </td>
+                </tr>
+              <% } %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <!-- Mobile Cards -->
+      <div class="mobile-card p-3">
+        <% if (orders && orders.length > 0) { %>
+          <% orders.forEach((order, index) => { %>
+            <div class="card mb-3">
+              <div class="card-body p-3">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                  <div class="flex-grow-1">
+                    <h6 class="card-title mb-1 fw-bold">
+                      #<%= (currentPage - 1) * 10 + index + 1 %> - <%= order.orderId || 'N/A' %>
+                    </h6>
+                    <div class="d-flex gap-2 mb-2">
+                      <span class="badge bg-light text-dark">
+                        <%= order.user && order.user.email ? order.user.email : 'N/A' %>
+                      </span>
+                    </div>
+                  </div>
+                  <span class="status-badge status-<%= order.orderStatus ? order.orderStatus.toLowerCase() : 'pending' %>">
+                    <%= order.orderStatus || 'Pending' %>
+                  </span>
+                </div>
+                <div class="row g-2 mb-3">
+                  <div class="col-6">
+                    <small class="text-muted d-block">Date</small>
+                    <span>
+                      <%= order.orderDate ? new Date(order.orderDate).toLocaleDateString('en-IN') : 'N/A' %>
+                    </span>
+                  </div>
+                  <div class="col-6">
+                    <small class="text-muted d-block">Subtotal</small>
+                    <span class="fw-bold">
+                      ₹<%= order.subtotal ? order.subtotal.toFixed(2) : '0.00' %>
+                    </span>
+                  </div>
+                  <div class="col-12">
+                    <small class="text-muted d-block">Items</small>
+                    <% if (order.items && order.items.length > 0) { %>
+                      <% order.items.forEach(item => { %>
+                        <p class="mb-1">
+                          <%= item.productName || 'N/A' %> (Qty: <%= item.quantity || 0 %>)
+                        </p>
+                      <% }) %>
+                    <% } else { %>
+                      <p>N/A</p>
+                    <% } %>
+                  </div>
+                  <div class="col-6">
+                    <small class="text-muted d-block">Discount</small>
+                    <span class="fw-bold discount-value">
+                      ₹<%= order.discount ? order.discount.toFixed(2) : '0.00' %>
+                    </span>
+                  </div>
+                  <div class="col-6">
+                    <small class="text-muted d-block">Total</small>
+                    <span class="fw-bold">
+                      ₹<%= order.totalAmount ? order.totalAmount.toFixed(2) : '0.00' %>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          <% }) %>
+        <% } else { %>
+          <div class="text-center py-5 text-muted">
+            <i class="bi bi-inbox display-1 d-block mb-3 opacity-25"></i>
+            <h5>No orders found</h5>
+            <p class="mb-0">Select a different period or generate a new report.</p>
+          </div>
+        <% } %>
+      </div>
+      <!-- Pagination -->
+      <div class="d-flex justify-content-between align-items-center p-4 pagination-container">
+        <span>Showing <%= (currentPage - 1) * 10 + 1 %> to <%= Math.min(currentPage * 10, totalOrders) %> of <%= totalOrders %> orders</span>
+        <nav aria-label="Page navigation">
+          <ul class="pagination">
+            <% if (currentPage > 1) { %>
+              <li class="page-item">
+                <a class="page-link" href="/admin/sales-report?reportType=<%= reportType %>&startDate=<%= startDate %>&endDate=<%= endDate %>&page=<%= currentPage - 1 %>">Previous</a>
+              </li>
+            <% } else { %>
+              <li class="page-item disabled">
+                <a class="page-link" href="#">Previous</a>
+              </li>
+            <% } %>
+            <% for (let i = 1; i <= totalPages; i++) { %>
+              <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+                <a class="page-link" href="/admin/sales-report?reportType=<%= reportType %>&startDate=<%= startDate %>&endDate=<%= endDate %>&page=<%= i %>">
+                  <%= i %>
+                </a>
+              </li>
+            <% } %>
+            <% if (currentPage < totalPages) { %>
+              <li class="page-item">
+                <a class="page-link" href="/admin/sales-report?reportType=<%= reportType %>&startDate=<%= startDate %>&endDate=<%= endDate %>&page=<%= currentPage + 1 %>">Next</a>
+              </li>
+            <% } else { %>
+              <li class="page-item disabled">
+                <a class="page-link" href="#">Next</a>
+              </li>
+            <% } %>
+          </ul>
+        </nav>
+      </div>
+      <!-- Chart -->
+      <div class="chart-container">
+        <canvas id="salesChart"></canvas>
+      </div>
+    </div>
+  </main>
 
-        function downloadReport(format) {
-            const reportType = document.getElementById('reportType').value;
-            const startDate = document.getElementById('startDate').value;
-            const endDate = document.getElementById('endDate').value;
-            const url = `/admin/sales-report/${format}?reportType=${reportType}&startDate=${startDate}&endDate=${endDate}`;
-            window.location.href = url;
-        }
+  <footer class="bg-gray-100 p-4 text-center text-gray-600 text-sm shadow-inner">
+    © <%= new Date().getFullYear() %> Timzo Admin Panel. All rights reserved.
+  </footer>
 
-        const orders = <% - JSON.stringify(orders) %>;
-        const labels = orders.map(order => new Date(order.orderDate).toLocaleDateString('en-IN'));
-        const amounts = orders.map(order => order.totalAmount);
-        const discounts = orders.map(order => order.discount);
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Sidebar Toggle
+    const sidebar = document.getElementById('sidebar');
+    const sidebarBackdrop = document.getElementById('sidebarBackdrop');
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    const menuIcon = document.getElementById('menuIcon');
+    const closeIcon = document.getElementById('closeIcon');
 
-        const ctx = document.getElementById('salesChart').getContext('2d');
-        new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: labels,
-                datasets: [
-                    {
-                        label: 'Total Amount (₹)',
-                        data: amounts,
-                        borderColor: '#28a745',
-                        fill: false,
-                        tension: 0.1
-                    },
-                    {
-                        label: 'Discount (₹)',
-                        data: discounts,
-                        borderColor: '#ef4444',
-                        fill: false,
-                        tension: 0.1
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        title: {
-                            display: true,
-                            text: 'Amount (₹)'
-                        }
-                    },
-                    x: {
-                        title: {
-                            display: true,
-                            text: 'Order Date'
-                        }
-                    }
-                },
-                plugins: {
-                    legend: {
-                        display: true,
-                        position: 'top'
-                    }
-                }
+    function toggleSidebar() {
+      sidebar.classList.toggle('translate-x-0');
+      sidebarBackdrop.classList.toggle('opacity-0');
+      sidebarBackdrop.classList.toggle('pointer-events-none');
+      menuIcon.classList.toggle('hidden');
+      closeIcon.classList.toggle('hidden');
+    }
+
+    sidebarToggle.addEventListener('click', toggleSidebar);
+    sidebarBackdrop.addEventListener('click', toggleSidebar);
+
+    // Toggle Date Fields
+    function toggleDateFields() {
+      const reportType = document.getElementById('reportType').value;
+      const customDateFields = document.getElementById('customDateFields');
+      customDateFields.classList.toggle('d-none', reportType !== 'custom');
+    }
+
+    // Update Report Type Hidden Field
+    function updateReportType() {
+      const reportType = document.getElementById('reportType').value;
+      document.getElementById('reportTypeHidden').value = reportType;
+    }
+
+    // Download Report
+    function downloadReport(format) {
+      const reportType = document.getElementById('reportType').value;
+      const startDate = document.getElementById('startDate').value || '';
+      const endDate = document.getElementById('endDate').value || '';
+      const url = `/admin/orders/download/${format}?reportType=${reportType}&startDate=${startDate}&endDate=${endDate}`;
+      window.location.href = url;
+    }
+
+    // Chart.js Configuration
+    const orders = <%- JSON.stringify(orders || []) %>;
+    const labels = orders.map(order => order.orderDate ? new Date(order.orderDate).toLocaleDateString('en-IN') : 'N/A');
+    const amounts = orders.map(order => order.totalAmount || 0);
+    const discounts = orders.map(order => order.discount || 0);
+
+    const ctx = document.getElementById('salesChart').getContext('2d');
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: labels,
+        datasets: [
+          {
+            label: 'Total Amount (₹)',
+            data: amounts,
+            borderColor: '#0288d1',
+            backgroundColor: 'rgba(2, 136, 209, 0.2)',
+            fill: false,
+            tension: 0.3
+          },
+          {
+            label: 'Discount (₹)',
+            data: discounts,
+            borderColor: '#dc2626',
+            backgroundColor: 'rgba(220, 38, 38, 0.2)',
+            fill: false,
+            tension: 0.3
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        scales: {
+          y: {
+            beginAtZero: true,
+            title: {
+              display: true,
+              text: 'Amount (₹)'
             }
-        });
-    </script>
-</body>
+          },
+          x: {
+            title: {
+              display: true,
+              text: 'Order Date'
+            }
+          }
+        },
+        plugins: {
+          legend: {
+            display: true,
+            position: 'top'
+          }
+        }
+      }
+    });
 
+    // Close Sidebar on Large Screens
+    window.addEventListener('resize', () => {
+      if (window.innerWidth >= 1024) {
+        sidebar.classList.remove('translate-x-0');
+        sidebarBackdrop.classList.add('opacity-0', 'pointer-events-none');
+        menuIcon.classList.remove('hidden');
+        closeIcon.classList.add('hidden');
+      }
+    });
+  </script>
+</body>
 </html>

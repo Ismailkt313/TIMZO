@@ -1,70 +1,60 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Coupon Listing - Admin</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Timzo Admin - Coupons</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+  <link rel="icon" type="image/x-icon" href="/images/TIMZO.jpg" />
+  <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
   <style>
-    .dashboard-container {
+    .table-container::-webkit-scrollbar {
+      height: 8px;
+    }
+
+    .table-container::-webkit-scrollbar-track {
+      background: #f1f5f9;
+      border-radius: 4px;
+    }
+
+    .table-container::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+    }
+
+    .table-container::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+
+    .status-badge {
+      padding: 0.25rem 0.5rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    .status-active {
+      background-color: #dcfce7;
+      color: #166534;
+    }
+
+    .status-inactive {
+      background-color: #fee2e2;
+      color: #dc2626;
+    }
+
+    .action-btn-group {
       display: flex;
-      min-height: 100vh;
-    }
-
-    .sidebar {
-      width: 250px;
-      position: fixed;
-      top: 0;
-      left: 0;
-      height: 100%;
-      background-color: #1f2937;
-      color: white;
-      padding-top: 20px;
-      transition: transform 0.3s ease;
-    }
-
-    .sidebar.collapsed {
-      transform: translateX(-250px);
-    }
-
-    .navbar {
-      background-color: #ffffff;
-      border-bottom: 1px solid #e5e7eb;
-      padding: 1rem;
-      margin-left: 250px;
-      width: calc(100% - 250px);
-      position: fixed;
-      top: 0;
-      z-index: 10;
-      transition: margin-left 0.3s ease, width 0.3s ease;
-    }
-
-    .main-content-wrapper {
-      margin-left: 40px;
-      width: 1700px;
-    }
-
-    .main-content {
-      margin-left: 240px;
-      padding: 24px;
-      width: 1600px;
-      min-height: calc(100vh - 64px);
-      transition: margin-left 0.3s ease, width 0.3s ease;
-    }
-
-    .loading-spinner {
-      display: none;
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      z-index: 1000;
+      gap: 0.25rem;
+      flex-wrap: wrap;
     }
 
     .sort-icon::after {
@@ -83,195 +73,505 @@
       content: '\f0dd';
     }
 
+    .loading-spinner {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 1000;
+    }
+
     @media (max-width: 768px) {
-      .sidebar {
-        width: 200px;
+      .mobile-card {
+        display: block !important;
       }
-
-      .navbar,
-      .main-content {
-        margin-left: 200px;
-        width: calc(100% - 200px);
+      
+      .desktop-table {
+        display: none !important;
       }
+      
+      .mobile-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.25rem;
+      }
+      
+      .mobile-actions .btn {
+        font-size: 0.75rem;
+        padding: 0.25rem 0.5rem;
+      }
+      
+      .controls-container {
+        flex-direction: column;
+        gap: 1rem;
+      }
+      
+      .pagination-container {
+        overflow-x: auto;
+        padding: 0.5rem 0;
+      }
+      
+      .pagination {
+        white-space: nowrap;
+        margin: 0;
+      }
+      
+      .card-body {
+        padding: 1rem;
+      }
+      
+      .table th, .table td {
+        font-size: 0.875rem;
+      }
+      
+      .filter-group {
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+    }
 
-      .sidebar.collapsed~.navbar,
-      .sidebar.collapsed~.main-content {
-        margin-left: 0;
-        width: 100%;
+    @media (min-width: 769px) {
+      .mobile-card {
+        display: none !important;
+      }
+      
+      .desktop-table {
+        display: table !important;
+      }
+    }
+
+    @media (max-width: 576px) {
+      .action-btn-group .btn {
+        font-size: 0.7rem;
+        padding: 0.2rem 0.4rem;
+      }
+      
+      .card-title {
+        font-size: 0.875rem;
+      }
+      
+      .badge, .status-badge {
+        font-size: 0.6875rem;
+      }
+      
+      .filter-group select, .filter-group input {
+        font-size: 0.875rem;
       }
     }
   </style>
 </head>
-
-<body class="font-sans">
-  <div class="dashboard-container">
-    <!-- Sidebar Partial -->
-    <%- include('../Partials/admin/adminsidebar', { activePage: 'coupons' , admin: admin || {} }) %>
-  
-
-      <!-- Main Content Area -->
-      <div class="main-content-wrapper">
-        <!-- Main Content -->
-        <div class="main-content">
-          <% if (success && success.length) { %>
-            <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4">
-              <%= success %>
-            </div>
-            <% } %>
-              <% if (error && error.length) { %>
-                <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4">
-                  <%= error %>
-                </div>
-                <% } %>
-
-                  <div class="flex justify-between items-center mb-4">
-                    <h1 class="text-3xl font-bold text-gray-800">Coupon Listing</h1>
-                    <button id="toggleSidebar" class="md:hidden bg-gray-600 text-white px-3 py-2 rounded">
-                      <i class="fas fa-bars"></i>
-                    </button>
-                  </div>
-
-                  <!-- Loading Spinner -->
-                  <div class="loading-spinner">
-                    <i class="fas fa-spinner fa-spin text-4xl text-blue-600"></i>
-                  </div>
-
-                  <!-- Search and Filters -->
-                  <div class="flex flex-col md:flex-row justify-between items-center mb-6">
-                    <div class="w-full md:w-1/3 mb-4 md:mb-0">
-                      <input type="text" id="searchInput" placeholder="Search by code or description..."
-                        class="w-full p-2 border rounded-md shadow-sm">
-                    </div>
-                    <div class="flex space-x-4">
-                      <select id="statusFilter" class="p-2 border rounded-md">
-                        <option value="all">All Statuses</option>
-                        <option value="active">Active</option>
-                        <option value="inactive">Inactive</option>
-                      </select>
-                      <select id="referralFilter" class="p-2 border rounded-md">
-                        <option value="all">All Types</option>
-                        <option value="referral">Referral</option>
-                        <option value="non-referral">Non-Referral</option>
-                      </select>
-                      <a href="/admin/coupons/add" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-                        <i class="fas fa-plus mr-2"></i>Add Coupon
-                      </a>
-                    </div>
-                  </div>
-
-                  <!-- Coupon Table -->
-                  <div class="bg-white shadow-md rounded-lg overflow-hidden">
-                    <table class="min-w-full divide-y divide-gray-200">
-                      <thead class="bg-gray-50">
-                        <tr>
-                          <th
-                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer sort"
-                            data-sort="code">Code</th>
-                          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Description</th>
-                          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Type</th>
-                          <th
-                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer sort"
-                            data-sort="discount">Discount</th>
-                          <th
-                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer sort"
-                            data-sort="validity">Validity</th>
-                          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Used</th>
-                          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Status</th>
-                          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Referral</th>
-                          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Actions</th>
-                        </tr>
-                      </thead>
-                      <tbody id="couponTableBody" class="bg-white divide-y divide-gray-200">
-                        <% coupons.forEach(coupon=> { %>
-                          <% // Compute effective status: active if isActive is true AND validUntil is in the future
-                            const currentDate=new Date(); const validUntil=new Date(coupon.validUntil); const
-                            isExpired=validUntil < currentDate; const effectiveStatus=coupon.isActive && !isExpired
-                            ? 'active' : 'inactive' ; const statusText=effectiveStatus==='active' ? 'Active'
-                            : 'Inactive' ; const statusClass=effectiveStatus==='active' ? 'text-green-600'
-                            : 'text-red-600' ; const toggleText=effectiveStatus==='active' ? 'Deactivate' : 'Activate' ;
-                            const toggleIcon=effectiveStatus==='active' ? 'fa-pause' : 'fa-play' ; const
-                            toggleClass=effectiveStatus==='active' ? 'text-yellow-600 hover:text-yellow-800'
-                            : 'text-green-600 hover:text-green-800' ; %>
-                            <tr class="coupon-row" data-status="<%= effectiveStatus %>"
-                              data-referral="<%= coupon.isReferral ? 'referral' : 'non-referral' %>">
-                              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                <%= coupon.code %>
-                              </td>
-                              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                <%= coupon.description || '-' %>
-                              </td>
-                              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                <%= coupon.discountType %>
-                              </td>
-                              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                                data-discount="<%= coupon.discountAmount %>">
-                                <%= coupon.discountType==='percentage' ? coupon.discountAmount + '%' : '$' +
-                                  coupon.discountAmount %>
-                                  <%= coupon.maxDiscount && coupon.discountType==='percentage' ? `(Max
-                                    ₹${coupon.maxDiscount})` : '' %>
-                              </td>
-                              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                                data-validity="<%= coupon.validUntil %>">
-                                <%= new Date(coupon.validFrom).toLocaleDateString() %> - <%= new
-                                    Date(coupon.validUntil).toLocaleDateString() %>
-                              </td>
-                              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                <%= coupon.usedCount %> / <%= coupon.usageLimit || 'Unlimited' %>
-                              </td>
-                              <td class="px-6 py-4 whitespace-nowrap text-sm">
-                                <span class="<%= statusClass %>">
-                                  <%= statusText %>
-                                </span>
-                              </td>
-                              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                <%= coupon.isReferral ? 'Yes' : 'No' %>
-                              </td>
-                              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                <a href="/admin/coupons/edit/<%= coupon._id %>"
-                                  class="text-blue-600 hover:text-blue-800 mr-2">
-                                  <i class="fas fa-edit"></i> Edit
-                                </a>
-                                <button class="text-red-600 hover:text-red-800 mr-2 delete-coupon"
-                                  data-id="<%= coupon._id %>">
-                                  <i class="fas fa-trash"></i> Delete
-                                </button>
-                                <button class="toggle-status <%= toggleClass %>" data-id="<%= coupon._id %>">
-                                  <i class="fas <%= toggleIcon %>"></i>
-                                  <%= toggleText %>
-                                </button>
-                              </td>
-                            </tr>
-                            <% }) %>
-                      </tbody>
-                    </table>
-                  </div>
-
-                  <!-- Pagination -->
-                  <div class="mt-4 flex justify-between items-center">
-                    <div>
-                      <span>Showing <%= (page - 1) * limit + 1 %> to <%= Math.min(page * limit, totalCoupons) %> of <%=
-                              totalCoupons %> coupons</span>
-                    </div>
-                    <div class="flex space-x-2">
-                      <button id="prevPage"
-                        class="px-4 py-2 bg-gray-200 rounded <%= page === 1 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-300' %>"
-                        <%=page===1 ? 'disabled' : '' %>>Previous</button>
-                      <button id="nextPage"
-                        class="px-4 py-2 bg-gray-200 rounded <%= page * limit >= totalCoupons ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-300' %>"
-                        <%=page * limit>= totalCoupons ? 'disabled' : '' %>>Next</button>
-                    </div>
-                  </div>
+<body class="bg-gray-50">
+  <!-- Sidebar -->
+  <div class="fixed inset-y-0 left-0 z-40 transition-all duration-300 transform -translate-x-full lg:translate-x-0" id="sidebar">
+    <div class="flex flex-col h-full w-72 bg-gradient-to-b from-slate-800 to-slate-900 text-white shadow-xl rounded-r-xl overflow-hidden">
+      <div class="p-5 flex items-center gap-3 border-b border-slate-700/50">
+        <img src="/images/TIMZO.jpg" alt="Timzo Logo" class="w-10 h-10 rounded-md">
+        <div class="text-xl font-bold tracking-wide bg-gradient-to-r from-amber-300 to-amber-500 bg-clip-text text-transparent">
+          Timzo Admin
         </div>
       </div>
+      <div class="px-4 py-5">
+        <div class="flex items-center gap-3 mb-2 px-2">
+          <div class="w-10 h-10 rounded-full bg-amber-500 flex items-center justify-center text-slate-900 font-bold">
+            <%= admin && admin.name ? admin.name.charAt(0).toUpperCase() : 'A' %>
+          </div>
+          <div>
+            <div class="font-medium">
+              <%= admin && admin.name ? admin.name : 'Admin User' %>
+            </div>
+            <div class="text-xs text-slate-400">
+              <%= admin && admin.email ? admin.email : 'admin@timzo.com' %>
+            </div>
+          </div>
+        </div>
+      </div>
+      <nav class="flex-1 px-4 space-y-1 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
+        <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider px-3 mb-2">Dashboard</div>
+        <a href="/admin/dashboard" class="flex items-center px-3 py-2.5 rounded-lg transition-all duration-200 group text-slate-300 hover:bg-slate-700/50 hover:text-white">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-slate-400 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+          </svg>
+          <span>Dashboard</span>
+        </a>
+        <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider px-3 mt-6 mb-2">Store Management</div>
+        <a href="/admin/getProduct" class="flex items-center px-3 py-2.5 rounded-lg transition-all duration-200 group text-slate-300 hover:bg-slate-700/50 hover:text-white">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-slate-400 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+          </svg>
+          <span>Products</span>
+        </a>
+        <a href="/admin/brand" class="flex items-center px-3 py-2.5 rounded-lg transition-all duration-200 group text-slate-300 hover:bg-slate-700/50 hover:text-white">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-slate-400 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+          </svg>
+          <span>Brands</span>
+        </a>
+        <a href="/admin/categories" class="flex items-center px-3 py-2.5 rounded-lg transition-all duration-200 group text-slate-300 hover:bg-slate-700/50 hover:text-white">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-slate-400 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+          </svg>
+          <span>Categories</span>
+        </a>
+        <a href="/admin/orders" class="flex items-center px-3 py-2.5 rounded-lg transition-all duration-200 group text-slate-300 hover:bg-slate-700/50 hover:text-white">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-slate-400 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+          </svg>
+          <span>Orders</span>
+        </a>
+        <a href="/admin/coupons" class="flex items-center px-3 py-2.5 rounded-lg transition-all duration-200 group bg-amber-500/10 text-amber-400">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
+          </svg>
+          <span>Coupons</span>
+        </a>
+        <a href="/admin/sales-report" class="flex items-center px-3 py-2.5 rounded-lg transition-all duration-200 group text-slate-300 hover:bg-slate-700/50 hover:text-white">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-slate-400 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+          <span>Sales Report</span>
+        </a>
+        <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider px-3 mt-6 mb-2">User Management</div>
+        <a href="/admin/users" class="flex items-center px-3 py-2.5 rounded-lg transition-all duration-200 group text-slate-300 hover:bg-slate-700/50 hover:text-white">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-slate-400 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+          </svg>
+          <span>Users</span>
+        </a>
+        <div class="py-10"></div>
+      </nav>
+      <div class="p-4 mt-auto border-t border-slate-700/50">
+        <a href="/admin/logout" class="flex items-center px-3 py-2.5 rounded-lg text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-all duration-200">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+          </svg>
+          <span>Logout</span>
+        </a>
+      </div>
+    </div>
   </div>
 
+  <!-- Sidebar Backdrop for Mobile -->
+  <div class="fixed inset-0 bg-black/50 z-30 lg:hidden transition-opacity duration-300 opacity-0 pointer-events-none" id="sidebarBackdrop"></div>
+
+  <!-- Mobile Sidebar Toggle -->
+  <div class="fixed top-4 left-4 z-50 lg:hidden">
+    <button id="sidebarToggle" class="bg-amber-500 text-slate-900 rounded-lg p-2 shadow-lg flex items-center justify-center">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" id="menuIcon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+      </svg>
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 hidden" id="closeIcon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+  </div>
+
+  <!-- Main Content -->
+  <main class="lg:ml-72 min-h-screen p-4 lg:p-6 pt-16 lg:pt-6">
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+      <!-- Header -->
+      <div class="p-4 lg:p-6 border-b border-gray-200">
+        <div class="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-4 controls-container">
+          <h1 class="text-2xl lg:text-3xl font-bold text-gray-900">Coupons Management</h1>
+          <div class="flex gap-2 align-items-center">
+            <a href="/admin/coupons/add" class="btn btn-primary">
+              <i class="bi bi-plus-circle me-1"></i>
+              <span class="d-none d-sm-inline">Add Coupon</span>
+              <span class="d-sm-none">Add</span>
+            </a>
+          </div>
+        </div>
+      </div>
+      <!-- Flash Messages -->
+      <% if (success && success.length) { %>
+        <div class="alert alert-success alert-dismissible fade show m-4" role="alert">
+          <%= success %>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      <% } %>
+      <% if (error && error.length) { %>
+        <div class="alert alert-danger alert-dismissible fade show m-4" role="alert">
+          <%= error %>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      <% } %>
+      <!-- Filters -->
+      <div class="p-4 border-b border-gray-200">
+        <div class="flex flex-col md:flex-row gap-3 filter-group">
+          <input type="text" id="searchInput" placeholder="Search by code or description..."
+                 class="form-control flex-grow-1" style="max-width: 300px;">
+          <select id="statusFilter" class="form-select" style="width: 150px;">
+            <option value="all">All Statuses</option>
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+          </select>
+          <select id="referralFilter" class="form-select" style="width: 150px;">
+            <option value="all">All Types</option>
+            <option value="referral">Referral</option>
+            <option value="non-referral">Non-Referral</option>
+          </select>
+        </div>
+      </div>
+      <!-- Desktop Table -->
+      <div class="desktop-table">
+        <div class="table-container" style="overflow-x: auto;">
+          <table class="table table-hover mb-0">
+            <thead class="table-dark">
+              <tr>
+                <th class="text-center">#</th>
+                <th class="cursor-pointer sort" data-sort="code">Code <i class="fas fa-sort"></i></th>
+                <th>Description</th>
+                <th>Type</th>
+                <th class="cursor-pointer sort" data-sort="discount">Discount <i class="fas fa-sort"></i></th>
+                <th class="cursor-pointer sort" data-sort="validity">Validity <i class="fas fa-sort"></i></th>
+                <th class="text-center">Used</th>
+                <th class="text-center">Status</th>
+                <th class="text-center">Referral</th>
+                <th class="text-center">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="couponTableBody">
+              <% if (coupons && coupons.length > 0) { %>
+                <% coupons.forEach((coupon, index) => { %>
+                  <% 
+                    const currentDate = new Date();
+                    const validUntil = new Date(coupon.validUntil);
+                    const isExpired = validUntil < currentDate;
+                    const effectiveStatus = coupon.isActive && !isExpired ? 'active' : 'inactive';
+                    const statusText = effectiveStatus === 'active' ? 'Active' : 'Inactive';
+                    const statusClass = effectiveStatus === 'active' ? 'status-active' : 'status-inactive';
+                    const toggleText = effectiveStatus === 'active' ? 'Deactivate' : 'Activate';
+                    const toggleIcon = effectiveStatus === 'active' ? 'fa-pause' : 'fa-play';
+                    const toggleClass = effectiveStatus === 'active' ? 'btn-warning' : 'btn-success';
+                  %>
+                  <tr class="coupon-row" 
+                      data-status="<%= effectiveStatus %>"
+                      data-referral="<%= coupon.isReferral ? 'referral' : 'non-referral' %>"
+                      data-discount="<%= coupon.discountAmount %>"
+                      data-validity="<%= coupon.validUntil %>">
+                    <td class="text-center fw-medium"><%= (page - 1) * limit + index + 1 %></td>
+                    <td>
+                      <div class="fw-medium text-truncate" style="max-width: 150px;" title="<%= coupon.code %>">
+                        <%= coupon.code || 'N/A' %>
+                      </div>
+                    </td>
+                    <td>
+                      <div class="text-truncate" style="max-width: 200px;" title="<%= coupon.description %>">
+                        <%= coupon.description || '-' %>
+                      </div>
+                    </td>
+                    <td>
+                      <span class="badge bg-secondary text-capitalize">
+                        <%= coupon.discountType || 'N/A' %>
+                      </span>
+                    </td>
+                    <td>
+                      <%= coupon.discountType === 'percentage' ? coupon.discountAmount + '%' : '₹' + coupon.discountAmount %>
+                      <%= coupon.maxDiscount && coupon.discountType === 'percentage' ? `(Max ₹${coupon.maxDiscount})` : '' %>
+                    </td>
+                    <td>
+                      <%= coupon.validFrom ? new Date(coupon.validFrom).toLocaleDateString() : 'N/A' %> - 
+                      <%= coupon.validUntil ? new Date(coupon.validUntil).toLocaleDateString() : 'N/A' %>
+                    </td>
+                    <td class="text-center">
+                      <span class="badge bg-info">
+                        <%= coupon.usedCount || 0 %> / <%= coupon.usageLimit || 'Unlimited' %>
+                      </span>
+                    </td>
+                    <td class="text-center">
+                      <span class="status-badge <%= statusClass %>">
+                        <%= statusText %>
+                      </span>
+                    </td>
+                    <td class="text-center">
+                      <span class="badge <%= coupon.isReferral ? 'bg-success' : 'bg-warning' %>">
+                        <%= coupon.isReferral ? 'Yes' : 'No' %>
+                      </span>
+                    </td>
+                    <td class="text-center">
+                      <div class="action-btn-group justify-content-center">
+                        <a href="/admin/coupons/edit/<%= coupon._id %>" class="btn btn-sm btn-outline-warning" title="Edit">
+                          <i class="fas fa-edit"></i>
+                        </a>
+                        <button class="btn btn-sm btn-outline-danger delete-coupon" data-id="<%= coupon._id %>" title="Delete">
+                          <i class="fas fa-trash"></i>
+                        </button>
+                        <button class="btn btn-sm toggle-status <%= toggleClass %>" data-id="<%= coupon._id %>" title="<%= toggleText %>">
+                          <i class="fas <%= toggleIcon %>"></i>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                <% }) %>
+              <% } else { %>
+                <tr>
+                  <td colspan="10" class="text-center py-5 text-muted">
+                    <i class="bi bi-inbox display-1 d-block mb-3 opacity-25"></i>
+                    <h5>No coupons found</h5>
+                    <p class="mb-0">Try adjusting your filters or add a new coupon.</p>
+                  </td>
+                </tr>
+              <% } %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <!-- Mobile Cards -->
+      <div class="mobile-card p-3">
+        <% if (coupons && coupons.length > 0) { %>
+          <% coupons.forEach((coupon, index) => { %>
+            <% 
+              const currentDate = new Date();
+              const validUntil = new Date(coupon.validUntil);
+              const isExpired = validUntil < currentDate;
+              const effectiveStatus = coupon.isActive && !isExpired ? 'active' : 'inactive';
+              const statusText = effectiveStatus === 'active' ? 'Active' : 'Inactive';
+              const statusClass = effectiveStatus === 'active' ? 'status-active' : 'status-inactive';
+              const toggleText = effectiveStatus === 'active' ? 'Deactivate' : 'Activate';
+              const toggleIcon = effectiveStatus === 'active' ? 'fa-pause' : 'fa-play';
+              const toggleClass = effectiveStatus === 'active' ? 'btn-warning' : 'btn-success';
+            %>
+            <div class="card mb-3 coupon-row"
+                 data-status="<%= effectiveStatus %>"
+                 data-referral="<%= coupon.isReferral ? 'referral' : 'non-referral' %>"
+                 data-discount="<%= coupon.discountAmount %>"
+                 data-validity="<%= coupon.validUntil %>">
+              <div class="card-body p-3">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                  <div class="flex-grow-1">
+                    <h6 class="card-title mb-1 fw-bold">
+                      #<%= (page - 1) * limit + index + 1 %> - <%= coupon.code || 'N/A' %>
+                    </h6>
+                  </div>
+                  <span class="status-badge <%= statusClass %>">
+                    <%= statusText %>
+                  </span>
+                </div>
+                <div class="row g-2 mb-3">
+                  <div class="col-12">
+                    <small class="text-muted d-block">Description</small>
+                    <span><%= coupon.description || '-' %></span>
+                  </div>
+                  <div class="col-6">
+                    <small class="text-muted d-block">Type</small>
+                    <span class="badge bg-secondary text-capitalize">
+                      <%= coupon.discountType || 'N/A' %>
+                    </span>
+                  </div>
+                  <div class="col-6">
+                    <small class="text-muted d-block">Discount</small>
+                    <span>
+                      <%= coupon.discountType === 'percentage' ? coupon.discountAmount + '%' : '₹' + coupon.discountAmount %>
+                      <%= coupon.maxDiscount && coupon.discountType === 'percentage' ? `(Max ₹${coupon.maxDiscount})` : '' %>
+                    </span>
+                  </div>
+                  <div class="col-12">
+                    <small class="text-muted d-block">Validity</small>
+                    <span>
+                      <%= coupon.validFrom ? new Date(coupon.validFrom).toLocaleDateString() : 'N/A' %> - 
+                      <%= coupon.validUntil ? new Date(coupon.validUntil).toLocaleDateString() : 'N/A' %>
+                    </span>
+                  </div>
+                  <div class="col-6">
+                    <small class="text-muted d-block">Used</small>
+                    <span class="badge bg-info">
+                      <%= coupon.usedCount || 0 %> / <%= coupon.usageLimit || 'Unlimited' %>
+                    </span>
+                  </div>
+                  <div class="col-6">
+                    <small class="text-muted d-block">Referral</small>
+                    <span class="badge <%= coupon.isReferral ? 'bg-success' : 'bg-warning' %>">
+                      <%= coupon.isReferral ? 'Yes' : 'No' %>
+                    </span>
+                  </div>
+                </div>
+                <div class="mobile-actions">
+                  <a href="/admin/coupons/edit/<%= coupon._id %>" class="btn btn-outline-warning btn-sm">
+                    <i class="fas fa-edit"></i> Edit
+                  </a>
+                  <button class="btn btn-outline-danger btn-sm delete-coupon" data-id="<%= coupon._id %>">
+                    <i class="fas fa-trash"></i> Delete
+                  </button>
+                  <button class="btn <%= toggleClass %> btn-sm toggle-status" data-id="<%= coupon._id %>">
+                    <i class="fas <%= toggleIcon %>"></i> <%= toggleText %>
+                  </button>
+                </div>
+              </div>
+            </div>
+          <% }) %>
+        <% } else { %>
+          <div class="text-center py-5 text-muted">
+            <i class="bi bi-inbox display-1 d-block mb-3 opacity-25"></i>
+            <h5>No coupons found</h5>
+            <p class="mb-0">Try adjusting your filters or add a new coupon.</p>
+          </div>
+        <% } %>
+      </div>
+      <!-- Pagination -->
+      <div class="d-flex justify-content-between align-items-center p-4 pagination-container">
+        <span>Showing <%= (page - 1) * limit + 1 %> to <%= Math.min(page * limit, totalCoupons) %> of <%= totalCoupons %> coupons</span>
+        <nav aria-label="Page navigation">
+          <ul class="pagination">
+            <% if (page > 1) { %>
+              <li class="page-item">
+                <a class="page-link" href="/admin/coupons?page=<%= page - 1 %>&limit=<%= limit %>">Previous</a>
+              </li>
+            <% } else { %>
+              <li class="page-item disabled">
+                <a class="page-link" href="#">Previous</a>
+              </li>
+            <% } %>
+            <% for (let i = 1; i <= Math.ceil(totalCoupons / limit); i++) { %>
+              <li class="page-item <%= page === i ? 'active' : '' %>">
+                <a class="page-link" href="/admin/coupons?page=<%= i %>&limit=<%= limit %>">
+                  <%= i %>
+                </a>
+              </li>
+            <% } %>
+            <% if (page * limit < totalCoupons) { %>
+              <li class="page-item">
+                <a class="page-link" href="/admin/coupons?page=<%= page + 1 %>&limit=<%= limit %>">Next</a>
+              </li>
+            <% } else { %>
+              <li class="page-item disabled">
+                <a class="page-link" href="#">Next</a>
+              </li>
+            <% } %>
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </main>
+
+  <footer class="bg-gray-100 p-4 text-center text-gray-600 text-sm shadow-inner">
+    © <%= new Date().getFullYear() %> Timzo Admin Panel. All rights reserved.
+  </footer>
+
+  <div class="loading-spinner">
+    <i class="fas fa-spinner fa-spin text-4xl text-blue-600"></i>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"></script>
   <script>
+    // Sidebar Toggle
+    const sidebar = document.getElementById('sidebar');
+    const sidebarBackdrop = document.getElementById('sidebarBackdrop');
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    const menuIcon = document.getElementById('menuIcon');
+    const closeIcon = document.getElementById('closeIcon');
+
+    function toggleSidebar() {
+      sidebar.classList.toggle('translate-x-0');
+      sidebarBackdrop.classList.toggle('opacity-0');
+      sidebarBackdrop.classList.toggle('pointer-events-none');
+      menuIcon.classList.toggle('hidden');
+      closeIcon.classList.toggle('hidden');
+    }
+
+    sidebarToggle.addEventListener('click', toggleSidebar);
+    sidebarBackdrop.addEventListener('click', toggleSidebar);
+
+    // Toast Notifications
     function showToast(message, type = 'success') {
       Toastify({
         text: message,
@@ -282,6 +582,7 @@
       }).showToast();
     }
 
+    // Spinner Functions
     function showSpinner() {
       document.querySelector('.loading-spinner').style.display = 'block';
     }
@@ -290,163 +591,176 @@
       document.querySelector('.loading-spinner').style.display = 'none';
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
-      const dltButtons = document.querySelectorAll('.delete-coupon');
-      dltButtons.forEach(button => {
-        button.addEventListener('click', async () => {
-          const deleteId = button.dataset.id;
-          const result = await Swal.fire({
-            title: 'Are you sure?',
-            text: "You won't be able to revert this!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Yes, delete it!',
-          });
-
-          if (result.isConfirmed) {
-            try {
-              const response = await fetch(`/admin/coupons/delete/${deleteId}`, {
-                method: 'DELETE',
-              });
-              if (response.ok) {
-                showToast('Coupon deleted successfully');
-                button.closest('tr').remove();
-              } else {
-                const error = await response.json();
-                showToast(`Error: ${error.message}`, 'error');
-              }
-            } catch (error) {
-              showToast(`Error: ${error.message}`, 'error');
-            }
-          }
+    // Delete Coupon
+    document.querySelectorAll('.delete-coupon').forEach(button => {
+      button.addEventListener('click', async () => {
+        const deleteId = button.dataset.id;
+        const result = await Swal.fire({
+          title: 'Are you sure?',
+          text: "You won't be able to revert this!",
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#dc3545',
+          cancelButtonColor: '#6b7280',
+          confirmButtonText: 'Yes, delete it!'
         });
-      });
 
-      document.querySelectorAll('.toggle-status').forEach(button => {
-        button.addEventListener('click', async () => {
-          const id = button.dataset.id;
+        if (result.isConfirmed) {
           try {
-            const result = await Swal.fire({
-              title: 'Change coupon status?',
-              text: "Are you sure you want to toggle this coupon's status?",
-              icon: 'question',
-              showCancelButton: true,
-              confirmButtonColor: '#3085d6',
-              cancelButtonColor: '#aaa',
-              confirmButtonText: 'Yes, toggle it!',
+            showSpinner();
+            const response = await fetch(`/admin/coupons/delete/${deleteId}`, {
+              method: 'POST' // Changed to POST to match common practices
             });
-
-            if (result.isConfirmed) {
-              showSpinner();
-              const response = await fetch(`/admin/coupons/toggle-status/${id}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-              });
-
-              if (response.ok) {
-                showToast('Coupon status updated');
-                setTimeout(() => window.location.reload(), 1000);
-              } else {
-                const error = await response.json();
-                showToast(`Error: ${error.message}`, 'error');
-              }
+            const data = await response.json();
+            if (data.status) {
+              showToast('Coupon deleted successfully');
+              button.closest('tr')?.remove();
+              button.closest('.card')?.remove();
+            } else {
+              showToast(`Error: ${data.message}`, 'error');
             }
           } catch (error) {
-            showToast(`Error: ${error.message}`, 'error');
+              console.error(error);
+              Swal.fire('Error', 'An error occurred while deleting the coupon', 'error');
+            } finally {
+              hideSpinner();
+            }
+        }
+      });
+    });
+
+    // Toggle Status
+    document.querySelectorAll('.toggle-status').forEach(button => {
+      button.addEventListener('click', async () => {
+        const id = button.dataset.id;
+        const result = await Swal.fire({
+          title: 'Change coupon status?',
+          text: "Are you sure you want to toggle this coupon's status?",
+          icon: 'question',
+          showCancelButton: true,
+          confirmButtonColor: '#3085d6',
+          cancelButtonColor: '#6b7280',
+          confirmButtonText: 'Yes, toggle it!'
+        });
+
+        if (result.isConfirmed) {
+          try {
+            showSpinner();
+            const response = await fetch(`/admin/coupons/status/${id}`, {
+              method: 'PATCH',
+              headers: { 'Content-Type': 'application/json' }
+            });
+            const data = await response.json();
+            if (data.status) {
+              showToast('Coupon status updated');
+              setTimeout(() => window.location.reload(), 1000);
+            } else {
+              showToast(`Error: ${data.message}`, 'error');
+            }
+          } catch (error) {
+            console.error(error);
+            Swal.fire('Error', 'An error occurred while toggling the status', 'error');
           } finally {
             hideSpinner();
           }
-        });
+        }
       });
-
-      const sortButtons = document.querySelectorAll('.sort');
-      let currentSort = { column: 'code', direction: 'asc' };
-
-      sortButtons.forEach(button => {
-        button.addEventListener('click', () => {
-          const column = button.dataset.sort;
-          if (currentSort.column === column) {
-            currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
-          } else {
-            currentSort = { column, direction: 'asc' };
-          }
-
-          sortButtons.forEach(btn => {
-            btn.classList.remove('sort-asc', 'sort-desc');
-            if (btn.dataset.sort === column) {
-              btn.classList.add(currentSort.direction === 'asc' ? 'sort-asc' : 'sort-desc');
-            }
-          });
-
-          const rows = Array.from(document.querySelectorAll('.coupon-row'));
-          rows.sort((a, b) => {
-            let aValue, bValue;
-            if (column === 'code') {
-              aValue = a.querySelector('td:nth-child(1)').textContent.toLowerCase();
-              bValue = b.querySelector('td:nth-child(1)').textContent.toLowerCase();
-            } else if (column === 'discount') {
-              aValue = parseFloat(a.querySelector(`td[data-discount]`).dataset.discount);
-              bValue = parseFloat(b.querySelector(`td[data-discount]`).dataset.discount);
-            } else if (column === 'validity') {
-              aValue = new Date(a.querySelector(`td[data-validity]`).dataset.validity);
-              bValue = new Date(b.querySelector(`td[data-validity]`).dataset.validity);
-            }
-            if (currentSort.direction === 'asc') {
-              return aValue > bValue ? 1 : -1;
-            } else {
-              return aValue < bValue ? 1 : -1;
-            }
-          });
-
-          const tbody = document.getElementById('couponTableBody');
-          tbody.innerHTML = '';
-          rows.forEach(row => tbody.appendChild(row));
-        });
-      });
-
-      const searchInput = document.getElementById('searchInput');
-      const statusFilter = document.getElementById('statusFilter');
-      const referralFilter = document.getElementById('referralFilter');
-      const couponRows = document.querySelectorAll('.coupon-row');
-
-      function filterCoupons() {
-        const search = searchInput.value.toLowerCase();
-        const status = statusFilter.value;
-        const referral = referralFilter.value;
-
-        couponRows.forEach(row => {
-          const code = row.querySelector('td:nth-child(1)').textContent.toLowerCase();
-          const description = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
-          const rowStatus = row.dataset.status;
-          const rowReferral = row.dataset.referral;
-
-          const matchesSearch = code.includes(search) || description.includes(search);
-          const matchesStatus = status === 'all' || rowStatus === status;
-          const matchesReferral = referral === 'all' || rowReferral === referral;
-
-          row.style.display = matchesSearch && matchesStatus && matchesReferral ? '' : 'none';
-        });
-      }
-
-      searchInput.addEventListener('input', filterCoupons);
-      statusFilter.addEventListener('change', filterCoupons);
-      referralFilter.addEventListener('change', filterCoupons);
-
-      document.getElementById('prevPage').addEventListener('click', () => {
-        if (<%= page %> > 1) {
-        window.location.href = `/admin/coupons?page=<%= page - 1 %>&limit=<%= limit %>`;
-      }
     });
 
-    document.getElementById('nextPage').addEventListener('click', () => {
-      if (<%= page * limit %> < <%= totalCoupons %>) {
-      window.location.href = `/admin/coupons?page=<%= page + 1 %>&limit=<%= limit %>`;
-    }
+    // Sorting
+    const sortButtons = document.querySelectorAll('.sort');
+    let currentSort = { column: 'code', direction: 'asc' };
+
+    sortButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        const column = button.dataset.sort;
+        if (currentSort.column === column) {
+          currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+        } else {
+          currentSort = { column, direction: 'asc' };
+        }
+
+        sortButtons.forEach(btn => {
+          btn.classList.remove('sort-asc', 'sort-desc');
+          btn.querySelector('i').classList.remove('fas', 'fa-sort-up', 'fa-sort-down');
+          btn.querySelector('i').classList.add('fas', 'fa-sort');
+          if (btn.dataset.sort === column) {
+            btn.classList.add(currentSort.direction === 'asc' ? 'sort-desc' : 'sort-asc');
+            btn.querySelector('i').classList.remove('fa-sort');
+            btn.querySelector('i').classList.add(currentSort.direction === 'asc' ? 'fa-sort-down' : 'fa-sort-up');
+          }
+        });
+
+        const rows = Array.from(document.querySelectorAll('.coupon-row'));
+        rows.sort((a, b) => {
+          let aValue, bValue;
+          if (column === 'code') {
+            aValue = a.querySelector('td:nth-child(2)').textContent.toLowerCase();
+            bValue = b.querySelector('td:nth-child(2)').textContent.toLowerCase();
+          } else if (column === 'discount') {
+            aValue = parseFloat(a.dataset.discount);
+            bValue = parseFloat(b.dataset.discount);
+          } else if (column === 'validity') {
+            aValue = new Date(a.dataset.validity);
+            bValue = new Date(b.dataset.validity);
+          }
+          if (currentSort.direction === 'asc') {
+            return aValue > bValue ? 1 : -1;
+          } else {
+            return aValue < bValue ? 1 : -1;
+          }
+        });
+
+        const tbody = document.getElementById('couponTableBody');
+        const cardContainer = document.querySelector('.mobile-card');
+        tbody.innerHTML = '';
+        cardContainer.innerHTML = '';
+        rows.forEach(row => {
+          tbody.appendChild(row);
+          if (row.classList.contains('card')) {
+            cardContainer.appendChild(row);
+          }
+        });
       });
+    });
+
+    // Filtering
+    const searchInput = document.getElementById('searchInput');
+    const statusFilter = document.getElementById('statusFilter');
+    const referralFilter = document.getElementById('referralFilter');
+
+    function filterCoupons() {
+      const search = searchInput.value.toLowerCase();
+      const status = statusFilter.value;
+      const referral = referralFilter.value;
+
+      document.querySelectorAll('.coupon-row').forEach(row => {
+        const code = row.querySelector('td:nth-child(2)')?.textContent.toLowerCase() || row.querySelector('.card-title')?.textContent.toLowerCase() || '';
+        const description = row.querySelector('td:nth-child(3)')?.textContent.toLowerCase() || row.querySelector('.card .col-12 span')?.textContent.toLowerCase() || '';
+        const rowStatus = row.dataset.status;
+        const rowReferral = row.dataset.referral;
+
+        const matchesSearch = code.includes(search) || description.includes(search);
+        const matchesStatus = status === 'all' || rowStatus === status;
+        const matchesReferral = referral === 'all' || rowReferral === referral;
+
+        row.style.display = matchesSearch && matchesStatus && matchesReferral ? '' : 'none';
+      });
+    }
+
+    searchInput.addEventListener('input', filterCoupons);
+    statusFilter.addEventListener('change', filterCoupons);
+    referralFilter.addEventListener('change', filterCoupons);
+
+    // Close Sidebar on Large Screens
+    window.addEventListener('resize', () => {
+      if (window.innerWidth >= 1024) {
+        sidebar.classList.remove('translate-x-0');
+        sidebarBackdrop.classList.add('opacity-0', 'pointer-events-none');
+        menuIcon.classList.remove('hidden');
+        closeIcon.classList.add('hidden');
+      }
     });
   </script>
 </body>
-
 </html>

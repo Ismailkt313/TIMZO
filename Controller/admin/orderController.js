@@ -9,7 +9,7 @@ const loadAdminOrder = async (req, res) => {
     try {
         const search = req.query.query ? req.query.query.trim() : '';
         const page = parseInt(req.query.page) || 1;
-        const limit = 8;
+        const limit = 20;
 
         if (page < 1) {
             return res.status(400).render('Admin/error404', { error: 'Invalid page number' });

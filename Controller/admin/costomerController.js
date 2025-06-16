@@ -5,6 +5,8 @@ const loadUsers = async (req, res) => {
         const page = parseInt(req.query.page) || 1;
         const limit = 10;
         const skip = (page - 1) * limit;
+        const filter = req.query.filter || 'all';
+
 
         console.log('Skip value:', skip);
 
@@ -51,6 +53,8 @@ const loadUsers = async (req, res) => {
             : 0;
 
         res.render('Admin/costomer', {
+            activeClass: filter,
+            searchQuery:req.query.search || '',
             newUsersGrowth,
             newUsers,
             blockedUsersPercent,
@@ -111,37 +115,29 @@ const profile = async (req, res) => {
 
 const searchUsers = async (req, res) => {
     try {
-        const query = req.query.query ? req.query.query.trim() : '';
-        const page = parseInt(req.query.page) || 1;
-        const limit = 10;
-
-        const users = await customer.find({
-            $or: [
-                { fullname: { $regex: query, $options: 'i' } },
-                { email: { $regex: query, $options: 'i' } }
-            ]
-        })
-            .limit(limit)
-            .skip((page - 1) * limit)
-            .exec();
-
-        const totalUsers = await customer.countDocuments({
-            $or: [
-                { fullname: { $regex: query, $options: 'i' } },
-                { email: { $regex: query, $options: 'i' } }
-            ]
-        });
-
-        res.json({
-            users,
-            currentPage: page,
-            totalPages: Math.ceil(totalUsers / limit)
-        });
+      const query = req.query.query || '';
+      const page = parseInt(req.query.page) || 1;
+      const limit = 10;
+      const skip = (page - 1) * limit;
+  
+      const searchQuery = {
+        $or: [
+          { fullname: { $regex: query, $options: 'i' } },
+          { email: { $regex: query, $options: 'i' } }
+        ]
+      };
+  
+      const users = await customer.find(searchQuery)
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit);
+  
+      res.json({ success: true, users, currentPage: page });
     } catch (error) {
-        console.error('Error searching users:', error);
-        res.status(500).json({ error: 'Failed to search users' });
+      console.error('Error searching users:', error);
+      res.json({ success: false, message: 'Search failed' });
     }
-};
+  };
 
 const block = async (req, res) => {
     try {
