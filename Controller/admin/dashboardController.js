@@ -246,7 +246,7 @@ const loadAdminDashboard = async (req, res) => {
       chartData
     });
 
-    res.render('admin/admindashbord', {
+    res.render('Admin/admindashbord', {
       activePage: 'dashboard',
       bestSellingProducts: bestSellingProducts || [],
       bestSellingCategories: bestSellingCategories || [],
