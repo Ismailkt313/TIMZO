@@ -538,7 +538,7 @@
     const sidebarToggle = document.getElementById('sidebarToggle');
     const menuIcon = document.getElementById('menuIcon');
     const closeIcon = document.getElementById('closeIcon');
-
+  
     function toggleSidebar() {
       sidebar.classList.toggle('translate-x-0');
       sidebarBackdrop.classList.toggle('opacity-0');
@@ -546,43 +546,43 @@
       menuIcon.classList.toggle('hidden');
       closeIcon.classList.toggle('hidden');
     }
-
+  
     sidebarToggle.addEventListener('click', toggleSidebar);
     sidebarBackdrop.addEventListener('click', toggleSidebar);
-
-    // Toggle Date Fields
+  
+    // Toggle Date Fields on Report Type Change
     function toggleDateFields() {
       const reportType = document.getElementById('reportType').value;
       const customDateFields = document.getElementById('customDateFields');
       customDateFields.classList.toggle('d-none', reportType !== 'custom');
     }
-
-    // Update Report Type Hidden Field
+  
+    // Update Hidden Report Type Field
     function updateReportType() {
       const reportType = document.getElementById('reportType').value;
       document.getElementById('reportTypeHidden').value = reportType;
     }
-
-    // Download Report
+  
+    // Download Report (PDF/Excel)
     function downloadReport(format) {
       const reportType = document.getElementById('reportType').value;
       const startDate = document.getElementById('startDate').value || '';
       const endDate = document.getElementById('endDate').value || '';
-      const url = `/admin/orders/download/${format}?reportType=${reportType}&startDate=${startDate}&endDate=${endDate}`;
+      const url = `/admin/sales-report/download/${format}?reportType=${reportType}&startDate=${startDate}&endDate=${endDate}`;
       window.location.href = url;
     }
-
-    // Chart.js Configuration
+  
+    // Chart.js Sales Report Chart
     const orders = <%- JSON.stringify(orders || []) %>;
     const labels = orders.map(order => order.orderDate ? new Date(order.orderDate).toLocaleDateString('en-IN') : 'N/A');
     const amounts = orders.map(order => order.totalAmount || 0);
     const discounts = orders.map(order => order.discount || 0);
-
+  
     const ctx = document.getElementById('salesChart').getContext('2d');
     new Chart(ctx, {
       type: 'line',
       data: {
-        labels: labels,
+        labels,
         datasets: [
           {
             label: 'Total Amount (₹)',
@@ -627,8 +627,8 @@
         }
       }
     });
-
-    // Close Sidebar on Large Screens
+  
+    // Automatically close sidebar on large screens
     window.addEventListener('resize', () => {
       if (window.innerWidth >= 1024) {
         sidebar.classList.remove('translate-x-0');
@@ -638,5 +638,6 @@
       }
     });
   </script>
+  
 </body>
 </html>

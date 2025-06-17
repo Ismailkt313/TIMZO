@@ -1,427 +1,540 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>User Profile - TIMZO</title>
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-    />
-    <link
-      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
-      rel="stylesheet"
-    />
-    <link rel="icon" type="image/x-icon" href="/images/TIMZO.jpg" />
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <style>
-      body {
-        background-color: #f4f4f4;
-        font-family: "Arial", sans-serif;
-        margin: 0;
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Profile - Timzo</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@600&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/x-icon" href="/images/TIMZO.jpg">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f4f4f9;
+    }
+    h1, h2, h3 {
+      font-family: 'Poppins', sans-serif;
+    }
+    .sidebar {
+      background: linear-gradient(180deg, #1f2937 0%, #111827 100%);
+      width: 250px;
+      transition: transform 0.3s ease-in-out;
+      z-index: 1000;
+      transform: translateX(-100%);
+    }
+    .sidebar-active {
+      transform: translateX(0);
+    }
+    .overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 999;
+    }
+    .overlay-active {
+      display: block;
+    }
+    .main-content {
+      transition: margin-left 0.3s ease-in-out;
+      padding: 1.5rem;
+    }
+    .profile-card {
+      background-color: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      padding: 2rem;
+      max-width: 600px;
+      margin: 0 auto;
+      transition: transform 0.2s ease-in-out;
+    }
+    .profile-card:hover {
+      transform: translateY(-2px);
+    }
+    .btn-primary {
+      background-color: #1f2937;
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      transition: all 0.3s;
+      font-weight: 500;
+    }
+    .btn-primary:hover:not(:disabled) {
+      background-color: #facc15;
+      color: #1f2937;
+    }
+    .btn-success {
+      background-color: #28a745;
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      transition: all 0.3s;
+    }
+    .btn-success:hover {
+      background-color: #218838;
+    }
+    .btn-danger {
+      background-color: #ef4444;
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      transition: all 0.3s;
+    }
+    .btn-danger:hover {
+      background-color: #dc2626;
+    }
+    .info-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.75rem;
+      background-color: #f8f9fa;
+      border-radius: 8px;
+      margin-bottom: 0.75rem;
+    }
+    .info-item strong {
+      color: #333;
+      font-weight: 500;
+      width: 30%;
+    }
+    .info-item span, .info-item input {
+      color: #666;
+      width: 60%;
+      text-align: right;
+    }
+    .info-item input {
+      border: 1px solid #ced4da;
+      border-radius: 6px;
+      padding: 0.5rem;
+      font-size: 0.875rem;
+    }
+    .info-item input:focus {
+      outline: none;
+      border-color: #1f2937;
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+    }
+    .avatar {
+      width: 80px;
+      height: 80px;
+      background-color: #1f2937;
+      color: white;
+      font-size: 2rem;
+      font-weight: bold;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1.5rem;
+    }
+    .sidebar-toggle {
+      z-index: 1001;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: #1f2937;
+      color: white;
+      position: fixed;
+      top: 1rem;
+      left: 1rem;
+    }
+    @media (min-width: 769px) {
+      .sidebar {
+        transform: translateX(0);
       }
-
-      .container-fluid {
-        padding: 0;
-      }
-
       .main-content {
-        padding: 20px;
-        min-height: 100vh;
-        background-color: #ffffff;
+        margin-left: 250px;
       }
-
-      /* Profile Card */
+      .sidebar-toggle, .overlay {
+        display: none !important;
+      }
+    }
+    @media (max-width: 768px) {
+      .main-content {
+        padding: 1rem;
+      }
       .profile-card {
-        background-color: #ffffff;
-        border-radius: 16px;
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-        padding: 40px;
-        width: 100%;
-        max-width: 600px;
-        min-width: 400px;
-        margin: auto;
+        padding: 1.5rem;
       }
-
-      .profile-card h1 {
-        font-size: 24px;
-        color: #1a1a1a;
-        margin-bottom: 20px;
-        text-align: center;
-        font-weight: 600;
+      .btn-primary, .btn-success, .btn-danger {
+        font-size: 0.875rem;
+        padding: 0.5rem 0.75rem;
       }
-
-      .profile-card .info-item {
-        margin-bottom: 15px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 10px;
-        background-color: #f8f9fa;
-        border-radius: 8px;
+      .info-item {
+        padding: 0.5rem;
       }
-
-      .profile-card .info-item strong {
-        color: #333;
-        font-weight: 500;
+      .info-item input {
+        font-size: 0.875rem;
       }
-
-      .profile-card .info-item span {
-        color: #666;
+    }
+    @media (max-width: 576px) {
+      .main-content {
+        padding: 0.75rem;
       }
-
-      .profile-card .info-item input {
-        width: 60%;
-        padding: 5px;
-        border: 1px solid #ced4da;
-        border-radius: 6px;
-        font-size: 14px;
-        color: #333;
+      .profile-card {
+        padding: 1rem;
       }
-
-      .profile-card .info-item input:focus {
-        outline: none;
-        border-color: #1a1a1a;
-        box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+      h1 {
+        font-size: 1.5rem;
       }
-
-      .profile-card .btn-edit {
-        background-color: #1a1a1a;
-        color: #ffffff;
-        border: none;
-        padding: 10px;
-        border-radius: 8px;
-        text-align: center;
-        font-weight: 500;
-        transition: background-color 0.3s ease;
+      .avatar {
+        width: 60px;
+        height: 60px;
+        font-size: 1.5rem;
       }
-
-      .profile-card .btn-edit:hover {
-        background-color: #ffd700;
-        color: #1a1a1a;
+      .info-item strong, .info-item span, .info-item input {
+        font-size: 0.875rem;
       }
+    }
+  </style>
+</head>
+<body>
+  <div class="flex min-h-screen">
+    <!-- Sidebar -->
+    <div id="sidebar" class="sidebar w-64 fixed top-0 left-0 h-full shadow-xl flex flex-col">
+      <div class="p-6 text-xl font-semibold border-b border-gray-700 text-center text-white">
+        <% if (user && user.fullname) { %>
+          <%= user.fullname %>
+        <% } else { %>
+          Guest
+        <% } %>
+      </div>
+      <div class="flex justify-center items-center py-5 border-b border-gray-700">
+        <div class="w-16 h-16 bg-gray-600 rounded-full flex items-center justify-center text-2xl font-bold uppercase text-white">
+          <% if (user && user.fullname) { %>
+            <%= user.fullname.charAt(0) %>
+          <% } else { %>
+            ?
+          <% } %>
+        </div>
+      </div>
+      <nav class="flex-1 px-4 py-6 space-y-3 text-sm font-medium text-white">
+        <a href="/user/account" class="flex items-center gap-3 px-4 py-2 rounded-md transition-all duration-200 <%= currentPage === 'profile' ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white' %>">
+          <i class="fas fa-user w-4"></i> My Profile
+        </a>
+        <a href="/user/address" class="flex items-center gap-3 px-4 py-2 rounded-md transition-all duration-200 <%= currentPage === 'address' ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white' %>">
+          <i class="fas fa-map-marker-alt w-4"></i> My Address
+        </a>
+        <a href="/user/orders" class="flex items-center gap-3 px-4 py-2 rounded-md transition-all duration-200 <%= currentPage === 'orders' ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white' %>">
+          <i class="fas fa-shopping-bag w-4"></i> My Orders
+        </a>
+        <a href="/user/wallet" class="flex items-center gap-3 px-4 py-2 rounded-md transition-all duration-200 <%= currentPage === 'wallet' ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white' %>">
+          <i class="fas fa-wallet w-4"></i> My Wallet
+        </a>
+        <a href="/user/newPassword" class="flex items-center gap-3 px-4 py-2 rounded-md transition-all duration-200 <%= currentPage === 'changepassword' ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white' %>">
+          <i class="fas fa-lock w-4"></i> Change Password
+        </a>
+        <a href="/user/sidewishlist" class="flex items-center gap-3 px-4 py-2 rounded-md transition-all duration-200 <%= currentPage === 'Wishlist' ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white' %>">
+          <i class="fas fa-heart w-4"></i> Wishlist
+        </a>
+        <a href="/user/coupons" class="flex items-center gap-3 px-4 py-2 rounded-md transition-all duration-200 <%= currentPage === 'coupons' ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white' %>">
+          <i class="fas fa-ticket-alt w-4"></i> My Coupon
+        </a>
+        <a href="/user/referral" class="flex items-center gap-3 px-4 py-2 rounded-md transition-all duration-200 <%= currentPage === 'referral' ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white' %>">
+          <i class="fas fa-users w-4"></i> Refer & Earn
+        </a>
+        <a href="/user/" class="flex items-center gap-3 px-4 py-2 rounded-md transition-all duration-200 text-gray-300 hover:bg-gray-800 hover:text-white">
+          <i class="fas fa-home w-4"></i> Home
+        </a>
+        <a href="/logout" class="flex items-center gap-3 px-4 py-2 rounded-md transition-all duration-200 text-red-400 hover:bg-red-500 hover:text-white">
+          <i class="fas fa-sign-out-alt w-4"></i> Log Out
+        </a>
+      </nav>
+    </div>
 
-      .profile-card .btn-update {
-        background-color: #28a745;
-        color: #ffffff;
-        border: none;
-        padding: 10px;
-        border-radius: 8px;
-        text-align: center;
-        font-weight: 500;
-        transition: background-color 0.3s ease;
-      }
+    <!-- Overlay for Mobile Sidebar -->
+    <div class="overlay" id="sidebarOverlay"></div>
 
-      .profile-card .btn-update:hover {
-        background-color: #218838;
-      }
-
-      .profile-card .btn-cancel {
-        background-color: #dc3545;
-        color: #ffffff;
-        border: none;
-        padding: 10px;
-        border-radius: 8px;
-        text-align: center;
-        font-weight: 500;
-        transition: background-color 0.3s ease;
-      }
-
-      .profile-card .btn-cancel:hover {
-        background-color: #c82333;
-      }
-
-      .button-group {
-        display: flex;
-        gap: 10px;
-        margin-top: 20px;
-      }
-      .row {
-        padding-left: 520px;
-      }
-
-      /* Responsive Adjustments */
-      @media (max-width: 767px) {
-        .main-content {
-          padding: 15px;
-        }
-
-        .profile-card {
-          padding: 20px;
-        }
-
-        .profile-card h1 {
-          font-size: 20px;
-        }
-
-        .profile-card .info-item input {
-          width: 50%;
-          font-size: 12px;
-        }
-      }
-    </style>
-  </head>
-
-  <body>
-    <%- include('.././Partials/user/userSidebar', { user: user, currentPage:
-    'profile' }) %>
-    <!-- Main Content with Sidebar -->
-    <div class="container-fluid vh-100">
-      <div class="row h-100">
-        <!-- Include User Sidebar -->
-
-        <!-- Main Content -->
-        <div class="col-md-9 d-flex align-items-center justify-content-center">
-          <div class="profile-card text-center">
-            <h1>
-              Welcome <%= user && user.fullname ? user.fullname : 'Guest' %>!
-            </h1>
-            <div class="info-item">
-              <strong>Full Name</strong>
-              <span class="view-field" id="fullname-view">
-                <%= user && user.fullname ? user.fullname : 'Not provided' %>
-              </span>
-              <input
-                type="text"
-                class="edit-field d-none"
-                id="fullname-edit"
-                name="fullname"
-                value="<%= user && user.fullname ? user.fullname : '' %>"
-              />
-            </div>
-            <div class="info-item">
-              <strong>Email</strong>
-              <span class="view-field" id="email-view">
-                <%= user && user.email ? user.email : 'Not provided' %>
-              </span>
-              <input
-                type="email"
-                class="edit-field d-none"
-                id="email-edit"
-                name="email"
-                value="<%= user && user.email ? user.email : '' %>"
-              />
-            </div>
-            <div class="info-item">
-              <strong>Phone</strong>
-              <span class="view-field" id="mobile-view">
-                <%= user && user.mobile ? user.mobile : 'Not provided' %>
-              </span>
-              <input
-                type="tel"
-                class="edit-field d-none"
-                id="mobile-edit"
-                name="mobile"
-                value="<%= user && user.mobile ? user.mobile : '' %>"
-              />
-            </div>
-            <div class="button-group" id="button-group">
-              <button class="btn-edit w-100" id="edit-btn">Edit</button>
-            </div>
+    <!-- Main Content -->
+    <div class="main-content flex-1">
+      <button class="sidebar-toggle md:hidden">
+        <i class="fas fa-bars text-lg"></i>
+      </button>
+      <div class="max-w-5xl mx-auto">
+        <h1 class="text-2xl md:text-3xl font-bold text-gray-800 mb-8 text-center">
+          My Profile
+        </h1>
+        <div class="profile-card">
+          <div class="avatar">
+            <% if (user && user.fullname) { %>
+              <%= user.fullname.charAt(0) %>
+            <% } else { %>
+              ?
+            <% } %>
+          </div>
+          <div class="info-item">
+            <strong>Full Name</strong>
+            <span class="view-field" id="fullname-view">
+              <%= user && user.fullname ? user.fullname : 'Not provided' %>
+            </span>
+            <input type="text" class="edit-field hidden" id="fullname-edit" name="fullname" value="<%= user && user.fullname ? user.fullname : '' %>" />
+          </div>
+          <div class="info-item">
+            <strong>Email</strong>
+            <span class="view-field" id="email-view">
+              <%= user && user.email ? user.email : 'Not provided' %>
+            </span>
+            <input type="email" class="edit-field hidden" id="email-edit" name="email" value="<%= user && user.email ? user.email : '' %>" />
+          </div>
+          <div class="info-item">
+            <strong>Phone</strong>
+            <span class="view-field" id="mobile-view">
+              <%= user && user.mobile ? user.mobile : 'Not provided' %>
+            </span>
+            <input type="tel" class="edit-field hidden" id="mobile-edit" name="mobile" value="<%= user && user.mobile ? user.mobile : '' %>" />
+          </div>
+          <div class="info-item">
+            <strong>Last Updated</strong>
+            <span>
+              <%= user && user.updatedAt ? new Date(user.updatedAt).toLocaleDateString() : 'Not available' %>
+            </span>
+          </div>
+          <div class="flex flex-wrap gap-2 mt-6" id="button-group">
+            <button class="btn-primary flex-1 text-sm" id="edit-btn">Edit Profile</button>
+            <a href="/user/newPassword" class="btn-primary flex-1 text-sm text-center">Change Password</a>
           </div>
         </div>
       </div>
     </div>
+  </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-      const editBtn = document.getElementById("edit-btn");
-      const buttonGroup = document.getElementById("button-group");
-      let isEditing = false;
+  <footer class="bg-white p-4 text-center text-gray-600 text-sm mt-8 shadow-inner">
+    © <%= new Date().getFullYear() %> Timzo. All rights reserved.
+  </footer>
 
-      const originalValues = {
-        fullname: document.getElementById("fullname-edit").value,
-        email: document.getElementById("email-edit").value,
-        mobile: document.getElementById("mobile-edit").value,
-      };
+  <script>
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('sidebarOverlay');
+      sidebar.classList.toggle('sidebar-active');
+      overlay.classList.toggle('overlay-active');
+      document.body.style.overflow = sidebar.classList.contains('sidebar-active') ? 'hidden' : '';
+    }
 
-      editBtn.addEventListener("click", () => {
-        if (isEditing) {
-          updateProfile();
-        } else {
-          toggleEditMode(true);
-        }
-      });
+    document.addEventListener('DOMContentLoaded', () => {
+      const sidebarToggle = document.querySelector('.sidebar-toggle');
+      const overlay = document.getElementById('sidebarOverlay');
+      if (sidebarToggle && overlay) {
+        sidebarToggle.addEventListener('click', toggleSidebar);
+        overlay.addEventListener('click', toggleSidebar);
+      }
+    });
 
-      function toggleEditMode(edit) {
-        isEditing = edit;
-        const viewFields = document.querySelectorAll(".view-field");
-        const editFields = document.querySelectorAll(".edit-field");
+    const editBtn = document.getElementById('edit-btn');
+    const buttonGroup = document.getElementById('button-group');
+    let isEditing = false;
 
-        if (edit) {
-          viewFields.forEach((field) => field.classList.add("d-none"));
-          editFields.forEach((field) => field.classList.remove("d-none"));
+    const originalValues = {
+      fullname: document.getElementById('fullname-edit').value,
+      email: document.getElementById('email-edit').value,
+      mobile: document.getElementById('mobile-edit').value
+    };
 
-          editBtn.textContent = "Update";
-          editBtn.classList.remove("btn-edit");
-          editBtn.classList.add("btn-update");
+    editBtn.addEventListener('click', () => {
+      if (isEditing) {
+        updateProfile();
+      } else {
+        toggleEditMode(true);
+      }
+    });
 
-          const cancelBtn = document.createElement("button");
-          cancelBtn.className = "btn-cancel w-100";
-          cancelBtn.textContent = "Cancel";
-          cancelBtn.addEventListener("click", () => {
-            document.getElementById("fullname-edit").value =
-              originalValues.fullname;
-            document.getElementById("email-edit").value = originalValues.email;
-            document.getElementById("mobile-edit").value =
-              originalValues.mobile;
-            toggleEditMode(false);
-          });
-          buttonGroup.appendChild(cancelBtn);
-        } else {
-          viewFields.forEach((field) => field.classList.remove("d-none"));
-          editFields.forEach((field) => field.classList.add("d-none"));
+    function toggleEditMode(edit) {
+      isEditing = edit;
+      const viewFields = document.querySelectorAll('.view-field');
+      const editFields = document.querySelectorAll('.edit-field');
 
-          document.getElementById("fullname-view").textContent =
-            document.getElementById("fullname-edit").value || "Not provided";
-          document.getElementById("email-view").textContent =
-            document.getElementById("email-edit").value || "Not provided";
-          document.getElementById("mobile-view").textContent =
-            document.getElementById("mobile-edit").value || "Not provided";
+      if (edit) {
+        viewFields.forEach(field => field.classList.add('hidden'));
+        editFields.forEach(field => field.classList.remove('hidden'));
+        editBtn.textContent = 'Update';
+        editBtn.classList.remove('btn-primary');
+        editBtn.classList.add('btn-success');
 
-          editBtn.textContent = "Edit";
-          editBtn.classList.remove("btn-update");
-          editBtn.classList.add("btn-edit");
+        const cancelBtn = document.createElement('button');
+        cancelBtn.className = 'btn-danger flex-1 text-sm';
+        cancelBtn.textContent = 'Cancel';
+        cancelBtn.addEventListener('click', () => {
+          document.getElementById('fullname-edit').value = originalValues.fullname;
+          document.getElementById('email-edit').value = originalValues.email;
+          document.getElementById('mobile-edit').value = originalValues.mobile;
+          toggleEditMode(false);
+        });
+        buttonGroup.appendChild(cancelBtn);
+      } else {
+        viewFields.forEach(field => field.classList.remove('hidden'));
+        editFields.forEach(field => field.classList.add('hidden'));
+        document.getElementById('fullname-view').textContent = document.getElementById('fullname-edit').value || 'Not provided';
+        document.getElementById('email-view').textContent = document.getElementById('email-edit').value || 'Not provided';
+        document.getElementById('mobile-view').textContent = document.getElementById('mobile-edit').value || 'Not provided';
+        editBtn.textContent = 'Edit Profile';
+        editBtn.classList.remove('btn-success');
+        editBtn.classList.add('btn-primary');
+        const cancelBtn = buttonGroup.querySelector('.btn-danger');
+        if (cancelBtn) cancelBtn.remove();
+      }
+    }
 
-          const cancelBtn = buttonGroup.querySelector(".btn-cancel");
-          if (cancelBtn) cancelBtn.remove();
-        }
+    async function updateProfile() {
+      const fullname = document.getElementById('fullname-edit').value.trim();
+      const email = document.getElementById('email-edit').value.trim();
+      const mobile = document.getElementById('mobile-edit').value.trim();
+
+      const nameRegex = /^[A-Za-z ]{3,}$/;
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      const mobileRegex = /^(?:\+91|0)?[6-9][0-9]{9}$/;
+
+      if (!nameRegex.test(fullname)) {
+        Swal.fire({
+          toast: true,
+          position: 'bottom-end',
+          icon: 'error',
+          title: 'Name must be at least 3 characters long and contain only letters and spaces.',
+          showConfirmButton: false,
+          timer: 3000
+        });
+        return;
       }
 
-      async function updateProfile() {
-        const fullname = document.getElementById("fullname-edit").value.trim();
-        const email = document.getElementById("email-edit").value.trim();
-        const mobile = document.getElementById("mobile-edit").value.trim();
+      if (!emailRegex.test(email)) {
+        Swal.fire({
+          toast: true,
+          position: 'bottom-end',
+          icon: 'error',
+          title: 'Please enter a valid email address.',
+          showConfirmButton: false,
+          timer: 3000
+        });
+        return;
+      }
 
-        const nameRegex = /^[A-Za-z ]{3,}$/;
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        const mobileRegex = /^(?:\+91|0)?[6-9][0-9]{9}$/;
+      if (!mobileRegex.test(mobile)) {
+        Swal.fire({
+          toast: true,
+          position: 'bottom-end',
+          icon: 'error',
+          title: 'Mobile number must be exactly 10 digits.',
+          showConfirmButton: false,
+          timer: 3000
+        });
+        return;
+      }
 
-        if (!nameRegex.test(fullname)) {
-          Swal.fire({
-            title: "Invalid Name",
-            text: "Name must be at least 3 characters long and contain only letters and spaces.",
-            icon: "error",
-            confirmButtonText: "OK",
-          });
-          return;
+      const data = { fullname, email, mobile };
+
+      try {
+        Swal.fire({
+          title: 'Updating Profile...',
+          allowOutsideClick: false,
+          didOpen: () => Swal.showLoading()
+        });
+
+        const response = await fetch('/user/edit-profile', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data),
+          credentials: 'include'
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
         }
 
-        if (!emailRegex.test(email)) {
+        const result = await response.json();
+        Swal.close();
+
+        if (result.success) {
           Swal.fire({
-            title: "Invalid Email",
-            text: "Please enter a valid email address.",
-            icon: "error",
-            confirmButtonText: "OK",
+            toast: true,
+            position: 'bottom-end',
+            icon: 'success',
+            title: 'Profile updated successfully',
+            showConfirmButton: false,
+            timer: 3000
           });
-          return;
-        }
-
-        if (!mobileRegex.test(mobile)) {
-          Swal.fire({
-            title: "Invalid Mobile Number",
-            text: "Mobile number must be exactly 10 digits.",
-            icon: "error",
-            confirmButtonText: "OK",
-          });
-          return;
-        }
-
-        const data = { fullname, email, mobile };
-
-        try {
-          const response = await fetch("/user/edit-profile", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(data),
-            credentials: "include",
-          });
-
-          if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-          }
-
-          const result = await response.json();
-
-          if (result.success) {
-            Swal.fire({
-              title: "Success",
-              text: "Profile updated successfully",
-              icon: "success",
-              timer: 1500,
-              showConfirmButton: false,
-            });
-            originalValues.fullname = data.fullname;
-            originalValues.email = data.email;
-            originalValues.mobile = data.mobile;
-            toggleEditMode(false);
-          } else if (result.requiresOtp) {
-            const { value: otp } = await Swal.fire({
-              title: "Enter OTP",
-              text: "An OTP has been sent to your new email address.",
-              input: "text",
-              inputPlaceholder: "Enter OTP",
-              showCancelButton: true,
-              confirmButtonText: "Verify",
-              cancelButtonText: "Cancel",
-              inputValidator: (value) => {
-                if (!value) return "Please enter the OTP";
-              },
-            });
-
-            if (otp) {
-              const otpResponse = await fetch("/user/verify-email-otp", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ otp }),
-                credentials: "include",
-              });
-
-              const otpResult = await otpResponse.json();
-
-              if (otpResult.success) {
-                Swal.fire({
-                  title: "Success",
-                  text: "Email and profile updated successfully",
-                  icon: "success",
-                  timer: 1500,
-                  showConfirmButton: false,
-                });
-                originalValues.fullname = data.fullname;
-                originalValues.email = data.email;
-                originalValues.mobile = data.mobile;
-                toggleEditMode(false);
-              } else {
-                Swal.fire({
-                  title: "Error",
-                  text: otpResult.message || "Invalid OTP",
-                  icon: "error",
-                  confirmButtonText: "OK",
-                });
-              }
+          originalValues.fullname = data.fullname;
+          originalValues.email = data.email;
+          originalValues.mobile = data.mobile;
+          toggleEditMode(false);
+          setTimeout(() => window.location.reload(), 1500);
+        } else if (result.requiresOtp) {
+          const { value: otp } = await Swal.fire({
+            title: 'Enter OTP',
+            text: 'An OTP has been sent to your new email address.',
+            input: 'text',
+            inputPlaceholder: 'Enter OTP',
+            showCancelButton: true,
+            confirmButtonText: 'Verify',
+            cancelButtonText: 'Cancel',
+            inputValidator: (value) => {
+              if (!value) return 'Please enter the OTP';
             }
-          } else {
-            Swal.fire({
-              title: "Error",
-              text: result.message || "Failed to update profile",
-              icon: "error",
-              confirmButtonText: "OK",
+          });
+
+          if (otp) {
+            const otpResponse = await fetch('/user/verify-email-otp', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ otp }),
+              credentials: 'include'
             });
+
+            const otpResult = await otpResponse.json();
+
+            if (otpResult.success) {
+              Swal.fire({
+                toast: true,
+                position: 'bottom-end',
+                icon: 'success',
+                title: 'Email and profile updated successfully',
+                showConfirmButton: false,
+                timer: 3000
+              });
+              originalValues.fullname = data.fullname;
+              originalValues.email = data.email;
+              originalValues.mobile = data.mobile;
+              toggleEditMode(false);
+              setTimeout(() => window.location.reload(), 1500);
+            } else {
+              Swal.fire({
+                toast: true,
+                position: 'bottom-end',
+                icon: 'error',
+                title: otpResult.message || 'Invalid OTP',
+                showConfirmButton: false,
+                timer: 3000
+              });
+            }
           }
-        } catch (error) {
-          console.error("Error updating profile:", error);
+        } else {
           Swal.fire({
-            title: "Error",
-            text: "An error occurred while updating profile. Please try again.",
-            icon: "error",
-            confirmButtonText: "OK",
+            toast: true,
+            position: 'bottom-end',
+            icon: 'error',
+            title: result.message || 'Failed to update profile',
+            showConfirmButton: false,
+            timer: 3000
           });
         }
+      } catch (error) {
+        console.error('Error updating profile:', error);
+        Swal.close();
+        Swal.fire({
+          toast: true,
+          position: 'bottom-end',
+          icon: 'error',
+          title: 'An error occurred while updating profile. Please try again.',
+          showConfirmButton: false,
+          timer: 3000
+        });
       }
-    </script>
-  </body>
+    }
+  </script>
+</body>
 </html>

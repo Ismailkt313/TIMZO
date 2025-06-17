@@ -1,225 +1,308 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>My Orders - Timzo</title>
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-  <link rel="icon" type="image/x-icon" href="/images/TIMZO.jpg" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@600&display=swap"
-    rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@600&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/x-icon" href="/images/TIMZO.jpg">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
   <style>
     body {
       font-family: 'Inter', sans-serif;
+      background-color: #f4f4f9;
     }
-
-    h1,
-    h2,
-    h3 {
+    h1, h2, h3 {
       font-family: 'Poppins', sans-serif;
     }
-
     .sidebar {
       background: linear-gradient(180deg, #1f2937 0%, #111827 100%);
+      width: 250px;
       transition: transform 0.3s ease-in-out;
-      z-index: 50;
-    }
-
-    .sidebar-hidden {
+      z-index: 1000;
       transform: translateX(-100%);
     }
-
     .sidebar-active {
       transform: translateX(0);
     }
-
-    .main-content {
-      margin-left: 256px;
-      padding: 2rem;
-      background-color: #f9fafb;
+    .overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 999;
     }
-
+    .overlay-active {
+      display: block;
+    }
+    .main-content {
+      transition: margin-left 0.3s ease-in-out;
+      padding: 1.5rem;
+    }
     .order-card {
-      background-color: #ffffff;
+      background-color: white;
       border-radius: 12px;
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
-      padding: 24px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      padding: 1.5rem;
       transition: transform 0.2s ease-in-out;
     }
-
     .order-card:hover {
-      transform: translateY(-4px);
+      transform: translateY(-2px);
     }
-
     .btn-primary {
       background-color: #1f2937;
-      color: #ffffff;
-      padding: 8px 16px;
+      color: white;
+      padding: 0.5rem 1rem;
       border-radius: 6px;
       transition: all 0.3s;
+      font-weight: 500;
     }
-
-    .btn-primary:hover {
+    .btn-primary:hover:not(:disabled) {
       background-color: #facc15;
       color: #1f2937;
     }
-
     .btn-danger {
       background-color: #ef4444;
-      color: #ffffff;
-      padding: 8px 16px;
+      color: white;
+      padding: 0.5rem 1rem;
       border-radius: 6px;
       transition: all 0.3s;
     }
-
     .btn-danger:hover {
       background-color: #dc2626;
     }
-
     .btn-retry {
       background-color: #f59e0b;
-      color: #ffffff;
-      padding: 8px 16px;
+      color: white;
+      padding: 0.5rem 1rem;
       border-radius: 6px;
       transition: all 0.3s;
     }
-
     .btn-retry:hover {
       background-color: #d97706;
     }
-
     .status-badge {
-      display: inline-flex;
-      align-items: center;
-      padding: 6px 12px;
-      border-radius: 20px;
+      padding: 0.5rem 1rem;
+      border-radius: 9999px;
       font-size: 0.875rem;
       font-weight: 500;
     }
-
     .status-processing {
       background-color: #fef3c7;
       color: #d97706;
     }
-
     .status-delivered {
       background-color: #d1fae5;
       color: #059669;
     }
-
     .status-cancelled {
       background-color: #fee2e2;
       color: #dc2626;
     }
-
     .progress-bar {
       height: 6px;
       background-color: #e5e7eb;
       border-radius: 3px;
       overflow: hidden;
     }
-
     .progress-fill {
       height: 100%;
       background-color: #10b981;
       transition: width 0.5s ease-in-out;
     }
-
-    @media (max-width: 768px) {
+    .sidebar-toggle {
+      z-index: 1001;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: #1f2937;
+      color: white;
+      position: fixed;
+      top: 1rem;
+      left: 1rem;
+    }
+    @media (min-width: 769px) {
       .sidebar {
-        transform: translateX(-100%);
+        transform: translateX(0);
       }
-
       .main-content {
-        margin-left: 0;
+        margin-left: 250px;
+      }
+      .sidebar-toggle, .overlay {
+        display: none !important;
+      }
+    }
+    @media (max-width: 768px) {
+      .main-content {
         padding: 1rem;
       }
-
       .order-grid {
-        grid-template-columns: 1fr !important;
+        grid-template-columns: 1fr;
+      }
+      .btn-primary, .btn-danger, .btn-retry {
+        font-size: 0.875rem;
+        padding: 0.5rem 0.75rem;
+      }
+    }
+    @media (max-width: 576px) {
+      .main-content {
+        padding: 0.75rem;
+      }
+      h1 {
+        font-size: 1.75rem;
+      }
+      .order-card {
+        padding: 1rem;
+      }
+      .status-badge {
+        font-size: 0.75rem;
+        padding: 0.4rem 0.8rem;
       }
     }
   </style>
 </head>
-
-<body class="bg-gray-50">
+<body>
   <div class="flex min-h-screen">
-    <%- include('../Partials/user/userSidebar', { user: user, currentPage: 'orders' }) %>
-      <div class="main-content flex-1 flex justify-center">
-        <div class="w-full max-w-5xl">
-          <h1 class="text-4xl font-bold text-gray-900 mb-10 text-center">My Orders</h1>
-
-          <% if (orders.length===0) { %>
-            <div class="text-center py-16 bg-white rounded-xl shadow-md">
-              <i class="fas fa-shopping-bag text-gray-400 text-5xl mb-4"></i>
-              <p class="text-gray-600 text-lg mb-6">No orders found.</p>
-              <a href="/products" class="btn-primary inline-block px-6 py-3 text-lg">Start Shopping</a>
-            </div>
-            <% } else { %>
-              <div class="order-grid grid grid-cols-2 md:grid-cols-2 sm:grid-cols-1 gap-8">
-                <% orders.forEach(order=> { %>
-                  <div class="order-card">
-                    <div class="flex justify-end mb-2">
-                      <button class="text-sm text-blue-600 hover:underline"
-                        onclick="downloadInvoice('<%= order._id %>')">
-                        <i class="fas fa-download mr-1"></i> Download Invoice
-                      </button>
-                    </div>
-                    <div class="flex justify-between items-center mb-4">
-                      <p class="font-semibold text-xl text-gray-900">Order #<%= order.orderId %>
-                      </p>
-                      <span class="status-badge status-<%= order.orderStatus.toLowerCase() %>">
-                        <i class="fas fa-circle text-xs mr-2"></i>
-                        <%= order.orderStatus %>
-                      </span>
-                    </div>
-                    <p class="text-gray-600 text-sm mb-2">
-                      <i class="fas fa-calendar-alt mr-2"></i> Placed on:
-                      <%= new Date(order.orderDate).toLocaleDateString() %>
-                    </p>
-
-                    <p class="text-gray-800 font-semibold text-sm mt-1">
-                      Total: ₹<%= order.totalAmount.toFixed(2) %>
-                    </p>
-
-                    <div class="progress-bar mb-6">
-                      <div class="progress-fill"
-                        style="width: <%= order.orderStatus === 'Delivered' ? '100%' : order.orderStatus === 'Processing' ? '50%' : order.orderStatus === 'Cancelled' ? '0%' : '25%' %>">
-                      </div>
-                    </div>
-                    <div class="flex flex-wrap gap-2">
-                      <a href="/orders/<%= order._id %>" class="btn-primary flex-1 text-center">View Details</a>
-                      <% if (order.orderStatus==='Processing' ) { %>
-                        <button class="btn-danger flex-1 cancel-order" data-order-id="<%= order._id %>">Cancel
-                          Order</button>
-                        <% } %>
-                          <% if (order.paymentMethod==='Online' && order.paymentStatus==='Pending' ) { %>
-                            <button class="btn-retry flex-1 retry-payment" data-order-id="<%= order._id %>">Retry
-                              Payment</button>
-                            <% } %>
-                    </div>
-                  </div>
-                  <% }) %>
-              </div>
-              <% } %>
+    <!-- Sidebar -->
+    <div id="sidebar" class="sidebar w-64 fixed top-0 left-0 h-full shadow-xl flex flex-col">
+      <div class="p-6 text-xl font-semibold border-b border-gray-700 text-center text-white">
+        <% if (user && user.fullname) { %>
+          <%= user.fullname %>
+        <% } else { %>
+          Guest
+        <% } %>
+      </div>
+      <div class="flex justify-center items-center py-5 border-b border-gray-700">
+        <div class="w-16 h-16 bg-gray-600 rounded-full flex items-center justify-center text-2xl font-bold uppercase text-white">
+          <% if (user && user.fullname) { %>
+            <%= user.fullname.charAt(0) %>
+          <% } else { %>
+            ?
+          <% } %>
         </div>
       </div>
+      <nav class="flex-1 px-4 py-6 space-y-3 text-sm font-medium text-white">
+        <a href="/user/account" class="flex items-center gap-3 px-4 py-2 rounded-md transition-all duration-200 <%= currentPage === 'profile' ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white' %>">
+          <i class="fas fa-user w-4"></i> My Profile
+        </a>
+        <a href="/user/address" class="flex items-center gap-3 px-4 py-2 rounded-md transition-all duration-200 <%= currentPage === 'address' ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white' %>">
+          <i class="fas fa-map-marker-alt w-4"></i> My Address
+        </a>
+        <a href="/user/orders" class="flex items-center gap-3 px-4 py-2 rounded-md transition-all duration-200 <%= currentPage === 'orders' ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white' %>">
+          <i class="fas fa-shopping-bag w-4"></i> My Orders
+        </a>
+        <a href="/user/wallet" class="flex items-center gap-3 px-4 py-2 rounded-md transition-all duration-200 <%= currentPage === 'wallet' ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white' %>">
+          <i class="fas fa-wallet w-4"></i> My Wallet
+        </a>
+        <a href="/user/newPassword" class="flex items-center gap-3 px-4 py-2 rounded-md transition-all duration-200 <%= currentPage === 'changepassword' ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white' %>">
+          <i class="fas fa-lock w-4"></i> Change Password
+        </a>
+        <a href="/user/sidewishlist" class="flex items-center gap-3 px-4 py-2 rounded-md transition-all duration-200 <%= currentPage === 'Wishlist' ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white' %>">
+          <i class="fas fa-heart w-4"></i> Wishlist
+        </a>
+        <a href="/user/coupons" class="flex items-center gap-3 px-4 py-2 rounded-md transition-all duration-200 <%= currentPage === 'coupons' ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white' %>">
+          <i class="fas fa-ticket-alt w-4"></i> My Coupon
+        </a>
+        <a href="/user/referral" class="flex items-center gap-3 px-4 py-2 rounded-md transition-all duration-200 <%= currentPage === 'referral' ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white' %>">
+          <i class="fas fa-users w-4"></i> Refer & Earn
+        </a>
+        <a href="/user/" class="flex items-center gap-3 px-4 py-2 rounded-md transition-all duration-200 text-gray-300 hover:bg-gray-800 hover:text-white">
+          <i class="fas fa-home w-4"></i> Home
+        </a>
+        <a href="/logout" class="flex items-center gap-3 px-4 py-2 rounded-md transition-all duration-200 text-red-400 hover:bg-red-500 hover:text-white">
+          <i class="fas fa-sign-out-alt w-4"></i> Log Out
+        </a>
+      </nav>
+    </div>
+
+    <!-- Overlay for Mobile Sidebar -->
+    <div class="overlay" id="sidebarOverlay"></div>
+
+    <!-- Main Content -->
+    <div class="main-content flex-1">
+      <button class="sidebar-toggle md:hidden">
+        <i class="fas fa-bars text-lg"></i>
+      </button>
+      <div class="max-w-5xl mx-auto">
+        <h1 class="text-2xl md:text-3xl font-bold text-gray-800 mb-8 text-center">My Orders</h1>
+        <% if (orders.length === 0) { %>
+        <div class="bg-white rounded-xl shadow-md p-8 text-center">
+          <i class="fas fa-shopping-bag text-gray-400 text-4xl mb-4"></i>
+          <p class="text-gray-600 text-lg mb-6">No orders found.</p>
+          <a href="/products" class="btn-primary inline-block px-6 py-2 text-base">Start Shopping</a>
+        </div>
+        <% } else { %>
+        <div class="order-grid grid grid-cols-1 md:grid-cols-2 gap-6">
+          <% orders.forEach(order => { %>
+          <div class="order-card">
+            <div class="flex justify-end mb-3">
+              <button class="text-sm text-blue-600 hover:underline" onclick="downloadInvoice('<%= order._id %>')">
+                <i class="fas fa-download mr-1"></i> Download Invoice
+              </button>
+            </div>
+            <div class="flex justify-between items-center mb-3">
+              <p class="font-semibold text-lg text-gray-900">Order #<%= order.orderId %></p>
+              <span class="status-badge status-<%= order.orderStatus.toLowerCase() %>">
+                <i class="fas fa-circle text-xs mr-2"></i>
+                <%= order.orderStatus %>
+              </span>
+            </div>
+            <p class="text-gray-600 text-sm mb-2">
+              <i class="fas fa-calendar-alt mr-2"></i> Placed on: <%= new Date(order.orderDate).toLocaleDateString() %>
+            </p>
+            <p class="text-gray-800 font-semibold text-sm mb-3">
+              Total: ₹<%= order.totalAmount.toFixed(2) %>
+            </p>
+            <div class="progress-bar mb-4">
+              <div class="progress-fill" style="width: <%= order.orderStatus === 'Delivered' ? '100%' : order.orderStatus === 'Processing' ? '50%' : order.orderStatus === 'Cancelled' ? '0%' : '25%' %>"></div>
+            </div>
+            <div class="flex flex-wrap gap-2">
+              <a href="/orders/<%= order._id %>" class="btn-primary flex-1 text-center text-sm">View Details</a>
+              <% if (order.orderStatus === 'Processing') { %>
+              <button class="btn-danger flex-1 text-sm cancel-order" data-order-id="<%= order._id %>">Cancel Order</button>
+              <% } %>
+              <% if (order.paymentMethod === 'Online' && order.paymentStatus === 'Pending') { %>
+              <button class="btn-retry flex-1 text-sm retry-payment" data-order-id="<%= order._id %>">Retry Payment</button>
+              <% } %>
+            </div>
+          </div>
+          <% }) %>
+        </div>
+        <% } %>
+      </div>
+    </div>
   </div>
 
-  <footer class="bg-white p-6 text-center text-gray-600 text-sm shadow-inner mt-12">
+  <footer class="bg-white p-4 text-center text-gray-600 text-sm mt-8 shadow-inner">
     © <%= new Date().getFullYear() %> Timzo. All rights reserved.
   </footer>
 
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script>
     function toggleSidebar() {
       const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('sidebarOverlay');
       sidebar.classList.toggle('sidebar-active');
+      overlay.classList.toggle('overlay-active');
+      document.body.style.overflow = sidebar.classList.contains('sidebar-active') ? 'hidden' : '';
     }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const sidebarToggle = document.querySelector('.sidebar-toggle');
+      const overlay = document.getElementById('sidebarOverlay');
+      if (sidebarToggle && overlay) {
+        sidebarToggle.addEventListener('click', toggleSidebar);
+        overlay.addEventListener('click', toggleSidebar);
+      }
+    });
 
     document.querySelectorAll('.cancel-order').forEach(button => {
       button.addEventListener('click', async () => {
@@ -283,26 +366,21 @@
         buttonsStyling: false,
         customClass: {
           confirmButton: 'btn-retry px-4 py-2 rounded mr-2',
-          cancelButton: 'btn-primary px-4 py-2 rounded',
-        },
+          cancelButton: 'btn-primary px-4 py-2 rounded'
+        }
       });
-
       if (result.isConfirmed) {
         try {
-          console.log('Sending retry payment request for order:', orderId);
           Swal.fire({
             title: 'Processing Payment...',
             allowOutsideClick: false,
-            didOpen: () => Swal.showLoading(),
+            didOpen: () => Swal.showLoading()
           });
-
           const response = await fetch(`/orders/retry-payment/${orderId}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            credentials: 'include',
+            credentials: 'include'
           });
-
-          console.log('Retry payment response status:', response.status);
           if (!response.ok) {
             if (response.status === 401) {
               Swal.fire({
@@ -311,20 +389,16 @@
                 icon: 'error',
                 title: 'Please log in to retry payment',
                 showConfirmButton: false,
-                timer: 3000,
+                timer: 3000
               });
               setTimeout(() => window.location.href = '/login', 1500);
               return;
             }
             throw new Error(`HTTP error: ${response.status}`);
           }
-
           const data = await response.json();
-          console.log('Retry payment response data:', data);
-
           if (data.success) {
             Swal.close();
-
             const options = {
               key: data.razorpayKey,
               amount: data.razorpayOrder.amount,
@@ -333,7 +407,6 @@
               name: 'Timzo',
               description: `Retry Payment for Order ${data.orderDetails.orderId}`,
               handler: async function (response) {
-                console.log('Razorpay payment response:', response);
                 const verifyResponse = await fetch('/order/verify-payment', {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
@@ -341,14 +414,11 @@
                     razorpay_payment_id: response.razorpay_payment_id,
                     razorpay_order_id: response.razorpay_order_id,
                     razorpay_signature: response.razorpay_signature,
-                    orderId: data.orderDetails.orderId,
+                    orderId: data.orderDetails.orderId
                   }),
-                  credentials: 'include',
+                  credentials: 'include'
                 });
-
-                console.log('Verify payment response status:', verifyResponse.status);
                 const verifyData = await verifyResponse.json();
-                console.log('Verify payment response data:', verifyData);
                 if (verifyData.success) {
                   Swal.fire({
                     toast: true,
@@ -356,9 +426,8 @@
                     icon: 'success',
                     title: 'Payment successful!',
                     showConfirmButton: false,
-                    timer: 3000,
+                    timer: 3000
                   });
-                  console.log('Redirecting to:', `/order-success?orderId=${data.orderDetails.orderId}`);
                   setTimeout(() => window.location.href = `/order/success?orderId=${data.orderDetails.orderId}`, 1500);
                 } else {
                   Swal.fire({
@@ -367,23 +436,18 @@
                     icon: 'error',
                     title: verifyData.message || 'Payment verification failed',
                     showConfirmButton: false,
-                    timer: 3000,
+                    timer: 3000
                   });
-                  console.log('Redirecting to:', `/order-failed?message=${encodeURIComponent(verifyData.message)}`);
                   setTimeout(() => window.location.href = `/order-failed?message=${encodeURIComponent(verifyData.message)}`, 1500);
                 }
               },
               prefill: {
                 name: '<%= user.name || '' %>',
                 email: '<%= user.email || '' %>',
-                contact: '<%= user.phone || '' %>',
+                contact: '<%= user.phone || '' %>'
               },
-              theme: {
-                color: '#3399cc',
-              },
+              theme: { color: '#3399cc' }
             };
-
-            console.log('Opening Razorpay modal with options:', options);
             const rzp = new Razorpay(options);
             rzp.open();
           } else {
@@ -393,22 +457,23 @@
               icon: 'error',
               title: data.message || 'Failed to retry payment',
               showConfirmButton: false,
-              timer: 3000,
+              timer: 3000
             });
           }
         } catch (error) {
-          console.error('Error retrying:', error.message, error.stack);
+          console.error('Error retrying:', error);
           Swal.fire({
             toast: true,
             position: 'bottom-end',
             icon: 'error',
             title: 'Failed to retry payment. Try again.',
             showConfirmButton: false,
-            timer: 3000,
+            timer: 3000
           });
         }
       }
     }
+
     async function downloadInvoice(orderId) {
       try {
         Swal.fire({
@@ -416,16 +481,13 @@
           allowOutsideClick: false,
           didOpen: () => Swal.showLoading()
         });
-
         const response = await fetch(`/user/orders/invoice/${orderId}`, {
           method: 'GET',
           credentials: 'include'
         });
-
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
-
         const blob = await response.blob();
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -435,7 +497,6 @@
         a.click();
         document.body.removeChild(a);
         window.URL.revokeObjectURL(url);
-
         Swal.close();
       } catch (error) {
         console.error('Error downloading invoice:', error);
@@ -444,5 +505,4 @@
     }
   </script>
 </body>
-
 </html>

@@ -175,6 +175,7 @@ const loadAvailableCoupons = async (req, res) => {
         });
 
         res.render('user/availableCoupon', {
+            currentPage : 'coupons',
             user: req.session.user,
             coupons: availableCoupons,
         });

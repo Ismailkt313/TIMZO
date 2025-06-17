@@ -584,19 +584,16 @@ const changePassword = async (req, res) => {
 
 const loadProducts = async (req, res) => {
   try {
-    const { search, category, brand, minPrice, maxPrice, sort, page = 1 } = req.query;
+    const { search, category, brand, minPrice, maxPrice, sort } = req.query;
+    const page = parseInt(req.query.page) || 1;
     const limit = 12;
 
     let query = { isListed: true };
-    if (search) {
-      query.name = { $regex: search, $options: 'i' };
-    }
-    if (category) {
-      query.category = category;
-    }
-    if (brand) {
-      query.brand = brand;
-    }
+
+    if (search) query.name = { $regex: search, $options: 'i' };
+    if (category) query.category = category;
+    if (brand) query.brand = brand;
+
     if (minPrice || maxPrice) {
       query.salePrice = {};
       if (minPrice) query.salePrice.$gte = parseFloat(minPrice);
@@ -611,12 +608,10 @@ const loadProducts = async (req, res) => {
 
     const categories = await Category.find({ isListed: true });
     const brands = await Brand.find({ isListed: true });
+
     let user = null;
     if (req.session.user && req.session.user._id) {
       user = await User.findById(req.session.user._id);
-      console.log('Session userId in loadProducts:', req.session.user._id);
-    } else {
-      console.log('No valid session userId in loadProducts');
     }
 
     let wishlist = [];
@@ -625,29 +620,34 @@ const loadProducts = async (req, res) => {
         path: 'products.productId',
         match: { isListed: true, status: 'available' }
       });
+
       wishlist = wishlistDoc
         ? wishlistDoc.products
-          .filter(item => item.productId)
-          .map(item => item.productId._id.toString())
+            .filter(item => item.productId)
+            .map(item => item.productId._id.toString())
         : [];
-      console.log('Wishlist product IDs in loadProducts:', wishlist);
     }
 
     const totalProducts = await Product.countDocuments(query);
+
     let products = await Product.find(query)
       .sort(sortOption)
       .skip((page - 1) * limit)
       .limit(limit)
       .populate('brand')
       .populate('category');
-    products = products.filter(p => p.brand?.isListed && p.category?.isListed && p.isListed && p.status === 'available');
+
+    // Filter invalid listings
+    products = products.filter(
+      p => p.brand?.isListed && p.category?.isListed && p.isListed && p.status === 'available'
+    );
 
     let cartCount = 0;
     if (user) {
       const cart = await Cart.findOne({ user: user._id }).populate('items.product');
       if (cart) {
         cartCount = cart.items.reduce((sum, item) => {
-          if (item.product && item.product.isListed && item.product.status === 'available') {
+          if (item.product?.isListed && item.product.status === 'available') {
             return sum + item.quantity;
           }
           return sum;
@@ -655,9 +655,17 @@ const loadProducts = async (req, res) => {
       }
     }
 
+    // ✅ Construct query string excluding `page`
+    const queryParams = { ...req.query };
+    delete queryParams.page;
+    const queryString = Object.entries(queryParams)
+      .map(([key, value]) => `${key}=${encodeURIComponent(value)}`)
+      .join('&');
+
     return res.render('user/products', {
       user,
       cartCount,
+      currentPage: page,
       products,
       categories,
       brands,
@@ -668,9 +676,9 @@ const loadProducts = async (req, res) => {
       minPrice: minPrice || '',
       maxPrice: maxPrice || '',
       sort: sort || '',
-      currentPage: parseInt(page),
       totalPages: Math.ceil(totalProducts / limit),
-      hasMore: parseInt(page) * limit < totalProducts
+      hasMore: page * limit < totalProducts,
+      queryString
     });
   } catch (error) {
     console.error('Error loading products page:', error);
@@ -846,6 +854,7 @@ const loadRefferal = async (req, res) => {
 
     console.log('Rendering referral.ejs');
     res.render('user/referralCode', {
+      currentPage : 'referral',
       user,
       referralCode: user.referralCode || 'N/A',
     });

@@ -49,6 +49,7 @@ const loadWallet = async (req, res) => {
 
         res.render('user/wallet', {
             user,
+            currentPage:'wallet',
             wallet: {
                 ...wallet.toObject(),
                 transactions: paginatedTransactions
@@ -147,6 +148,8 @@ const loadnewpassword = async (req, res) => {
             return res.status(401).render('user/login', { message: 'User not found or blocked' });
         }
         res.render("user/newpassword", {
+            currentPage: 'changepassword',
+            error:null,
             user,
             currentpage: "changepassword"
         });

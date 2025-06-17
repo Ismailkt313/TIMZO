@@ -280,7 +280,7 @@ const generateSalesReportExcel = async (req, res) => {
         worksheet.addRow(['Total Discount', `₹${report.totalDiscount.toFixed(2)}`]);
         worksheet.addRow();
 
-        const headerRow = worksheet.addRow(['Order ID', 'User', 'Date', 'Items', 'Subtotal', 'AmountDiscount', 'Total', 'Status']);
+        const headerRow = worksheet.addRow(['Order ID', 'User', 'Date', 'Items', 'Subtotal', 'Discount', 'Total', 'Status']);
 
         headerRow.font = { bold: true, size: 10 };
 
@@ -309,14 +309,15 @@ const generateSalesReportExcel = async (req, res) => {
             ]);
         });
 
-        worksheet.columns.forEach((column, index) => {
-            let maxLength = 0;
+        worksheet.columns.forEach((column) => {
+            let maxLength = 10;
             column.eachCell({ includeEmpty: true }, (cell) => {
                 const columnLength = cell.value ? cell.value.toString().length : 10;
                 maxLength = Math.max(maxLength, columnLength);
             });
-            column.width = Math.min(maxLength + 40, 2);
+            column.width = Math.min(maxLength + 5, 50); 
         });
+        
 
         const filename = `Sales_Report_${reportType}_${new Date().toISOString().split('T')[0]}.xlsx`;
 

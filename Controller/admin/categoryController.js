@@ -289,19 +289,28 @@ const permanentlyDeleteCategory = async (req, res) => {
         res.status(500).json({ success: false, message: 'Failed to permanently delete category' });
     }
 };
-
 const loadeditcategory = async (req, res) => {
     try {
         const id = req.params.id;
         const page = parseInt(req.query.page) || 1;
         const limit = 10;
         const skip = (page - 1) * limit;
-        const showDeleted = req.query.showDeleted === 'true';
+        const search = req.query.search || '';
 
+        // Find the specific category to edit
+        const category = await Category.findById(id);
+        
+        if (!category) {
+            return res.redirect('/error404');
+        }
+
+        // Query for category list
         const query = {};
-        query.isDeleted = showDeleted;
+        if (search) {
+            query.name = { $regex: search, $options: 'i' };
+        }
 
-        let categories = await Category.find(query)
+        const categories = await Category.find(query)
             .sort({ createdAt: -1 })
             .skip(skip)
             .limit(limit);
@@ -309,16 +318,14 @@ const loadeditcategory = async (req, res) => {
         const totalcategories = await Category.countDocuments(query);
         const totalPages = Math.ceil(totalcategories / limit);
 
-        if (!categories) {
-            return res.redirect('/error404');
-        }
-
         res.render("Admin/editcategory", {
+            category, // Pass the specific category for prefilling
+            categories,
             currentPage: page,
             totalPages,
-            search:req.query.search || '',
-            categories,
-            error: null
+            search,
+            error: null,
+            admin: req.session.admin // Assuming admin data is stored in session
         });
     } catch (error) {
         console.error(error);
@@ -328,54 +335,47 @@ const loadeditcategory = async (req, res) => {
 const editcategory = async (req, res) => {
     try {
         const id = req.params.id;
-        const { categoryName, description } = req.body;
+        const { name, description } = req.body;
+
+        console.log('hey',req.body)
 
         if (!mongoose.Types.ObjectId.isValid(id)) {
-            return res.status(400).render('Admin/editcategory', {
-                category: { _id: id, name: categoryName, description },
-                error: "Invalid category ID"
-            });
+            return res.status(400).json({ error: "Invalid category ID" });
         }
+
+        if (!name || typeof name !== 'string') {
+            return res.status(400).json({ error: "Category name is required" });
+        }
+
+        const trimmedName = name.trim();
 
         const category = await Category.findById(id);
         if (!category || category.isDeleted) {
-            return res.status(404).render('Admin/editcategory', {
-                category: { _id: id, name: categoryName, description },
-                error: "Category not found or has been deleted"
-            });
+            return res.status(404).json({ error: "Category not found or has been deleted" });
         }
 
         const existingCategory = await Category.findOne({
-            name: { $regex: new RegExp(`^${categoryName.trim()}$`, 'i') },
+            name: { $regex: new RegExp(`^${trimmedName}$`, 'i') },
             isDeleted: false,
             _id: { $ne: category._id }
         });
 
         if (existingCategory) {
-            return res.status(400).render('Admin/editcategory', {
-                category: { _id: id, name: categoryName, description },
-                error: "Category name already exists, please choose another one"
-            });
+            return res.status(400).json({ error: "Category name already exists, please choose another one" });
         }
 
-        category.name = categoryName.trim();
+        category.name = trimmedName;
         category.description = description?.trim() || "";
         await category.save();
 
-        return res.redirect('/admin/categories');
+        return res.status(200).json({ message: "Category updated successfully" });
 
     } catch (error) {
         console.error('🔴 Internal Server Error:', error);
-        return res.status(500).render('Admin/editcategory', {
-            category: {
-                _id: req.params.id,
-                name: req.body.categoryName,
-                description: req.body.description
-            },
-            error: "Internal server error"
-        });
+        return res.status(500).json({ error: "Internal server error" });
     }
 };
+
 
 module.exports = {
     loadcategories,

@@ -96,10 +96,13 @@ const loadOrders = async (req, res) => {
       };
 
     });
+    const page = parseInt(req.query.page) || 1;
+
 
     res.render("user/myOrder", {
       user,
       orders,
+      currentPage:'orders',
     });
   } catch (error) {
     console.error("Error loading orders:", error);

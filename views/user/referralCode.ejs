@@ -1,130 +1,367 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Your Referral Code - Timzo</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body {
-            background: linear-gradient(135deg, #f0f4f8, #d9e2ec);
-            font-family: 'Poppins', sans-serif;
-            margin: 0;
-            overflow-x: hidden;
-        }
-
-        .referral-section {
-            max-width: 1200px;
-            margin: auto;
-            padding: 20px;
-        }
-
-        .referral-card {
-            background: #ffffff;
-            border-radius: 20px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
-            padding: 30px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .referral-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 4px;
-            background: linear-gradient(90deg, #28a745, #34c759);
-        }
-
-        .referral-code-box {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 10px;
-            text-align: center;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-            margin-bottom: 20px;
-        }
-
-        .referral-code-box h3 {
-            font-size: 1.1rem;
-            color: #6c757d;
-            margin-bottom: 10px;
-        }
-
-        .referral-code-box p {
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: #212529;
-            letter-spacing: 2px;
-        }
-
-        .share-button {
-            background: linear-gradient(90deg, #25D366, #128C7E);
-            color: #ffffff;
-            padding: 10px 20px;
-            border-radius: 50px;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            text-decoration: none;
-        }
-
-        .share-button:hover {
-            background: linear-gradient(90deg, #128C7E, #25D366);
-        }
-
-        @media (max-width: 767px) {
-            .referral-section {
-                padding: 15px;
-            }
-
-            .referral-code-box p {
-                font-size: 1.2rem;
-            }
-
-            .share-button {
-                padding: 8px 16px;
-                font-size: 0.9rem;
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your Referral Code - Timzo</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@600&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/x-icon" href="/images/TIMZO.jpg">
+  <link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f4f4f9;
+    }
+    h1, h2, h3 {
+      font-family: 'Poppins', sans-serif;
+    }
+    .sidebar {
+      background: linear-gradient(180deg, #1f2937 0%, #111827 100%);
+      width: 250px;
+      transition: transform 0.3s ease-in-out;
+      z-index: 1000;
+      transform: translateX(-100%);
+    }
+    .sidebar-active {
+      transform: translateX(0);
+    }
+    .overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 999;
+    }
+    .overlay-active {
+      display: block;
+    }
+    .main-content {
+      transition: margin-left 0.3s ease-in-out;
+      padding: 1.5rem;
+    }
+    .referral-card {
+      background-color: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      padding: 2rem;
+      max-width: 600px;
+      margin: 0 auto;
+      position: relative;
+      overflow: hidden;
+    }
+    .referral-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: linear-gradient(90deg, #28a745, #34c759);
+    }
+    .referral-code-box {
+      background: #f8f9fa;
+      padding: 1rem;
+      border-radius: 8px;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      margin-bottom: 1.5rem;
+    }
+    .referral-code {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #1f2937;
+      letter-spacing: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+    .btn-primary {
+      background-color: #1f2937;
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      transition: all 0.3s;
+      font-weight: 500;
+    }
+    .btn-primary:hover:not(:disabled) {
+      background-color: #facc15;
+      color: #1f2937;
+    }
+    .btn-share {
+      background: linear-gradient(90deg, #25D366, #128C7E);
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 9999px;
+      font-weight: 500;
+      transition: all 0.3s;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .btn-share:hover {
+      background: linear-gradient(90deg, #128C7E, #25D366);
+    }
+    .btn-share.email {
+      background: linear-gradient(90deg, #4285F4, #34A853);
+    }
+    .btn-share.email:hover {
+      background: linear-gradient(90deg, #34A853, #4285F4);
+    }
+    .btn-share.twitter {
+      background: linear-gradient(90deg, #1DA1F2, #0A85D6);
+    }
+    .btn-share.twitter:hover {
+      background: linear-gradient(90deg, #0A85D6, #1DA1F2);
+    }
+    .section-title::after {
+      content: '';
+      width: 60px;
+      height: 4px;
+      background: #facc15;
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+    .tooltip {
+      position: relative;
+    }
+    .tooltip:hover::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      top: -2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #374151;
+      color: #fff;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      white-space: nowrap;
+      z-index: 10;
+    }
+    .sidebar-toggle {
+      z-index: 1001;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: #1f2937;
+      color: white;
+      position: fixed;
+      top: 1rem;
+      left: 1rem;
+    }
+    @media (min-width: 769px) {
+      .sidebar {
+        transform: translateX(0);
+      }
+      .main-content {
+        margin-left: 250px;
+      }
+      .sidebar-toggle, .overlay {
+        display: none !important;
+      }
+    }
+    @media (max-width: 768px) {
+      .main-content {
+        padding: 1rem;
+      }
+      .referral-card {
+        padding: 1.5rem;
+      }
+      .referral-code {
+        font-size: 1.25rem;
+      }
+      .btn-primary, .btn-share {
+        font-size: 0.875rem;
+        padding: 0.5rem 0.75rem;
+      }
+      .share-buttons {
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+    }
+    @media (max-width: 576px) {
+      .main-content {
+        padding: 0.75rem;
+      }
+      .referral-card {
+        padding: 1rem;
+      }
+      .section-title {
+        font-size: 1.5rem;
+      }
+      .referral-code-box {
+        padding: 0.75rem;
+      }
+      .referral-code {
+        font-size: 1rem;
+        letter-spacing: 1px;
+      }
+      .btn-primary, .btn-share {
+        font-size: 0.75rem;
+        padding: 0.5rem 0.75rem;
+      }
+    }
+  </style>
 </head>
-
 <body>
-    <div class="container-fluid min-h-screen flex">
-        <%- include('../Partials/user/userSidebar', { user: user || {}, currentPage : 'referral' }) %>
-
-            <div class="flex-1 p-6 mt-16">
-                <div class="referral-section">
-                    <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">Your Referral Code</h1>
-                    <div class="referral-card">
-                        <div class="referral-code-box">
-                            <h3>Your Referral Code</h3>
-                            <p>
-                                <%= referralCode %>
-                            </p>
-                        </div>
-                        <div class="text-center">
-                            <a href="https://wa.me/?text=Join%20Timzo%20and%20get%20exclusive%20discounts%20using%20my%20referral%20code:%20<%= referralCode %>%20%F0%9F%8E%89%20Visit%20Timzo%20to%20shop%20now!"
-                                target="_blank" class="share-button">
-                                <i class="fab fa-whatsapp"></i> Share via WhatsApp
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
+  <div class="flex min-h-screen">
+    <!-- Sidebar -->
+    <div id="sidebar" class="sidebar w-64 fixed top-0 left-0 h-full shadow-xl flex flex-col">
+      <div class="p-6 text-xl font-semibold border-b border-gray-700 text-center text-white">
+        <% if (user && user.fullname) { %>
+          <%= user.fullname %>
+        <% } else { %>
+          Guest
+        <% } %>
+      </div>
+      <div class="flex justify-center items-center py-5 border-b border-gray-700">
+        <div class="w-16 h-16 bg-gray-600 rounded-full flex items-center justify-center text-2xl font-bold uppercase text-white">
+          <% if (user && user.fullname) { %>
+            <%= user.fullname.charAt(0) %>
+          <% } else { %>
+            ?
+          <% } %>
+        </div>
+      </div>
+      <nav class="flex-1 px-4 py-6 space-y-3 text-sm font-medium text-white">
+        <a href="/user/account" class="flex items-center gap-3 px-4 py-2 rounded-md transition-all duration-200 <%= currentPage === 'profile' ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white' %>">
+          <i class="fas fa-user w-4"></i> My Profile
+        </a>
+        <a href="/user/address" class="flex items-center gap-3 px-4 py-2 rounded-md transition-all duration-200 <%= currentPage === 'address' ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white' %>">
+          <i class="fas fa-map-marker-alt w-4"></i> My Address
+        </a>
+        <a href="/user/orders" class="flex items-center gap-3 px-4 py-2 rounded-md transition-all duration-200 <%= currentPage === 'orders' ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white' %>">
+          <i class="fas fa-shopping-bag w-4"></i> My Orders
+        </a>
+        <a href="/user/wallet" class="flex items-center gap-3 px-4 py-2 rounded-md transition-all duration-200 <%= currentPage === 'wallet' ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white' %>">
+          <i class="fas fa-wallet w-4"></i> My Wallet
+        </a>
+        <a href="/user/newPassword" class="flex items-center gap-3 px-4 py-2 rounded-md transition-all duration-200 <%= currentPage === 'changepassword' ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white' %>">
+          <i class="fas fa-lock w-4"></i> Change Password
+        </a>
+        <a href="/user/sidewishlist" class="flex items-center gap-3 px-4 py-2 rounded-md transition-all duration-200 <%= currentPage === 'Wishlist' ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white' %>">
+          <i class="fas fa-heart w-4"></i> Wishlist
+        </a>
+        <a href="/user/coupons" class="flex items-center gap-3 px-4 py-2 rounded-md transition-all duration-200 <%= currentPage === 'coupons' ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white' %>">
+          <i class="fas fa-ticket-alt w-4"></i> My Coupon
+        </a>
+        <a href="/user/referral" class="flex items-center gap-3 px-4 py-2 rounded-md transition-all duration-200 <%= currentPage === 'referral' ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white' %>">
+          <i class="fas fa-users w-4"></i> Refer & Earn
+        </a>
+        <a href="/user/" class="flex items-center gap-3 px-4 py-2 rounded-md transition-all duration-200 text-gray-300 hover:bg-gray-800 hover:text-white">
+          <i class="fas fa-home w-4"></i> Home
+        </a>
+        <a href="/logout" class="flex items-center gap-3 px-4 py-2 rounded-md transition-all duration-200 text-red-400 hover:bg-red-500 hover:text-white">
+          <i class="fas fa-sign-out-alt w-4"></i> Log Out
+        </a>
+      </nav>
     </div>
 
-    <footer class="bg-white p-4 text-center text-gray-600 text-sm shadow-inner mt-6">
-        © <%= new Date().getFullYear() %> Timzo. All rights reserved.
-    </footer>
-</body>
+    <!-- Overlay for Mobile Sidebar -->
+    <div class="overlay" id="sidebarOverlay"></div>
 
+    <!-- Main Content -->
+    <div class="main-content flex-1">
+      <button class="sidebar-toggle md:hidden">
+        <i class="fas fa-bars text-lg"></i>
+      </button>
+      <div class="max-w-5xl mx-auto">
+        <h1 class="text-2xl md:text-3xl font-bold text-gray-800 mb-8 text-center relative section-title">Refer & Earn</h1>
+        <div class="referral-card" data-aos="fade-up">
+          <div class="referral-code-box">
+            <h3 class="text-sm text-gray-600 mb-2">Your Referral Code</h3>
+            <div class="referral-code">
+              <%= referralCode || 'N/A' %>
+              <button class="btn-primary btn-sm tooltip" onclick="copyReferralCode('<%= referralCode %>')" data-tooltip="Copy Code">
+                <i class="fas fa-copy"></i>
+              </button>
+            </div>
+          </div>
+          <div class="share-buttons flex flex-wrap justify-center gap-2">
+            <a href="https://wa.me/?text=Join%20Timzo%20and%20get%20exclusive%20discounts%20using%20my%20referral%20code:%20<%= referralCode %>%20%F0%9F%8E%89%20Visit%20Timzo%20to%20shop%20now!" target="_blank" class="btn-share text-sm">
+              <i class="fab fa-whatsapp"></i> WhatsApp
+            </a>
+            <a href="mailto:?subject=Join%20Timzo%20with%20My%20Referral%20Code&body=Hey!%20Use%20my%20referral%20code%20<%= referralCode %>%20to%20get%20exclusive%20discounts%20on%20Timzo.%20Shop%20now:%20https://timzo.com" class="btn-share email text-sm">
+              <i class="fas fa-envelope"></i> Email
+            </a>
+            <a href="https://twitter.com/intent/tweet?text=Join%20Timzo%20with%20my%20referral%20code%20<%= referralCode %>%20for%20exclusive%20discounts!%20%F0%9F%8E%89%20Shop%20now:%20https://timzo.com" target="_blank" class="btn-share twitter text-sm">
+              <i class="fab fa-twitter"></i> Twitter
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="bg-white p-4 text-center text-gray-600 text-sm mt-8 shadow-inner">
+    © <%= new Date().getFullYear() %> Timzo. All rights reserved.
+  </footer>
+
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script>
+    AOS.init({ duration: 800, once: true });
+
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('sidebarOverlay');
+      sidebar.classList.toggle('sidebar-active');
+      overlay.classList.toggle('overlay-active');
+      document.body.style.overflow = sidebar.classList.contains('sidebar-active') ? 'hidden' : '';
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const sidebarToggle = document.querySelector('.sidebar-toggle');
+      const overlay = document.getElementById('sidebarOverlay');
+      if (sidebarToggle && overlay) {
+        sidebarToggle.addEventListener('click', toggleSidebar);
+        overlay.addEventListener('click', toggleSidebar);
+      }
+    });
+
+    function copyReferralCode(code) {
+      if (!code || code === 'N/A') {
+        Swal.fire({
+          toast: true,
+          position: 'bottom-end',
+          icon: 'error',
+          title: 'No referral code available to copy.',
+          showConfirmButton: false,
+          timer: 1500
+        });
+        return;
+      }
+      navigator.clipboard.writeText(code).then(() => {
+        Swal.fire({
+          toast: true,
+          position: 'bottom-end',
+          icon: 'success',
+          title: 'Referral code copied to clipboard!',
+          showConfirmButton: false,
+          timer: 1500
+        });
+      }).catch(() => {
+        Swal.fire({
+          toast: true,
+          position: 'bottom-end',
+          icon: 'error',
+          title: 'Failed to copy referral code.',
+          showConfirmButton: false,
+          timer: 1500
+        });
+      });
+    }
+  </script>
+</body>
 </html>

@@ -21,6 +21,7 @@ const loadsidewishlist = async (req, res) => {
 
         res.render('user/sidebarWishlist', {
             wishlist: filteredProducts,
+            currentPage:"wishlist   ",
             user: req.session.user
         });
     } catch (error) {

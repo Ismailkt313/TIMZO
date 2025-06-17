@@ -13,6 +13,7 @@
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <style>
+
     body {
       font-family: 'Poppins', sans-serif;
       background-color: #f8f9fa;
@@ -132,7 +133,10 @@
       height: 1200px;
       object-fit: cover;
     }
-
+    .full{
+      background-color: #a2999e;
+      height: 100vh;
+    }
     .product-info h1 {
       font-size: 2rem;
       font-weight: 700;
@@ -409,7 +413,7 @@
 
 <body>
   <%- include('../Partials/user/navbar', { user: user, cartCount: cartCount, search: search }) %>
-
+  <div class="full">
     <div class="container">
       <nav class="breadcrumb mb-4">
         <a href="/">Home</a>
@@ -422,10 +426,8 @@
       </nav>
 
       <div class="product-details row">
-        <!-- Image Section -->
         <div class="col-lg-6 mb-4">
           <div class="image-container">
-            <!-- Sub-Images (1 to 6) -->
             <% if (product.images && product.images.length> 1) { %>
               <div class="sub-images">
                 <% product.images.slice(0, 6).forEach((img, index)=> { %>
@@ -434,7 +436,6 @@
                   <% }); %>
               </div>
               <% } %>
-                <!-- Main Image -->
                 <div class="main-image-wrapper">
                   <img
                     src="<%= product.images && product.images.length > 0 ? product.images[0] : '/images/default-watch.jpg' %>"
@@ -714,347 +715,364 @@
               <div class="toast-body"></div>
             </div>
           </div>
-
+  </div>
 
           <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
           <script>
             const toastEl = document.getElementById('toast');
             const toast = new bootstrap.Toast(toastEl);
             let quantity = 1;
-
-            const initialWishlist = <% - JSON.stringify(wishlist) %>;
-
+        
+            const initialWishlist = <%- JSON.stringify(wishlist) %>;
+        
+            // Image handling functions
             function changeMainImage(element) {
-              const mainImage = document.getElementById('mainImage');
-              const zoomImage = document.getElementById('zoomImage');
-              mainImage.src = element.src;
-              zoomImage.src = element.src;
-              document.querySelectorAll('.sub-image').forEach(img => img.classList.remove('active'));
-              element.classList.add('active');
+                const mainImage = document.getElementById('mainImage');
+                const zoomImage = document.getElementById('zoomImage');
+                mainImage.src = element.src;
+                zoomImage.src = element.src;
+                document.querySelectorAll('.sub-image').forEach(img => img.classList.remove('active'));
+                element.classList.add('active');
             }
-
+        
+            // Quantity control
             function updateQuantity(change) {
-              const input = document.getElementById('quantityInput');
-              const minusBtn = document.getElementById('minusBtn');
-              const plusBtn = document.getElementById('plusBtn');
-              quantity = parseInt(input.value) + change;
-              if (quantity < 1) quantity = 1;
-              if (quantity > parseInt(input.max)) quantity = parseInt(input.max);
-              input.value = quantity;
-              minusBtn.disabled = quantity === 1;
-              plusBtn.disabled = quantity === parseInt(input.max);
+                const input = document.getElementById('quantityInput');
+                const minusBtn = document.getElementById('minusBtn');
+                const plusBtn = document.getElementById('plusBtn');
+                quantity = parseInt(input.value) + change;
+                if (quantity < 1) quantity = 1;
+                if (quantity > parseInt(input.max)) quantity = parseInt(input.max);
+                input.value = quantity;
+                minusBtn.disabled = quantity === 1;
+                plusBtn.disabled = quantity === parseInt(input.max);
             }
-
+        
+            // Cart functions
             async function addToCart(productId) {
-              const isLoggedIn = <%= user ? 'true' : 'false' %>;
-              if (!isLoggedIn) {
-                Swal.fire({
-                  icon: 'warning',
-                  title: 'Please Log In',
-                  text: 'You need to be logged in to add items to your cart.',
-                  confirmButtonText: 'Log In',
-                }).then(result => {
-                  if (result.isConfirmed) window.location.href = '/login';
-                });
-                return;
-              }
-
-              try {
-                const response = await fetch('/user/add-to-cart', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({
-                    productId,
-                    quantity: parseInt(document.getElementById('quantityInput').value),
-                  }),
-                });
-                const data = await response.json();
-                toastEl.querySelector('.toast-body').textContent = data.message || (data.success ? 'Product added to cart' : 'Failed to add item to cart');
-                toast.show();
-                if (data.success) {
-                  const cartCountElement = document.querySelector('.cart-count');
-                  if (cartCountElement) {
-                    cartCountElement.textContent = data.cartCount || (parseInt(cartCountElement.textContent) + parseInt(document.getElementById('quantityInput').value));
-                  }
-                }
-              } catch (error) {
-                console.error('Error:', error);
-                toastEl.querySelector('.toast-body').textContent = 'An error occurred while adding item to cart';
-                toast.show();
-              }
-            }
-
-            async function syncWishlist() {
-              const isLoggedIn = <%= user ? 'true' : 'false' %>;
-              if (!isLoggedIn) return;
-
-              try {
-                const response = await fetch('/user/wishlist', {
-                  method: 'GET',
-                  headers: { 'Content-Type': 'application/json' },
-                });
-                const data = await response.json();
-                if (data.success && data.wishlist) {
-                  const wishlist = data.wishlist.map(item => item.productId._id.toString());
-                  document.querySelectorAll('.wishlist-btn').forEach(button => {
-                    const productId = button.getAttribute('data-product-id');
-                    const isInWishlist = wishlist.includes(productId);
-                    button.classList.toggle('active', isInWishlist);
-                    const icon = button.querySelector('i');
-                    icon.classList.toggle('far', !isInWishlist);
-                    icon.classList.toggle('fas', isInWishlist);
-                  });
-                }
-              } catch (error) {
-                console.error('Error syncing wishlist:', error);
-              }
-            }
-
-            document.querySelectorAll('.wishlist-btn').forEach(button => {
-              button.addEventListener('click', async (e) => {
-                e.stopPropagation();
-                const productId = button.getAttribute('data-product-id');
-                const isLoggedIn = "<%= user ? 'true' : 'false' %>" === "true";
-
+                const isLoggedIn = <%= user ? 'true' : 'false' %>;
                 if (!isLoggedIn) {
-                  Swal.fire({
-                    icon: 'warning',
-                    title: 'Please Log In',
-                    text: 'You need to be logged in to add items to your wishlist.',
-                    confirmButtonText: 'Log In',
-                  }).then(result => {
-                    if (result.isConfirmed) window.location.href = '/login';
-                  });
-                  return;
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Please Log In',
+                        text: 'You need to be logged in to add items to your cart.',
+                        confirmButtonText: 'Log In',
+                    }).then(result => {
+                        if (result.isConfirmed) window.location.href = '/login';
+                    });
+                    return;
                 }
-
+        
                 try {
-                  const isInWishlist = button.classList.contains('active');
-                  const endpoint = isInWishlist ? '/user/remove-from-wishlist' : '/user/wishlist/add';
-                  const response = await fetch(endpoint, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ productId }),
-                  });
-
-                  const data = await response.json();
-                  toastEl.querySelector('.toast-body').textContent = data.message || (isInWishlist ? 'Removed from Wishlist' : 'Added to Wishlist');
-                  toast.show();
-                  if (data.success) {
-                    button.classList.toggle('active');
-                    button.querySelector('i').classList.toggle('far');
-                    button.querySelector('i').classList.toggle('fas');
-                  }
+                    const response = await fetch('/user/add-to-cart', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        credentials: 'include',
+                        body: JSON.stringify({
+                            productId,
+                            quantity: parseInt(document.getElementById('quantityInput').value),
+                        }),
+                    });
+                    
+                    const data = await response.json();
+                    if (!response.ok) throw new Error(data.message || 'Failed to add to cart');
+                    
+                    toastEl.querySelector('.toast-body').textContent = data.message || 'Product added to cart';
+                    toast.show();
+                    
+                    if (data.cartCount) {
+                        const cartCountElement = document.querySelector('.cart-count');
+                        if (cartCountElement) {
+                            cartCountElement.textContent = data.cartCount;
+                        }
+                    }
                 } catch (error) {
-                  console.error('Error updating wishlist:', error);
-                  toastEl.querySelector('.toast-body').textContent = 'An error occurred while updating wishlist';
-                  toast.show();
+                    console.error('Error:', error);
+                    toastEl.querySelector('.toast-body').textContent = error.message || 'An error occurred while adding item to cart';
+                    toast.show();
                 }
-              });
+            }
+        
+            // Wishlist functions
+            async function syncWishlist() {
+                const isLoggedIn = <%= user ? 'true' : 'false' %>;
+                if (!isLoggedIn) return;
+        
+                try {
+                    const response = await fetch('/user/wishlist', {
+                        method: 'GET',
+                        headers: { 'Content-Type': 'application/json' },
+                        credentials: 'include',
+                    });
+                    
+                    const data = await response.json();
+                    if (!response.ok) throw new Error(data.message || 'Failed to load wishlist');
+                    
+                    if (data.wishlist) {
+                        const wishlistItems = data.wishlist.map(item => item.productId?._id?.toString());
+                        document.querySelectorAll('.wishlist-btn').forEach(button => {
+                            const productId = button.getAttribute('data-product-id');
+                            const isInWishlist = wishlistItems.includes(productId);
+                            button.classList.toggle('active', isInWishlist);
+                            const icon = button.querySelector('i');
+                            icon.classList.toggle('far', !isInWishlist);
+                            icon.classList.toggle('fas', isInWishlist);
+                        });
+                    }
+                } catch (error) {
+                    console.error('Wishlist sync error:', error);
+                }
+            }
+        
+            // Initialize wishlist buttons
+            document.querySelectorAll('.wishlist-btn').forEach(button => {
+                button.addEventListener('click', async (e) => {
+                    e.stopPropagation();
+                    const productId = button.getAttribute('data-product-id');
+                    const isLoggedIn = <%= user ? 'true' : 'false' %>;
+        
+                    if (!isLoggedIn) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Please Log In',
+                            text: 'You need to be logged in to modify your wishlist.',
+                            confirmButtonText: 'Log In',
+                        }).then(result => {
+                            if (result.isConfirmed) window.location.href = '/login';
+                        });
+                        return;
+                    }
+        
+                    try {
+                        const isInWishlist = button.classList.contains('active');
+                        const endpoint = isInWishlist ? '/user/remove-from-wishlist' : '/user/wishlist/add';
+                        
+                        const response = await fetch(endpoint, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            credentials: 'include',
+                            body: JSON.stringify({ productId }),
+                        });
+                        
+                        const data = await response.json();
+                        if (!response.ok) throw new Error(data.message || 'Wishlist update failed');
+                        
+                        toastEl.querySelector('.toast-body').textContent = 
+                            data.message || (isInWishlist ? 'Removed from wishlist' : 'Added to wishlist');
+                        toast.show();
+                        
+                        button.classList.toggle('active');
+                        const icon = button.querySelector('i');
+                        icon.classList.toggle('far');
+                        icon.classList.toggle('fas');
+                    } catch (error) {
+                        console.error('Wishlist error:', error);
+                        toastEl.querySelector('.toast-body').textContent = error.message || 'Wishlist operation failed';
+                        toast.show();
+                    }
+                });
             });
-
-            window.addEventListener('load', syncWishlist);
-
+        
+            // Image zoom functionality
             const mainImage = document.getElementById('mainImage');
             const zoomLens = document.getElementById('zoomLens');
             const zoomResult = document.getElementById('zoomResult');
             const zoomImage = document.getElementById('zoomImage');
-
+        
             function initializeZoom() {
-              if (window.innerWidth <= 767) return;
-
-              mainImage.addEventListener('mouseenter', () => {
-                zoomLens.style.display = 'block';
-                zoomResult.style.display = 'block';
-              });
-
-              mainImage.addEventListener('mouseleave', () => {
-                zoomLens.style.display = 'none';
-                zoomResult.style.display = 'none';
-              });
-
-              mainImage.addEventListener('mousemove', (e) => {
-                const rect = mainImage.getBoundingClientRect();
-                const lensWidth = zoomLens.offsetWidth;
-                const lensHeight = zoomLens.offsetHeight;
-
-                let x = e.clientX - rect.left - lensWidth / 2;
-                let y = e.clientY - rect.top - lensHeight / 2;
-
-                x = Math.max(0, Math.min(x, rect.width - lensWidth));
-                y = Math.max(0, Math.min(y, rect.height - lensHeight));
-
-                zoomLens.style.left = x + 'px';
-                zoomLens.style.top = y + 'px';
-
-                const ratioX = zoomImage.offsetWidth / rect.width;
-                const ratioY = zoomImage.offsetHeight / rect.height;
-                zoomImage.style.left = -(x * ratioX) + 'px';
-                zoomImage.style.top = -(y * ratioY) + 'px';
-              });
+                if (window.innerWidth <= 767) return;
+        
+                mainImage.addEventListener('mouseenter', () => {
+                    zoomLens.style.display = 'block';
+                    zoomResult.style.display = 'block';
+                });
+        
+                mainImage.addEventListener('mouseleave', () => {
+                    zoomLens.style.display = 'none';
+                    zoomResult.style.display = 'none';
+                });
+        
+                mainImage.addEventListener('mousemove', (e) => {
+                    const rect = mainImage.getBoundingClientRect();
+                    const lensWidth = zoomLens.offsetWidth;
+                    const lensHeight = zoomLens.offsetHeight;
+        
+                    let x = e.clientX - rect.left - lensWidth / 2;
+                    let y = e.clientY - rect.top - lensHeight / 2;
+        
+                    x = Math.max(0, Math.min(x, rect.width - lensWidth));
+                    y = Math.max(0, Math.min(y, rect.height - lensHeight));
+        
+                    zoomLens.style.left = `${x}px`;
+                    zoomLens.style.top = `${y}px`;
+        
+                    const ratioX = zoomImage.offsetWidth / rect.width;
+                    const ratioY = zoomImage.offsetHeight / rect.height;
+                    zoomImage.style.left = `${-(x * ratioX)}px`;
+                    zoomImage.style.top = `${-(y * ratioY)}px`;
+                });
             }
-
-            initializeZoom();
-
-            window.addEventListener('resize', () => {
-              if (window.innerWidth <= 767) {
-                zoomLens.style.display = 'none';
-                zoomResult.style.display = 'none';
-              } else {
+        
+            if (mainImage && zoomLens && zoomResult && zoomImage) {
                 initializeZoom();
-              }
-            });
-
+                window.addEventListener('resize', () => {
+                    if (window.innerWidth <= 767) {
+                        zoomLens.style.display = 'none';
+                        zoomResult.style.display = 'none';
+                    } else {
+                        initializeZoom();
+                    }
+                });
+            }
+        
+            // Review modal functions
             function openReviewModal(reviewId = '', rating = 0, comment = '') {
-              const modal = document.getElementById('reviewModal');
-              const form = document.getElementById('reviewForm');
-              const title = document.getElementById('reviewModalTitle');
-              const reviewIdInput = document.getElementById('reviewId');
-              const ratingInput = document.getElementById('reviewRating');
-              const commentInput = document.getElementById('reviewComment');
-              const stars = document.querySelectorAll('.star-rating i');
-
-              reviewIdInput.value = reviewId;
-              title.textContent = reviewId ? 'Edit Review' : 'Write a Review';
-              ratingInput.value = rating;
-              commentInput.value = comment;
-
-              stars.forEach(star => {
-                const value = parseInt(star.getAttribute('data-value'));
-                star.classList.toggle('active', value <= rating);
-              });
-
-              modal.classList.add('active');
-            }
-
-            function closeReviewModal() {
-              const modal = document.getElementById('reviewModal');
-              modal.classList.remove('active');
-              document.getElementById('reviewForm').reset();
-              document.querySelectorAll('.star-rating i').forEach(star => star.classList.remove('active'));
-              document.getElementById('reviewId').value = '';
-            }
-
-            document.querySelectorAll('.star-rating i').forEach(star => {
-              star.addEventListener('click', () => {
-                const rating = parseInt(star.getAttribute('data-value'));
-                document.getElementById('reviewRating').value = rating;
+                const modal = document.getElementById('reviewModal');
+                const title = document.getElementById('reviewModalTitle');
+                const reviewIdInput = document.getElementById('reviewId');
+                const ratingInput = document.getElementById('reviewRating');
+                const commentInput = document.getElementById('reviewComment');
                 const stars = document.querySelectorAll('.star-rating i');
-                stars.forEach(s => {
-                  s.classList.toggle('active', parseInt(s.getAttribute('data-value')) <= rating);
+        
+                reviewIdInput.value = reviewId;
+                title.textContent = reviewId ? 'Edit Review' : 'Write a Review';
+                ratingInput.value = rating;
+                commentInput.value = comment;
+        
+                stars.forEach(star => {
+                    const value = parseInt(star.getAttribute('data-value'));
+                    star.classList.toggle('active', value <= rating);
                 });
-              });
-            });
-
-            document.getElementById('reviewForm').addEventListener('submit', async (e) => {
-              e.preventDefault();
-
-              const reviewId = document.getElementById('reviewId').value;
-              const rating = parseInt(document.getElementById('reviewRating').value);
-              const comment = document.getElementById('reviewComment').value.trim();
-
-              if (!rating || rating < 1 || rating > 5) {
-                Swal.fire('Error', 'Please select a rating between 1 and 5 stars', 'error');
-                return;
-              }
-
-              if (comment.length < 5 || comment.length > 500) {
-                Swal.fire('Error', 'Review must be between 5 and 500 characters', 'error');
-                return;
-              }
-
-              try {
-                Swal.fire({
-                  title: 'Submitting...',
-                  allowOutsideClick: false,
-                  didOpen: () => Swal.showLoading(),
-                });
-
-                const endpoint = reviewId ? `/user/reviews/${reviewId}` : '/user/reviews';
-                const method = reviewId ? 'PUT' : 'POST';
-                const body = reviewId
-                  ? { rating, comment }
-                  : {
-                    orderId: "<%= product.orders && product.orders.length > 0 ? product.orders[0]._id : '' %>",
-                    productId: '<%= product._id %>',
-                    rating,
-                    comment,
-                  };
-
-                const response = await fetch(endpoint, {
-                  method,
-                  headers: { 'Content-Type': 'application/json' },
-                  credentials: 'include',
-                  body: JSON.stringify(body),
-                });
-
-                const data = await response.json();
-
-                if (data.success) {
-                  Swal.fire({
-                    title: reviewId ? 'Review Updated' : 'Review Submitted',
-                    text: data.message,
-                    icon: 'success',
-                    timer: 1500,
-                    showConfirmButton: false,
-                  });
-                  closeReviewModal();
-                  setTimeout(() => window.location.reload(), 1500);
-                } else {
-                  Swal.fire('Error', data.message || 'Failed to submit review', 'error');
-                }
-              } catch (error) {
-                console.error('Error submitting review:', error);
-                Swal.fire('Error', 'Failed to submit review. Please try again.', 'error');
-              }
-            });
-
-            async function deleteReview(reviewId) {
-              const result = await Swal.fire({
-                title: 'Delete Review',
-                text: 'Are you sure you want to delete this review?',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Yes, Delete',
-                cancelButtonText: 'Cancel',
-              });
-
-              if (result.isConfirmed) {
-                try {
-                  Swal.fire({
-                    title: 'Deleting...',
-                    allowOutsideClick: false,
-                    didOpen: () => Swal.showLoading(),
-                  });
-
-                  const response = await fetch(`/user/reviews/${reviewId}`, {
-                    method: 'DELETE',
-                    headers: { 'Content-Type': 'application/json' },
-                    credentials: 'include',
-                  });
-
-                  const data = await response.json();
-
-                  if (data.success) {
-                    Swal.fire({
-                      title: 'Deleted',
-                      text: data.message,
-                      icon: 'success',
-                      timer: 1500,
-                      showConfirmButton: false,
-                    });
-                    setTimeout(() => window.location.reload(), 1500);
-                  } else {
-                    Swal.fire('Error', data.message || 'Failed to delete review', 'error');
-                  }
-                } catch (error) {
-                  console.error('Error deleting review:', error);
-                  Swal.fire('Error', 'Failed to delete review. Please try again.', 'error');
-                }
-              }
+        
+                modal.classList.add('active');
             }
-          </script>
-
+        
+            function closeReviewModal() {
+                document.getElementById('reviewModal').classList.remove('active');
+                document.getElementById('reviewForm').reset();
+                document.querySelectorAll('.star-rating i').forEach(star => star.classList.remove('active'));
+                document.getElementById('reviewId').value = '';
+            }
+        
+            // Star rating interaction
+            document.querySelectorAll('.star-rating i').forEach(star => {
+                star.addEventListener('click', () => {
+                    const rating = parseInt(star.getAttribute('data-value'));
+                    document.getElementById('reviewRating').value = rating;
+                    document.querySelectorAll('.star-rating i').forEach(s => {
+                        s.classList.toggle('active', parseInt(s.getAttribute('data-value')) <= rating);
+                    });
+                });
+            });
+        
+            // Review form submission
+            document.getElementById('reviewForm')?.addEventListener('submit', async (e) => {
+                e.preventDefault();
+        
+                const reviewId = document.getElementById('reviewId').value;
+                const rating = parseInt(document.getElementById('reviewRating').value);
+                const comment = document.getElementById('reviewComment').value.trim();
+        
+                if (!rating || rating < 1 || rating > 5) {
+                    Swal.fire('Error', 'Please select a rating between 1 and 5 stars', 'error');
+                    return;
+                }
+        
+                if (comment.length < 5 || comment.length > 500) {
+                    Swal.fire('Error', 'Review must be between 5 and 500 characters', 'error');
+                    return;
+                }
+        
+                try {
+                    Swal.fire({
+                        title: 'Processing...',
+                        allowOutsideClick: false,
+                        didOpen: () => Swal.showLoading(),
+                    });
+        
+                    const endpoint = reviewId ? `/user/reviews/${reviewId}` : '/user/reviews';
+                    const method = reviewId ? 'PUT' : 'POST';
+                    
+                    const response = await fetch(endpoint, {
+                        method,
+                        headers: { 'Content-Type': 'application/json' },
+                        credentials: 'include',
+                        body: JSON.stringify({
+                            productId: '<%= product._id %>',
+                            rating,
+                            comment,
+                            ...(reviewId ? {} : { orderId: '<%= product.orders?.[0]?._id || "" %>' })
+                        }),
+                    });
+        
+                    const data = await response.json();
+                    if (!response.ok) throw new Error(data.message || 'Review submission failed');
+        
+                    Swal.fire({
+                        title: 'Success',
+                        text: data.message || (reviewId ? 'Review updated' : 'Review submitted'),
+                        icon: 'success',
+                        timer: 1500,
+                        showConfirmButton: false,
+                    });
+                    
+                    closeReviewModal();
+                    setTimeout(() => window.location.reload(), 1500);
+                } catch (error) {
+                    console.error('Review error:', error);
+                    Swal.fire('Error', error.message || 'Failed to process review', 'error');
+                }
+            });
+        
+            // Review deletion
+            async function deleteReview(reviewId) {
+                const result = await Swal.fire({
+                    title: 'Confirm Deletion',
+                    text: 'Are you sure you want to delete this review?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Delete',
+                    cancelButtonText: 'Cancel',
+                });
+        
+                if (result.isConfirmed) {
+                    try {
+                        Swal.fire({
+                            title: 'Deleting...',
+                            allowOutsideClick: false,
+                            didOpen: () => Swal.showLoading(),
+                        });
+        
+                        const response = await fetch(`/user/reviews/${reviewId}`, {
+                            method: 'DELETE',
+                            headers: { 'Content-Type': 'application/json' },
+                            credentials: 'include',
+                        });
+        
+                        const data = await response.json();
+                        if (!response.ok) throw new Error(data.message || 'Deletion failed');
+        
+                        Swal.fire({
+                            title: 'Deleted',
+                            text: data.message || 'Review deleted',
+                            icon: 'success',
+                            timer: 1500,
+                            showConfirmButton: false,
+                        });
+                        
+                        setTimeout(() => window.location.reload(), 1500);
+                    } catch (error) {
+                        console.error('Deletion error:', error);
+                        Swal.fire('Error', error.message || 'Failed to delete review', 'error');
+                    }
+                }
+            }
+        
+            // Initialize everything when page loads
+            window.addEventListener('DOMContentLoaded', () => {
+                syncWishlist();
+            });
+        </script>
 </body>
 
 </html>

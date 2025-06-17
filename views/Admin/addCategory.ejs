@@ -281,9 +281,7 @@
                       <tr>
                         <th class="p-3 text-left">Name</th>
                         <th class="p-3 text-left">Description</th>
-                        <th class="p-3 text-left">Offer</th>
                         <th class="p-3 text-left">Status</th>
-                        <th class="p-3 text-left">Actions</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -292,35 +290,13 @@
                           <tr class="hover:bg-gray-50">
                             <td class="p-3"><%= category.name || 'N/A' %></td>
                             <td class="p-3"><%= category.description || '-' %></td>
-                            <td class="p-3">
-                              <%= category.offer && category.offer.percentage ? `${category.offer.percentage}%` : 'None' %>
-                            </td>
+
                             <td class="p-3">
                               <span class="status-badge status-<%= category.isListed ? 'active' : 'blocked' %>">
                                 <%= category.isListed ? 'Listed' : 'Unlisted' %>
                               </span>
                             </td>
-                            <td class="p-3">
-                              <div class="d-flex gap-2 action-buttons">
-                                <button class="btn btn-sm btn-outline-primary" onclick="openEditModal('<%= category._id %>', '<%= category.name %>', '<%= category.description %>')">
-                                  <i class="bi bi-pencil-square"></i>
-                                </button>
-                                <button class="btn btn-sm btn-outline-<%= category.isListed ? 'danger' : 'success' %> toggle-status-btn"
-                                        data-category-id="<%= category._id %>"
-                                        data-status="<%= category.isListed ? 'unlist' : 'list' %>">
-                                  <i class="bi bi-<%= category.isListed ? 'x-circle' : 'check-circle' %>"></i>
-                                </button>
-                                <% if (category.offer && category.offer.percentage) { %>
-                                  <button class="btn btn-sm btn-outline-danger" onclick="removeOffer('<%= category._id %>')">
-                                    <i class="bi bi-trash"></i>
-                                  </button>
-                                <% } else { %>
-                                  <button class="btn btn-sm btn-outline-success" onclick="addOffer('<%= category._id %>')">
-                                    <i class="bi bi-percent"></i>
-                                  </button>
-                                <% } %>
-                              </div>
-                            </td>
+                            
                           </tr>
                         <% }); %>
                       <% } else { %>

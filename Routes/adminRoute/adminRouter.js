@@ -65,9 +65,8 @@ router.delete('/coupons/delete/:id', adminAuth, couponController.deleteCoupon);
 router.get('/coupons/edit/:id', adminAuth, couponController.loadEditCouponForm);
 router.post('/coupons/edit/:id', adminAuth, couponController.editCoupon);
 router.put('/coupons/toggle-status/:id', adminAuth, couponController.toggleStatus);
-
-router.get('/sales-report', adminAuth, saleController.generateAdminSalesReport)
-router.get('/sales-report/pdf', adminAuth, saleController.generateSalesReportPDF)
-router.get('/sales-report/excel', adminAuth, saleController.generateSalesReportExcel)
+router.get('/sales-report', adminAuth, saleController.generateAdminSalesReport);
+router.get('/sales-report/download/pdf', adminAuth, saleController.generateSalesReportPDF);
+router.get('/sales-report/download/excel', adminAuth, saleController.generateSalesReportExcel);
 
 module.exports = router;

@@ -1,166 +1,428 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Available Coupons - Timzo</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
-      rel="stylesheet"
-    />
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
-    <style>
-      body {
-        background: linear-gradient(135deg, #f0f4f8, #d9e2ec);
-        font-family: "Poppins", sans-serif;
-        margin: 0;
-        overflow-x: hidden;
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Available Coupons - Timzo</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@600&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/x-icon" href="/images/TIMZO.jpg">
+  <link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f4f4f9;
+    }
+    h1, h2, h3 {
+      font-family: 'Poppins', sans-serif;
+    }
+    .sidebar {
+      background: linear-gradient(180deg, #1f2937 0%, #111827 100%);
+      width: 250px;
+      transition: transform 0.3s ease-in-out;
+      z-index: 1000;
+      transform: translateX(-100%);
+    }
+    .sidebar-active {
+      transform: translateX(0);
+    }
+    .overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 999;
+    }
+    .overlay-active {
+      display: block;
+    }
+    .main-content {
+      transition: margin-left 0.3s ease-in-out;
+      padding: 1.5rem;
+    }
+    .coupons-card {
+      background-color: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      padding: 2rem;
+      max-width: 1000px;
+      margin: 0 auto;
+      position: relative;
+      overflow: hidden;
+    }
+    .coupons-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: linear-gradient(90deg, #28a745, #34c759);
+    }
+    .coupon-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+    }
+    .coupon-card {
+      background: #f8f9fa;
+      padding: 1rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      transition: transform 0.2s ease-in-out;
+    }
+    .coupon-card:hover {
+      transform: translateY(-2px);
+    }
+    .coupon-code {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #1f2937;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .btn-primary {
+      background-color: #1f2937;
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      transition: all 0.3s;
+      font-weight: 500;
+    }
+    .btn-primary:hover:not(:disabled) {
+      background-color: #facc15;
+      color: #1f2937;
+    }
+    .btn-apply {
+      background: linear-gradient(90deg, #28a745, #34c759);
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 9999px;
+      font-weight: 500;
+      transition: all 0.3s;
+    }
+    .btn-apply:hover {
+      background: linear-gradient(90deg, #34c759, #28a745);
+    }
+    .form-control {
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      padding: 0.5rem;
+      width: 100%;
+    }
+    .form-control:focus {
+      outline: none;
+      border-color: #facc15;
+      box-shadow: 0 0 0 3px rgba(250, 204, 21, 0.3);
+    }
+    .section-title::after {
+      content: '';
+      width: 60px;
+      height: 4px;
+      background: #facc15;
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+    .tooltip {
+      position: relative;
+    }
+    .tooltip:hover::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      top: -2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #374151;
+      color: #fff;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      white-space: nowrap;
+      z-index: 10;
+    }
+    .sidebar-toggle {
+      z-index: 1001;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: #1f2937;
+      color: white;
+      position: fixed;
+      top: 1rem;
+      left: 1rem;
+    }
+    .empty-coupons {
+      text-align: center;
+      padding: 2rem;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    @media (min-width: 769px) {
+      .sidebar {
+        transform: translateX(0);
       }
-      .coupons-section {
-        max-width: 1200px;
-        margin: auto;
-        padding: 20px;
+      .main-content {
+        margin-left: 250px;
+      }
+      .sidebar-toggle, .overlay {
+        display: none !important;
+      }
+    }
+    @media (max-width: 768px) {
+      .main-content {
+        padding: 1rem;
       }
       .coupons-card {
-        background: #ffffff;
-        border-radius: 20px;
-        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
-        padding: 30px;
-        position: relative;
-        overflow: hidden;
-      }
-      .coupons-card::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 4px;
-        background: linear-gradient(90deg, #28a745, #34c759);
+        padding: 1.5rem;
       }
       .coupon-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        gap: 20px;
-        margin-top: 20px;
-      }
-      .coupon-card {
-        background: #f8f9fa;
-        padding: 15px;
-        border-radius: 10px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-        position: relative;
-        transition: transform 0.3s ease;
-      }
-      .coupon-card:hover {
-        transform: translateY(-5px);
+        grid-template-columns: 1fr;
       }
       .coupon-code {
-        font-size: 1.2rem;
-        font-weight: 600;
-        color: #212529;
-        letter-spacing: 1px;
-        margin-bottom: 10px;
+        font-size: 1rem;
       }
       .coupon-details p {
-        margin: 5px 0;
-        font-size: 0.9rem;
-        color: #6c757d;
+        font-size: 0.875rem;
       }
-      .apply-button {
-        background: linear-gradient(90deg, #28a745, #34c759);
-        color: #ffffff;
-        padding: 8px 16px;
-        border-radius: 50px;
-        font-weight: 500;
-        transition: all 0.3s ease;
-        text-decoration: none;
-        display: inline-block;
-        margin-top: 10px;
+      .controls {
+        flex-direction: column;
+        gap: 0.75rem;
       }
-      .apply-button:hover {
-        background: linear-gradient(90deg, #34c759, #28a745);
+    }
+    @media (max-width: 576px) {
+      .main-content {
+        padding: 0.75rem;
       }
-      @media (max-width: 767px) {
-        .coupons-section {
-          padding: 15px;
-        }
-        .coupon-grid {
-          grid-template-columns: 1fr;
-        }
-        .coupon-code {
-          font-size: 1rem;
-        }
-        .coupon-details p {
-          font-size: 0.85rem;
-        }
+      .coupons-card {
+        padding: 1rem;
       }
-    </style>
-  </head>
-  <body>
-    <div class="container-fluid min-h-screen flex">
-      <%- include('.././partials/user/usersidebar', { user: user || {},
-      currentPage: 'coupons' }) %>
-      <div class="flex-1 p-6 mt-16">
-        <div class="coupons-section">
-          <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">
-            Available Coupons
-          </h1>
-          <div class="coupons-card">
-            <% if (coupons.length > 0) { %>
-            <div class="coupon-grid">
+      .section-title {
+        font-size: 1.5rem;
+      }
+      .coupon-card {
+        padding: 0.75rem;
+      }
+      .btn-primary, .btn-apply {
+        font-size: 0.875rem;
+        padding: 0.5rem 0.75rem;
+      }
+      .form-control {
+        font-size: 0.875rem;
+      }
+      .empty-coupons {
+        padding: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="flex min-h-screen">
+    <!-- Sidebar -->
+    <div id="sidebar" class="sidebar w-64 fixed top-0 left-0 h-full shadow-xl flex flex-col">
+      <div class="p-6 text-xl font-semibold border-b border-gray-700 text-center text-white">
+        <% if (user && user.fullname) { %>
+          <%= user.fullname %>
+        <% } else { %>
+          Guest
+        <% } %>
+      </div>
+      <div class="flex justify-center items-center py-5 border-b border-gray-700">
+        <div class="w-16 h-16 bg-gray-600 rounded-full flex items-center justify-center text-2xl font-bold uppercase text-white">
+          <% if (user && user.fullname) { %>
+            <%= user.fullname.charAt(0) %>
+          <% } else { %>
+            ?
+          <% } %>
+        </div>
+      </div>
+      <nav class="flex-1 px-4 py-6 space-y-3 text-sm font-medium text-white">
+        <a href="/user/account" class="flex items-center gap-3 px-4 py-2 rounded-md transition-all duration-200 <%= currentPage === 'profile' ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white' %>">
+          <i class="fas fa-user w-4"></i> My Profile
+        </a>
+        <a href="/user/address" class="flex items-center gap-3 px-4 py-2 rounded-md transition-all duration-200 <%= currentPage === 'address' ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white' %>">
+          <i class="fas fa-map-marker-alt w-4"></i> My Address
+        </a>
+        <a href="/user/orders" class="flex items-center gap-3 px-4 py-2 rounded-md transition-all duration-200 <%= currentPage === 'orders' ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white' %>">
+          <i class="fas fa-shopping-bag w-4"></i> My Orders
+        </a>
+        <a href="/user/wallet" class="flex items-center gap-3 px-4 py-2 rounded-md transition-all duration-200 <%= currentPage === 'wallet' ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white' %>">
+          <i class="fas fa-wallet w-4"></i> My Wallet
+        </a>
+        <a href="/user/newPassword" class="flex items-center gap-3 px-4 py-2 rounded-md transition-all duration-200 <%= currentPage === 'changepassword' ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white' %>">
+          <i class="fas fa-lock w-4"></i> Change Password
+        </a>
+        <a href="/user/sidewishlist" class="flex items-center gap-3 px-4 py-2 rounded-md transition-all duration-200 <%= currentPage === 'Wishlist' ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white' %>">
+          <i class="fas fa-heart w-4"></i> Wishlist
+        </a>
+        <a href="/user/coupons" class="flex items-center gap-3 px-4 py-2 rounded-md transition-all duration-200 <%= currentPage === 'coupons' ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white' %>">
+          <i class="fas fa-ticket-alt w-4"></i> My Coupon
+        </a>
+        <a href="/user/referral" class="flex items-center gap-3 px-4 py-2 rounded-md transition-all duration-200 <%= currentPage === 'referral' ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white' %>">
+          <i class="fas fa-users w-4"></i> Refer & Earn
+        </a>
+        <a href="/user/" class="flex items-center gap-3 px-4 py-2 rounded-md transition-all duration-200 text-gray-300 hover:bg-gray-800 hover:text-white">
+          <i class="fas fa-home w-4"></i> Home
+        </a>
+        <a href="/logout" class="flex items-center gap-3 px-4 py-2 rounded-md transition-all duration-200 text-red-400 hover:bg-red-500 hover:text-white">
+          <i class="fas fa-sign-out-alt w-4"></i> Log Out
+        </a>
+      </nav>
+    </div>
+
+    <!-- Overlay for Mobile Sidebar -->
+    <div class="overlay" id="sidebarOverlay"></div>
+
+    <!-- Main Content -->
+    <div class="main-content flex-1">
+      <button class="sidebar-toggle md:hidden">
+        <i class="fas fa-bars text-lg"></i>
+      </button>
+      <div class="max-w-5xl mx-auto">
+        <h1 class="text-2xl md:text-3xl font-bold text-gray-800 mb-8 text-center relative section-title">Available Coupons</h1>
+        <div class="coupons-card" data-aos="fade-up">
+          <% if (coupons && coupons.length > 0) { %>
+            <div class="controls flex flex-wrap gap-2 mb-6">
+              <input type="text" id="searchInput" class="form-control flex-1" placeholder="Search coupons..." aria-label="Search coupons">
+              <select id="sortBy" class="form-control flex-1" aria-label="Sort coupons">
+                <option value="code-asc">Code (A-Z)</option>
+                <option value="code-desc">Code (Z-A)</option>
+                <option value="discount-desc">Discount (High to Low)</option>
+                <option value="discount-asc">Discount (Low to High)</option>
+                <option value="validUntil-desc">Valid Until (Latest)</option>
+                <option value="validUntil-asc">Valid Until (Earliest)</option>
+              </select>
+            </div>
+            <div class="coupon-grid" id="couponGrid">
               <% coupons.forEach(coupon => { %>
-              <div class="coupon-card">
-                <div class="coupon-code"><%= coupon.code %></div>
-                <div class="coupon-details">
-                  <p>
-                    <strong>Discount:</strong>
-                    <%= coupon.discountType === 'percentage' ?
-                    `${coupon.discountValue}% off` : `₹${coupon.discountValue}
-                    off` %>
-                  </p>
-                  <p>
-                    <strong>Minimum Order:</strong> ₹<%=
-                    (coupon.minimumOrderAmount ?? 0).toFixed(2) %>
-                  </p>
-                  <p>
-                    <strong>Valid Until:</strong> <%= new
-                    Date(coupon.validUntil).toLocaleDateString('en-IN') %>
-                  </p>
-                  <% if (coupon.applicableCategories &&
-                  coupon.applicableCategories.length > 0) { %>
-                  <p>
-                    <strong>Applicable Categories:</strong> <%=
-                    coupon.applicableCategories.join(', ') %>
-                  </p>
-                  <% } %>
+                <div class="coupon-card" data-code="<%= coupon.code %>" data-discount="<%= coupon.discountType === 'percentage' ? coupon.discountValue : coupon.discountValue * 100 %>" data-valid-until="<%= new Date(coupon.validUntil).getTime() %>" data-aos="fade-up" data-aos-delay="100">
+                  <div class="coupon-code">
+                    <%= coupon.code %>
+                    <button class="btn-primary btn-sm tooltip" onclick="copyCoupon('<%= coupon.code %>')" data-tooltip="Copy Code">
+                      <i class="fas fa-copy"></i>
+                    </button>
+                  </div>
+                  <div class="coupon-details text-gray-600 text-sm mt-2">
+                    <p><strong>Discount:</strong> <%= coupon.discountType === 'percentage' ? `${coupon.discountValue}% off` : `₹${coupon.discountValue} off` %></p>
+                    <p><strong>Minimum Order:</strong> ₹<%= (coupon.minimumOrderAmount ?? 0).toFixed(2) %></p>
+                    <p><strong>Valid Until:</strong> <%= new Date(coupon.validUntil).toLocaleDateString('en-IN') %></p>
+                    <% if (coupon.applicableCategories && coupon.applicableCategories.length > 0) { %>
+                      <p><strong>Categories:</strong> <%= coupon.applicableCategories.join(', ') %></p>
+                    <% } %>
+                  </div>
+                  <a href="/user/cart?applyCoupon=<%= coupon.code %>" class="btn-apply mt-3 inline-block text-sm">Apply Coupon</a>
                 </div>
-                <a
-                  href="/user/cart?applyCoupon=<%= coupon.code %>"
-                  class="apply-button"
-                  >Apply Coupon</a
-                >
-              </div>
               <% }) %>
             </div>
-            <% } else { %>
-            <p class="text-center text-gray-600">
-              No coupons available at the moment.
-            </p>
-            <% } %>
-          </div>
+          <% } else { %>
+            <div class="empty-coupons" data-aos="fade-up">
+              <i class="fas fa-ticket-alt text-4xl text-gray-400 mb-4"></i>
+              <h3 class="text-xl font-semibold text-gray-900 mb-2">No Coupons Available</h3>
+              <p class="text-gray-600 mb-4">Check back later for exciting offers!</p>
+              <a href="/user/products" class="btn-primary inline-block px-6 py-2 text-sm">Start Shopping</a>
+            </div>
+          <% } %>
         </div>
       </div>
     </div>
+  </div>
 
-    <footer
-      class="bg-white p-4 text-center text-gray-600 text-sm shadow-inner mt-6"
-    >
-      © <%= new Date().getFullYear() %> Timzo. All rights reserved.
-    </footer>
-  </body>
+  <footer class="bg-white p-4 text-center text-gray-600 text-sm mt-8 shadow-inner">
+    © <%= new Date().getFullYear() %> Timzo. All rights reserved.
+  </footer>
+
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script>
+    AOS.init({ duration: 800, once: true });
+
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('sidebarOverlay');
+      sidebar.classList.toggle('sidebar-active');
+      overlay.classList.toggle('overlay-active');
+      document.body.style.overflow = sidebar.classList.contains('sidebar-active') ? 'hidden' : '';
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const sidebarToggle = document.querySelector('.sidebar-toggle');
+      const overlay = document.getElementById('sidebarOverlay');
+      if (sidebarToggle && overlay) {
+        sidebarToggle.addEventListener('click', toggleSidebar);
+        overlay.addEventListener('click', toggleSidebar);
+      }
+    });
+
+    function copyCoupon(code) {
+      navigator.clipboard.writeText(code).then(() => {
+        Swal.fire({
+          toast: true,
+          position: 'bottom-end',
+          icon: 'success',
+          title: 'Coupon code copied to clipboard!',
+          showConfirmButton: false,
+          timer: 1500
+        });
+      }).catch(() => {
+        Swal.fire({
+          toast: true,
+          position: 'bottom-end',
+          icon: 'error',
+          title: 'Failed to copy coupon code.',
+          showConfirmButton: false,
+          timer: 1500
+        });
+      });
+    }
+
+    const searchInput = document.getElementById('searchInput');
+    const sortBy = document.getElementById('sortBy');
+    let couponCards = Array.from(document.querySelectorAll('.coupon-card'));
+
+    function filterAndSortCoupons() {
+      const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
+      const sortOption = sortBy ? sortBy.value : 'code-asc';
+
+      let filteredCards = couponCards.filter(card => {
+        const code = card.getAttribute('data-code').toLowerCase();
+        return code.includes(searchTerm);
+      });
+
+      filteredCards.sort((a, b) => {
+        if (sortOption === 'code-asc') {
+          return a.getAttribute('data-code').localeCompare(b.getAttribute('data-code'));
+        } else if (sortOption === 'code-desc') {
+          return b.getAttribute('data-code').localeCompare(a.getAttribute('data-code'));
+        } else if (sortOption === 'discount-desc') {
+          return b.getAttribute('data-discount') - a.getAttribute('data-discount');
+        } else if (sortOption === 'discount-asc') {
+          return a.getAttribute('data-discount') - b.getAttribute('data-discount');
+        } else if (sortOption === 'validUntil-desc') {
+          return b.getAttribute('data-valid-until') - a.getAttribute('data-valid-until');
+        } else if (sortOption === 'validUntil-asc') {
+          return a.getAttribute('data-valid-until') - b.getAttribute('data-valid-until');
+        }
+      });
+
+      const couponGrid = document.getElementById('couponGrid');
+      if (couponGrid) {
+        couponGrid.innerHTML = '';
+        filteredCards.forEach(card => couponGrid.appendChild(card));
+      }
+    }
+
+    if (searchInput) searchInput.addEventListener('input', filterAndSortCoupons);
+    if (sortBy) sortBy.addEventListener('change', filterAndSortCoupons);
+  </script>
+</body>
 </html>
