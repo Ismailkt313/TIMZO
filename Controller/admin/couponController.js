@@ -140,11 +140,20 @@ const couponAdd = async (req, res) => {
       hasErrors = true;
     }
 
-    if (discountType === 'percentage' && discountAmount > 99) {
+    if (discountType === 'percentage' && parseFloat(discountAmount) > 99) {
       errors.discountAmount = 'Percentage discount cannot be more than 100%';
       hasErrors = true;
     }
 
+    if (discountType === 'fixed' && parseFloat(minPurchase) <= parseFloat(discountAmount)) {
+      errors.minPurchase = 'Minimum purchase must be greater than discount amount';
+      hasErrors = true;
+    }
+
+    if (discountType === 'percentage' && parseFloat(minPurchase) <= parseFloat(maxDiscount)) {
+      errors.minPurchase = 'Minimum purchase must be greater than max discount amount';
+      hasErrors = true;
+    }
 
     const existingCoupon = await Coupon.findOne({ code: code.toUpperCase() });
     if (existingCoupon) {
@@ -192,6 +201,7 @@ const couponAdd = async (req, res) => {
     });
   }
 };
+
 
 const deleteCoupon = async (req, res) => {
   try {
